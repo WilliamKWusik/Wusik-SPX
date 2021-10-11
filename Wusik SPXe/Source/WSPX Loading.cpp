@@ -17,9 +17,11 @@ void WusikSpxAudioProcessor::newCompilation()
 	//
 	hasUnsavedChanges = false;
 	collection = new WSPX_Collection;
+	collection->name = "Empty";
 	collection->presets.add(new WSPX_Collection_Presets);
-	collection->presets.getFirst()->sounds.add(new WSPX_Collection_Sounds);
+
+	/*collection->presets.getFirst()->sounds.add(new WSPX_Collection_Sounds);
 	collection->presets.getFirst()->sounds.getFirst()->subSounds.add(new WSPX_Collection_SubSounds);
 	//
-	collection->presets.getFirst()->sounds.getFirst()->subSounds.getFirst()->samples.setSize(2, 100, false, true); 
+	collection->presets.getFirst()->sounds.getFirst()->subSounds.getFirst()->samples.setSize(2, 100, false, true); */
 }
