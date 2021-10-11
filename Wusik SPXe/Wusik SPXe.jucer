@@ -7,6 +7,8 @@
               companyName="Wusik.com" companyCopyright="2021" companyWebsite="www.Wusik.com">
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
+      <FILE id="NRkjqL" name="Interface3.png" compile="0" resource="1" file="../Interface/Interface3.png"/>
+      <FILE id="qsvhGN" name="Interface2.png" compile="0" resource="1" file="../Interface/Interface2.png"/>
       <FILE id="dFpSUw" name="lucon.ttf" compile="0" resource="1" file="Source/lucon.ttf"/>
       <FILE id="J2O08T" name="Interface.png" compile="0" resource="1" file="../Interface/Interface.png"/>
       <FILE id="eweZFQ" name="Logo.png" compile="0" resource="1" file="Source/Logo.png"/>

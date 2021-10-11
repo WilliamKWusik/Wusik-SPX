@@ -42,11 +42,15 @@ public:
     void resized() override;
 	//
 	Image background;
+	Image background2; // Options & Close //
+	Image background3; // UnSaved Changes //
+	Image tempImage;
 	double uiRatio = 1.0;
 	ResizableCornerComponent* resizer;
 	ComponentBoundsConstrainer resizerConstrainer;
 	ScopedPointer<LookAndFeelEx> newLookAndFeel;
 	Label* collectionNameLabel;
+	bool showingOptions = false;
 	//
 private:
     WusikSpxAudioProcessor& processor;

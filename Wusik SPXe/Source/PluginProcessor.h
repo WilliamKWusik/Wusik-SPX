@@ -31,8 +31,10 @@ public:
 	void changeProgramName(int index, const String& newName) override { };
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+	void newCompilation();
 	//
-	WSPX_Collection collection;
+	ScopedPointer<WSPX_Collection> collection;
+	bool hasUnsavedChanges = false;
 	//
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WusikSpxAudioProcessor)

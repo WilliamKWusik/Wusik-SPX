@@ -12,6 +12,13 @@
 WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcessor& p) : AudioProcessorEditor (&p), processor (p)
 {
 	background = ImageCache::getFromMemory(BinaryData::Interface_png, BinaryData::Interface_pngSize);
+	background2 = ImageCache::getFromMemory(BinaryData::Interface2_png, BinaryData::Interface2_pngSize);
+	background3 = ImageCache::getFromMemory(BinaryData::Interface3_png, BinaryData::Interface3_pngSize);
+	//
+	tempImage = Image(Image::ARGB, background.getWidth(), background.getHeight(), false);
+	Graphics gg(tempImage);
+	gg.drawImageAt(background, 0, 0);
+	//
 	uiRatio = double(background.getWidth()) / double(background.getHeight());
 	//
 	newLookAndFeel = new LookAndFeelEx();
@@ -19,7 +26,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	//
 	addAndMakeVisible(collectionNameLabel = new Label());
 	collectionNameLabel->setColour(Label::ColourIds::textColourId, Colours::white.withAlpha(0.66f));
-	collectionNameLabel->setText(processor.collection.name, NotificationType::dontSendNotification);
+	collectionNameLabel->setText(processor.collection->name, NotificationType::dontSendNotification);
 	collectionNameLabel->setJustificationType(Justification::centred);
 	//
 	resizerConstrainer.setFixedAspectRatio(uiRatio);
@@ -38,7 +45,19 @@ WusikSpxAudioProcessorEditor::~WusikSpxAudioProcessorEditor()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 {
-	g.drawImage(background, 0, 0, getWidth(), getHeight(), 0, 0, background.getWidth(), background.getHeight());
+	Graphics gg(tempImage);
+	//
+	if (processor.hasUnsavedChanges)
+	{
+		gg.drawImageAt(background3, background.getWidth() - background3.getWidth(), 0);
+	}
+	//
+	if (showingOptions)
+	{
+		gg.drawImageAt(background2, background.getWidth() - background2.getWidth(), background.getHeight() - background2.getHeight());
+	}
+	//
+	g.drawImage(tempImage, 0, 0, getWidth(), getHeight(), 0, 0, tempImage.getWidth(), tempImage.getHeight());
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

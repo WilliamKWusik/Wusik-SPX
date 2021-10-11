@@ -8,10 +8,17 @@
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
 //
+#define WSPXEDITOR 1
+//
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_SubSounds
 {
 public:
+	AudioSampleBuffer samples;
+	//
+	#if WSPXEDITOR
+		File soundFile;
+	#endif
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -32,8 +39,12 @@ public:
 class WSPX_Collection
 {
 public:
-	int16 currentPreset = 0;
-	int16 currentSound = 0;
+	OwnedArray<WSPX_Collection_Presets> presets;
 	String name = "Empty";
-	File file;
+	//
+	#if WSPXEDITOR
+		int16 editingPreset = 0;
+		int16 editingSound = 0;
+		File file;
+	#endif
 };
