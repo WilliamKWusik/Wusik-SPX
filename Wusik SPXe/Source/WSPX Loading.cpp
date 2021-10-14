@@ -10,15 +10,14 @@
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessor::newCompilation()
 {
-	if (hasUnsavedChanges)
+	if (collection != nullptr && collection->hasUnsavedChanges)
 	{
 
 	}
 	//
-	hasUnsavedChanges = false;
 	collection = new WSPX_Collection;
 	collection->name = "Empty";
-	collection->presets.add(new WSPX_Collection_Presets);
+	collection->presets.add(new WSPX_Collection_Preset);
 
 	/*collection->presets.getFirst()->sounds.add(new WSPX_Collection_Sounds);
 	collection->presets.getFirst()->sounds.getFirst()->subSounds.add(new WSPX_Collection_SubSounds);

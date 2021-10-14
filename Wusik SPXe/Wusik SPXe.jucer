@@ -28,7 +28,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <VS2017 targetFolder="Builds/VisualStudio2017" windowsTargetPlatformVersion="8.1"
-            smallIcon="eweZFQ" bigIcon="eweZFQ">
+            smallIcon="eweZFQ" bigIcon="eweZFQ" extraDefs="WSPXEDITOR">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" binaryPath="D:\Vstplugins" headerPath="c:\Work Ready\VST SDK 2.4 (r2)&#10;c:\Work Ready\ASIOSDK2.3.2\common"
                        targetName="Wusik SPXe"/>

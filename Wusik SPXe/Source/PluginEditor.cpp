@@ -47,7 +47,7 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 {
 	Graphics gg(tempImage);
 	//
-	if (processor.hasUnsavedChanges)
+	if (processor.collection != nullptr && processor.collection->hasUnsavedChanges)
 	{
 		gg.drawImageAt(background3, background.getWidth() - background3.getWidth(), 0);
 	}

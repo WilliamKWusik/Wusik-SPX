@@ -34,7 +34,6 @@ public:
 	void newCompilation();
 	//
 	ScopedPointer<WSPX_Collection> collection;
-	bool hasUnsavedChanges = false;
 	//
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WusikSpxAudioProcessor)
