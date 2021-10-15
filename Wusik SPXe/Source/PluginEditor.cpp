@@ -15,6 +15,8 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	background2 = ImageCache::getFromMemory(BinaryData::Interface2_png, BinaryData::Interface2_pngSize);
 	background3 = ImageCache::getFromMemory(BinaryData::Interface3_png, BinaryData::Interface3_pngSize);
 	//
+	double multRatio = double(getHeight()) / double(background.getHeight());
+	//
 	tempImage = Image(Image::ARGB, background.getWidth(), background.getHeight(), false);
 	Graphics gg(tempImage);
 	gg.drawImageAt(background, 0, 0);
@@ -28,6 +30,13 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	collectionNameLabel->setColour(Label::ColourIds::textColourId, Colours::white.withAlpha(0.66f));
 	collectionNameLabel->setText(processor.collection->name, NotificationType::dontSendNotification);
 	collectionNameLabel->setJustificationType(Justification::centred);
+	//
+	addAndMakeVisible(logoButton = new WTransparentButton(this));
+	addAndMakeVisible(fileButton = new WTransparentButton(this));
+	addAndMakeVisible(saveButton = new WTransparentButton(this));
+	addAndMakeVisible(collectionButton = new WTransparentButton(this));
+	//
+	addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
 	//
 	resizerConstrainer.setFixedAspectRatio(uiRatio);
 	addAndMakeVisible(resizer = new ResizableCornerComponent(this, &resizerConstrainer));
@@ -65,9 +74,24 @@ void WusikSpxAudioProcessorEditor::resized()
 {
 	double multRatio = double(getHeight()) / double(background.getHeight());
 	//
-	collectionNameLabel->setBounds(682.0 * multRatio, 12.0 * multRatio, 452.0 * multRatio, 51.0 * multRatio);
+	boundsSet(682, 12, 452, 51, collectionNameLabel, multRatio);
 	collectionNameLabel->setFont(LookAndFeelEx::getCustomFont().withHeight(double(collectionNameLabel->getHeight()) * 0.52));
+	//
+	boundsSet(0, 0, 197, 65, logoButton, multRatio);
+	boundsSet(550, 11, 82, 49, fileButton, multRatio);
+	boundsSet(1185, 12, 84, 50, saveButton, multRatio);
+	boundsSet(682, 12, 452, 51, collectionButton, multRatio);
+	//
+	removeChildComponent(presetsTreeView);
+	addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
+	boundsSet(1638, 50, 248, 384, presetsTreeView, multRatio);
 	//
 	resizer->setBounds(getWidth() - 32, getHeight() - 32, 32, 32);
 	resizer->toFront(false);
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
+{
+	AlertWindow::showMessageBox(AlertWindow::NoIcon, "!", "!");
 }

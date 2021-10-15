@@ -16,7 +16,6 @@ public:
 	bool roundRobin = false;
 	bool random = false;
 	bool isRelease = false;
-	String name, tags;
 	bool reverse = false;
 	uint8_t keySwitch = 0;
 	uint8_t keySwitchType = 0;
@@ -61,6 +60,7 @@ class WSPX_Collection_Sound
 public:
 	OwnedArray<WSPX_Collection_SubSound> subSounds;
 	char chokeGroup = 0;
+	String name, tags;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -224,7 +224,7 @@ public:
 		int16 editingPreset = 0;
 		int16 editingSound = 0;
 	#else
-		WSPX_Collection_Preset preset;
+		ScopedPointer<WSPX_Collection_Preset> preset;
 		//
 		Array<int64> presetPositions;
 		Array<int64> soundPositions;
