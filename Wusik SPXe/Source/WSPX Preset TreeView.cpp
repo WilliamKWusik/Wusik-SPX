@@ -10,49 +10,43 @@
 #include "PluginEditor.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, uint8_t _level, int16 _preset, double _ui_ratio, int16 _sound, int16 _subSound)
-	: processor(_processor), preset(_preset), level(_level), ui_ratio(_ui_ratio), sound(_sound), subSound(_subSound)
+WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, uint8_t _level, String _name, int16 _preset, uint8_t _specialItem, int16 _layer, int16 _soundGroup, int16 _sound)
+	: processor(_processor), preset(_preset), level(_level), ui_ratio(_ui_ratio), soundGroup(_soundGroup), layer(_layer), specialItem(_specialItem), sound(_sound), name(_name)
 {
 	if (level == kLevel_AddPreset)
 	{
 		for (int pp = 0; pp < processor.collection->presets.size(); pp++)
 		{
-			addSubItem(new WSPXPresetTreeItem(processor, kLevel_PresetName, pp, ui_ratio));
+			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", pp));
 		}
 	}
-	else if (level == kLevel_PresetName)
+	else if (level == kLevel_Presets)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_PresetName_Options, preset, ui_ratio, kPreset_Options));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_PresetName_Options, preset, ui_ratio, kPreset_Remove));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_PresetName_Options, preset, ui_ratio, kPreset_Duplicate));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_PresetName_Options, preset, ui_ratio, kPreset_Add_Sound));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_PresetName_Options, preset, ui_ratio, kPreset_Sounds));
-	}
-	else if (level == kLevel_PresetName_Options && sound == kPreset_Sounds)
-	{
-		for (int ss = 0; ss < processor.collection->presets[preset]->sounds.size(); ss++)
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Options", preset, kPreset_Options));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Remove", preset, kPreset_Remove));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Duplicate", preset, kPreset_Duplicate));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Add Layer", preset, kPreset_Add_Layer));
+		//
+		for (int ll = 0; ll < processor.collection->presets[preset]->layers.size(); ll++)
 		{
-			addSubItem(new WSPXPresetTreeItem(processor, kLevel_Sounds, preset, ui_ratio, ss));
+			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "", preset, kRegular_Item, ll));
 		}
 	}
-	else if (level == kLevel_Sounds)
+	else if (level == kLevel_Preset_Layers && specialItem == kRegular_Item)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_Sounds_Options, preset, ui_ratio, kSound_Options));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_Sounds_Options, preset, ui_ratio, kSound_Remove));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_Sounds_Options, preset, ui_ratio, kSound_Add_SubSound));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_Sounds_Options, preset, ui_ratio, sound));
-	}
-	else if (level == kLevel_Sounds_Options && sound >= 0)
-	{
-		for (int ss = 0; ss < processor.collection->presets[preset]->sounds[sound]->soundsID.size(); ss++)
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Options", preset, kPreset_Layer_Options, layer));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Remove", preset, kPreset_Layer_Remove, layer));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Add Group", preset, kPreset_Layer_Add_Sound_Group, layer));
+		//
+		for (int ss = 0; ss < processor.collection->presets[preset]->layers[soundGroup]->soundGroupIDs.size(); ss++)
 		{
-			addSubItem(new WSPXPresetTreeItem(processor, kLevel_SubSounds, preset, ui_ratio, sound, ss));
+			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", preset, kRegular_Item, layer, ss));
 		}
 	}
-	else if (level == kLevel_SubSounds)
+	else if (level == kLevel_Sound_Groups && specialItem == kRegular_Item)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_SubSounds_Options, preset, ui_ratio, kSubSound_Options));
-		addSubItem(new WSPXPresetTreeItem(processor, kLevel_SubSounds_Options, preset, ui_ratio, kSubSound_Remove));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups_Options, "Options", preset, kSound_Group_Options, layer, sound));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups_Options, "Remove", preset, kSound_Group_Remove, layer, sound));
 	}
 }
 //
@@ -64,83 +58,14 @@ void WSPXPresetTreeItem::paintItem(Graphics& g, int width, int height)
 	g.setColour(Colours::white.withAlpha(0.82f));
 	g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(height) * 0.72f));
 	//
-	if (level == kLevel_AddPreset)
+	if (name.isNotEmpty())
 	{
 		g.setColour(Colours::lightblue.withAlpha(0.82f));
-		g.drawText("Add Preset", 0, 0, width, height, Justification::left);
+		g.drawText(name, 0, 0, width, height, Justification::left);
 	}
-	else if (level == kLevel_PresetName) g.drawText(processor.collection->presets[preset]->name, 0, 0, width, height, Justification::left);
-	else if (level == kLevel_PresetName_Options)
-	{
-		if (sound == kPreset_Options)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Options", 0, 0, width, height, Justification::left);
-		}
-		else if (sound == kPreset_Remove)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Remove", 0, 0, width, height, Justification::left);
-		}
-		else if (sound == kPreset_Duplicate)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Duplicate", 0, 0, width, height, Justification::left);
-		}
-		else if (sound == kPreset_Add_Sound)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Add Sound", 0, 0, width, height, Justification::left);
-		}
-		else if (sound == kPreset_Sounds)
-		{
-			g.drawText("Sounds", 0, 0, width, height, Justification::left);
-		}
-	}
-	else if (level == kLevel_Sounds)
-	{
-		g.drawText("Sound " + String(sound + 1), 0, 0, width, height, Justification::left);
-	}
-	else if (level == kLevel_Sounds_Options)
-	{
-		if (sound == kSound_Options)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Options", 0, 0, width, height, Justification::left);
-		}
-		else if (sound == kSound_Add_SubSound)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Add Sub", 0, 0, width, height, Justification::left);
-		}
-		else if (sound == kSound_Remove)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Remove", 0, 0, width, height, Justification::left);
-		}
-		else if (sound >= 0)
-		{
-			g.drawText("SubSounds", 0, 0, width, height, Justification::left);
-		}
-	}
-	else if (level == kLevel_SubSounds)
-	{
-		g.drawText(processor.collection->sounds[processor.collection->presets[preset]->sounds[sound]->soundsID[subSound]]->name,
-			0, 0, width, height, Justification::left);
-	}
-	else if (level == kLevel_SubSounds_Options)
-	{
-		if (sound == kSubSound_Options)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Options", 0, 0, width, height, Justification::left);
-		}
-		else if (sound == kSubSound_Remove)
-		{
-			g.setColour(Colours::lightblue.withAlpha(0.82f));
-			g.drawText("Remove", 0, 0, width, height, Justification::left);
-		}
-	}
+	else if (level == kLevel_Presets) g.drawFittedText(processor.collection->presets[preset]->name, 0, 0, width, height, Justification::left, 1);
+	else if (level == kLevel_Sound_Groups) g.drawFittedText("Snd Group " + String(soundGroup + 1), 0, 0, width, height, Justification::left, 1);
+	else if (level == kLevel_Preset_Layers) g.drawFittedText("Layer " + String(layer + 1), 0, 0, width, height, Justification::left, 1);
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

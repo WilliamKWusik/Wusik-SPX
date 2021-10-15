@@ -9,7 +9,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Collection_SubSound
+class WSPX_Collection_Sound
 {
 public:
 	MemoryBlock samples;
@@ -55,10 +55,10 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Collection_Sound
+class WSPX_Collection_Sound_Group
 {
 public:
-	OwnedArray<WSPX_Collection_SubSound> subSounds;
+	OwnedArray<WSPX_Collection_Sound> sounds;
 	char chokeGroup = 0;
 	String name, tags;
 };
@@ -156,10 +156,10 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Collection_PresetSound
+class WSPX_Collection_Preset_Layer
 {
 public:
-	Array<int16> soundsID;
+	Array<int16> soundGroupIDs;
 	bool reverse = false;
 	uint8_t keyZoneLow = 0;
 	uint8_t keyZoneHigh = 127;
@@ -175,7 +175,7 @@ public:
 class WSPX_Collection_Preset
 {
 public:
-	OwnedArray<WSPX_Collection_PresetSound> sounds;
+	OwnedArray<WSPX_Collection_Preset_Layer> layers;
 	OwnedArray<WSPX_Collection_Effect> effects;
 	WSPX_Collection_LFO lfos[2];
 	ScopedPointer<WSPX_Image> imagePresetIcon;
@@ -218,11 +218,11 @@ public:
 	//
 	#if WSPXEDITOR
 		OwnedArray<WSPX_Collection_Preset> presets;
-		OwnedArray<WSPX_Collection_Sound> sounds;
+		OwnedArray<WSPX_Collection_Sound_Group> soundGroups;
 		//
 		bool hasUnsavedChanges = false;
-		int16 editingPreset = 0;
-		int16 editingSound = 0;
+		int16 editingPreset = -1;
+		int16 editingSound = -1;
 	#else
 		ScopedPointer<WSPX_Collection_Preset> preset;
 		//

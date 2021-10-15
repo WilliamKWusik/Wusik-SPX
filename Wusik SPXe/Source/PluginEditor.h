@@ -14,7 +14,7 @@
 class WSPXPresetTreeItem : public TreeViewItem
 {
 public:
-	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, uint8_t _level, int16 _preset, double _ui_ratio, int16 _sound = 0, int16 _subSound = 0);
+	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, uint8_t _level, String _name = String(), int16 _preset = 0, uint8_t _specialItem = 0, int16 _layer = 0, int16 _soundGroup = 0, int16 _sound = 0);
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
@@ -22,38 +22,81 @@ public:
 	//
 	WusikSpxAudioProcessor& processor;
 	int16 preset = 0;
+	int16 layer = 0;
+	int16 soundGroup = 0;
 	int16 sound = 0;
-	int16 subSound = 0;
 	uint8_t level = 0;
+	uint8_t specialItem = 0;
 	double ui_ratio = 1.0;
+	String name;
 	//
 	enum
 	{
 		kLevel_AddPreset = 0,
-		kLevel_PresetName,
-		kLevel_PresetName_Options,
-		kLevel_Sounds,
-		kLevel_Sounds_Options,
-		kLevel_SubSounds,
-		kLevel_SubSounds_Options,
+		kLevel_Presets,
+		kLevel_Preset_Layers,
+		kLevel_Sound_Groups,
+		kLevel_Sound_Groups_Options,
 		//
-		kPreset_Options = -1,
-		kPreset_Remove = -2,
-		kPreset_Duplicate = -3,
-		kPreset_Add_Sound = -4,
-		kPreset_Sounds = -5,
+		kRegular_Item = 0,
 		//
-		kSound_Options = -1,
-		kSound_Remove = -2,
-		kSound_Add_SubSound = -3,
-		kSound_SubSounds = -4,
+		kAdd_Preset = 1,
 		//
-		kSubSound_Options = -1,
-		kSubSound_Remove = -2
+		kPreset_Options = 1,
+		kPreset_Remove,
+		kPreset_Duplicate,
+		kPreset_Add_Layer,
+		kPreset_Layers,
+		//
+		kPreset_Layer_Options = 1,
+		kPreset_Layer_Remove,
+		kPreset_Layer_Add_Sound_Group,
+		//
+		kSound_Group_Options = 1,
+		kSound_Group_Remove
 	};
 	//
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WSPXPresetTreeItem)
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPXSoundTreeItem : public TreeViewItem
+{
+public:
+	WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, uint8_t _level, String _name = String(), uint8_t _specialItem = 0, int16 _soundGroup = 0, int16 _sound = 0);
+	bool mightContainSubItems() override { return getNumSubItems() != 0; }
+	void paintItem(Graphics& g, int width, int height) override;
+	void itemClicked(const MouseEvent& e) override;
+	int getItemHeight() const override { return 24.0 * ui_ratio; };
+	//
+	WusikSpxAudioProcessor& processor;
+	int16 soundGroup = 0;
+	int16 sound = 0;
+	uint8_t level = 0;
+	uint8_t specialItem = 0;
+	double ui_ratio = 1.0;
+	String name;
+	//
+	enum
+	{
+		kLevel_AddSound = 0,
+		kLevel_Sound_Groups,
+		kLevel_Sounds,
+		kLevel_Sounds_Options,
+		//
+		kRegular_Item = 0,
+		//
+		kSound_Group_Options = 1,
+		kSound_Group_Remove,
+		kSound_Group_Add_Sound,
+		//
+		kSound_Options = 1,
+		kSound_Remove
+	};
+	//
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WSPXSoundTreeItem)
 };
 //
 // -------------------------------------------------------------------------------------------------------------------------------
@@ -63,14 +106,19 @@ public:
 	WusikTreeHolder(WusikSpxAudioProcessor& _processor, bool isPresetTreeView, double _ui_ratio) : processor(_processor)
 	{
 		addAndMakeVisible(tree);
-		if (isPresetTreeView) tree.setRootItem(new WSPXPresetTreeItem(processor, WSPXPresetTreeItem::kLevel_AddPreset, 0, _ui_ratio));
+		//
+		if (isPresetTreeView) 
+			tree.setRootItem(new WSPXPresetTreeItem(processor, _ui_ratio, WSPXPresetTreeItem::kLevel_AddPreset, "Add Preset", WSPXPresetTreeItem::kAdd_Preset));
+		else 
+			tree.setRootItem(new WSPXSoundTreeItem(processor, _ui_ratio, WSPXSoundTreeItem::kLevel_AddSound, "Add Sound", WSPXSoundTreeItem::kSound_Group_Add_Sound));
+		//
 		tree.getRootItem()->setOpen(true);
 		tree.setColour(TreeView::linesColourId, Colours::white);
 	}
 	//
 	~WusikTreeHolder()
 	{
-		tree.deleteRootItem(); // this deletes the children too...
+		tree.deleteRootItem();
 	}
 	//
 	void resized() override { tree.setBounds(getLocalBounds()); }
@@ -113,6 +161,15 @@ public:
 	{
 		return true;
 	}
+	//
+	void drawTreeviewPlusMinusBox(Graphics& g, const Rectangle<float>& area, Colour backgroundColour, bool isOpen, bool isMouseOver) override
+	{
+		Path p;
+		p.addTriangle(0.0f, 0.0f, 1.0f, isOpen ? 0.0f : 0.5f, isOpen ? 0.5f : 0.0f, 1.0f);
+		//
+		g.setColour(Colours::red.withAlpha(0.66f));
+		g.fillPath(p, p.getTransformToScaleToFit(area.reduced(2, area.getHeight() / 4), true));
+	}
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -141,6 +198,7 @@ public:
 	Label* collectionNameLabel;
 	bool showingOptions = false;
 	WusikTreeHolder* presetsTreeView;
+	WusikTreeHolder* soundsTreeView;
 	//
 	WTransparentButton* logoButton;
 	WTransparentButton* fileButton;

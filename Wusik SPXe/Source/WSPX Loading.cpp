@@ -20,12 +20,12 @@ void WusikSpxAudioProcessor::newCompilation()
 	collection->presets.add(new WSPX_Collection_Preset);
 	//
 	collection->presets.getFirst()->name = "Init";
-	collection->presets.getFirst()->sounds.add(new WSPX_Collection_PresetSound);
-	collection->presets.getFirst()->sounds.getFirst()->soundsID.add(0);
+	collection->presets.getFirst()->layers.add(new WSPX_Collection_Preset_Layer);
+	collection->presets.getFirst()->layers.getFirst()->soundGroupIDs.add(0);
 	//
-	collection->sounds.add(new WSPX_Collection_Sound);
-	collection->sounds.getFirst()->subSounds.add(new WSPX_Collection_SubSound);
-	collection->sounds.getFirst()->name = "Empty Sound";
+	collection->soundGroups.add(new WSPX_Collection_Sound_Group);
+	collection->soundGroups.getFirst()->sounds.add(new WSPX_Collection_Sound);
+	collection->soundGroups.getFirst()->name = "Empty Sound";
 	//
 	collection->presets.add(new WSPX_Collection_Preset);
 	collection->presets.getLast()->name = "Init 2";

@@ -37,6 +37,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	addAndMakeVisible(collectionButton = new WTransparentButton(this));
 	//
 	addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
+	addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
 	//
 	resizerConstrainer.setFixedAspectRatio(uiRatio);
 	addAndMakeVisible(resizer = new ResizableCornerComponent(this, &resizerConstrainer));
@@ -85,6 +86,10 @@ void WusikSpxAudioProcessorEditor::resized()
 	removeChildComponent(presetsTreeView);
 	addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
 	boundsSet(1638, 50, 248, 384, presetsTreeView, multRatio);
+	//
+	removeChildComponent(soundsTreeView);
+	addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
+	boundsSet(1638, 508, 248, 474, soundsTreeView, multRatio);
 	//
 	resizer->setBounds(getWidth() - 32, getHeight() - 32, 32, 32);
 	resizer->toFront(false);
