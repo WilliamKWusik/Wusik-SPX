@@ -10,6 +10,24 @@
 #include "WSPX Components.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WusikEditObject
+{
+public:
+	void set(char _type, void* _object) { type = _type; object = _object; };
+	char type = 0;
+	void* object = nullptr;
+	//
+	enum
+	{
+		kNone,
+		kPreset,
+		kPresetLayer,
+		kSoundGroup,
+		kSound
+	};
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WusikSpxAudioProcessorEditor  : public AudioProcessorEditor, public Button::Listener
 {
 public:
@@ -36,10 +54,12 @@ public:
 	ComponentBoundsConstrainer resizerConstrainer;
 	ScopedPointer<LookAndFeelEx> newLookAndFeel;
 	Label* collectionNameLabel;
+	Label* statusBar;
 	bool showingOptions = false;
 	WusikTreeHolder* presetsTreeView;
 	WusikTreeHolder* soundsTreeView;
 	OwnedArray<WSPXSoundZone> soundZones;
+	WusikEditObject editObject;
 	//
 	WTransparentButton* logoButton;
 	WTransparentButton* fileButton;

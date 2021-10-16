@@ -22,7 +22,6 @@ WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, doubl
 	}
 	else if (level == kLevel_Presets)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Options", preset, kPreset_Options));
 		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Remove", preset, kPreset_Remove));
 		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Duplicate", preset, kPreset_Duplicate));
 		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "Add Layer", preset, kPreset_Add_Layer));
@@ -34,7 +33,6 @@ WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, doubl
 	}
 	else if (level == kLevel_Preset_Layers && specialItem == kRegular_Item)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Options", preset, kPreset_Layer_Options, layer));
 		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Remove", preset, kPreset_Layer_Remove, layer));
 		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Add Group", preset, kPreset_Layer_Add_Sound_Group, layer));
 		//
@@ -45,7 +43,6 @@ WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, doubl
 	}
 	else if (level == kLevel_Sound_Groups && specialItem == kRegular_Item)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups_Options, "Options", preset, kSound_Group_Options, layer, sound));
 		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups_Options, "Remove", preset, kSound_Group_Remove, layer, sound));
 	}
 }

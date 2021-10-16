@@ -18,8 +18,19 @@ void WusikSpxAudioProcessorEditor::cleanInterface()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::updateInterface()
 {
-	for (int ss = 0; ss < processor.collection->soundGroups[processor.collection->editingSound]->sounds.size(); ss++)
+	/*for (int ss = 0; ss < processor.collection->soundGroups[processor.collection->editingSound]->sounds.size(); ss++)
 	{
 		addAndMakeVisible(soundZones.add(new WSPXSoundZone(processor.collection->soundGroups[processor.collection->editingSound]->sounds[ss])));
+	}*/
+
+
+	if (editObject.type == WusikEditObject::kPreset)
+	{
+		WSPX_Collection_Preset* preset = (WSPX_Collection_Preset*) editObject.object;
+		//
+		for (int ll = 0; ll < preset->layers.size(); ll++)
+		{
+			
+		}
 	}
 }

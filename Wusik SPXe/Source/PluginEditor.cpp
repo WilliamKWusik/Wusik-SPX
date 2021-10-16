@@ -31,6 +31,16 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	collectionNameLabel->setText(processor.collection->name, NotificationType::dontSendNotification);
 	collectionNameLabel->setJustificationType(Justification::centred);
 	//
+	addAndMakeVisible(statusBar = new Label());
+	statusBar->setColour(Label::ColourIds::textColourId, Colours::white.withAlpha(0.66f));
+	//
+	if (processor.collection->file.existsAsFile())
+		statusBar->setText(processor.collection->file.getFullPathName(), NotificationType::dontSendNotification);
+	else
+		statusBar->setText("Unsaved Collection", NotificationType::dontSendNotification);
+	//
+	statusBar->setJustificationType(Justification::centred);
+	//
 	addAndMakeVisible(logoButton = new WTransparentButton(this));
 	addAndMakeVisible(fileButton = new WTransparentButton(this));
 	addAndMakeVisible(saveButton = new WTransparentButton(this));
@@ -78,6 +88,10 @@ void WusikSpxAudioProcessorEditor::resized()
 {
 	double multRatio = double(getHeight()) / double(background.getHeight());
 	//
+	// Status Bar //
+	boundsSet(0, 958, 1624, 38, statusBar, multRatio);
+	statusBar->setFont(LookAndFeelEx::getCustomFont().withHeight(double(statusBar->getHeight()) * 0.48));
+	//
 	// Collection Name //
 	boundsSet(682, 12, 452, 51, collectionNameLabel, multRatio);
 	collectionNameLabel->setFont(LookAndFeelEx::getCustomFont().withHeight(double(collectionNameLabel->getHeight()) * 0.52));
@@ -100,17 +114,14 @@ void WusikSpxAudioProcessorEditor::resized()
 	//
 	// Sound Zones //
 	{
-		//int ww = 1604;
-		//int hh = 900;
-		//
 		for (int zz = 0; zz < soundZones.size(); zz++)
 		{
 			int xPos = int(double(soundZones[zz]->sound->keyZoneLow) * ((1589.0 * multRatio) / 127.0));
 			int yPos = 0;
 			int ww = int((double(soundZones[zz]->sound->keyZoneHigh + 1) * ((1589.0 * multRatio) / 127.0)) - xPos);
-			int hh = int(900.0 * multRatio);
+			int hh = int(856.0 * multRatio);
 			//
-			soundZones[zz]->setBounds(xPos + int(14.0 * multRatio), yPos + int(84.0 * multRatio), ww, hh);
+			soundZones[zz]->setBounds(xPos + int(13.0 * multRatio), yPos + int(84.0 * multRatio), ww, hh);
 		}
 	}
 	//

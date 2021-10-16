@@ -22,7 +22,6 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 	}
 	else if (level == kLevel_Sound_Groups)
 	{
-		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "Options", kSound_Group_Options, soundGroup));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "Remove", kSound_Group_Remove, soundGroup));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "Load File", kSound_Group_Add_Sound, soundGroup));
 		//
@@ -33,7 +32,6 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 	}
 	else if (level == kLevel_Sounds && name.isEmpty())
 	{
-		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds_Options, "Options", kSound_Options, soundGroup, sound));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds_Options, "Remove", kSound_Remove, soundGroup, sound));
 	}
 }

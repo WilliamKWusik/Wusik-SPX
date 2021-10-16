@@ -58,18 +58,15 @@ public:
 		//
 		kAdd_Preset = 1,
 		//
-		kPreset_Options = 1,
-		kPreset_Remove,
+		kPreset_Remove = 1,
 		kPreset_Duplicate,
 		kPreset_Add_Layer,
 		kPreset_Layers,
 		//
-		kPreset_Layer_Options = 1,
-		kPreset_Layer_Remove,
+		kPreset_Layer_Remove = 1,
 		kPreset_Layer_Add_Sound_Group,
 		//
-		kSound_Group_Options = 1,
-		kSound_Group_Remove
+		kSound_Group_Remove = 1
 	};
 	//
 private:
@@ -103,12 +100,10 @@ public:
 		//
 		kRegular_Item = 0,
 		//
-		kSound_Group_Options = 1,
-		kSound_Group_Remove,
+		kSound_Group_Remove = 1,
 		kSound_Group_Add_Sound,
 		//
-		kSound_Options = 1,
-		kSound_Remove
+		kSound_Remove = 1
 	};
 	//
 private:

@@ -205,28 +205,10 @@ public:
 	ScopedPointer<WSPX_Sequencer> sequencer;
 	OwnedArray<WSPX_Channel> channels;
 	Array<int16> soundGroupIDs;
-	bool reverse = false;
-	uint8_t keyZoneLow = 0;
-	uint8_t keyZoneHigh = 127;
-	uint8_t velZoneLow = 0;
-	uint8_t velZoneHigh = 127;
-	float volume = 1.0f;
-	float pan = 0.0f;
-	float fineTune = 0.0f;
-	char coarseTune = 0;
-};
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Collection_Preset
-{
-public:
-	OwnedArray<WSPX_Collection_Preset_Layer> layers;
-	OwnedArray<WSPX_Collection_Effect> effects;
 	WSPX_Collection_LFO lfos[2];
-	ScopedPointer<WSPX_Image> imagePresetIcon;
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
-	String name, tags, author, description;
+	bool reverse = false;
 	uint8_t keyZoneLow = 0;
 	uint8_t keyZoneHigh = 127;
 	uint8_t velZoneLow = 0;
@@ -240,6 +222,20 @@ public:
 	float glide = 0.0f;
 	bool autoGlide = true;
 	MemoryBlock scripting;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Collection_Preset
+{
+public:
+	OwnedArray<WSPX_Collection_Preset_Layer> layers;
+	OwnedArray<WSPX_Collection_Effect> effects;
+	ScopedPointer<WSPX_Image> imagePresetIcon;
+	String name, tags, author, description;
+	float volume = 1.0f;
+	float pan = 0.0f;
+	float fineTune = 0.0f;
+	char coarseTune = 0;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -264,9 +260,7 @@ public:
 	#if WSPXEDITOR
 		OwnedArray<WSPX_Collection_Preset> presets;
 		OwnedArray<WSPX_Collection_Sound_Group> soundGroups;
-		//
 		bool hasUnsavedChanges = false;
-		int16 editingSound = 0;
 	#else
 		ScopedPointer<WSPX_Collection_Preset> preset;
 		//
