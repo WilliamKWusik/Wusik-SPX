@@ -250,11 +250,11 @@ public:
 class WSPX_Collection
 {
 public:
-	ScopedPointer<WSPX_Image> imageAbout;
-	ScopedPointer<WSPX_Image> imageIcon;
+	WSPX_Image imageAbout;
+	WSPX_Image imageIcon;
 	//
 	String name, description, author, company, tags, version;
-	bool isProtected = false;
+	String protectionKey;
 	File file;
 	//
 	#if WSPXEDITOR

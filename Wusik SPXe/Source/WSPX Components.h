@@ -10,6 +10,69 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 //
+#define WAlert AlertWindow::showMessageBox(AlertWindow::NoIcon, "!", "!")
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WusikEditObject
+{
+public:
+	void set(char _type, void* _object = nullptr) { type = _type; object = _object; };
+	char type = kCollection;
+	void* object = nullptr;
+	//
+	enum
+	{
+		kNone,
+		kCollection,
+		kPreset,
+		kPresetLayer,
+		kSoundGroup,
+		kSound
+	};
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WusikEditOption : public Component
+{
+public:
+	WusikEditOption(int _type, String _label, void* _object) : label(_label), object(_object), type(_type) { };
+	void mouseMove(const MouseEvent& e) override { repaint(); };
+	void mouseExit(const MouseEvent& e) override { repaint(); };
+	void mouseEnter(const MouseEvent& e) override { repaint(); };
+	//
+	void paint(Graphics& g) override
+	{
+		if (isMouseOver()) g.fillAll(Colours::darkblue.withAlpha(0.42f)); else g.fillAll(Colours::darkblue.withAlpha(0.12f));
+		//
+		g.setColour(Colours::white.withAlpha(0.26f));
+		g.drawRect(0, 0, getWidth(), getHeight(), 1);
+		g.setColour(Colours::white.withAlpha(0.86f));
+		g.drawFittedText(label, 8, 0, (double(getWidth()) * 0.26) - 16, getHeight(), Justification::centredLeft, 1);
+		//
+		if (type == kString)
+		{
+			g.drawFittedText(((String*)object)[0], (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+		}
+		else if (type == kImage)
+		{
+			WSPX_Image* theImage = (WSPX_Image*)object;
+			if (theImage->imageFilename.existsAsFile())
+				g.drawFittedText(theImage->imageFilename.getFileNameWithoutExtension(), (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+			else
+				g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+		}
+	};
+	//
+	void* object;
+	String label;
+	int type = 0;
+	//
+	enum
+	{
+		kString,
+		kImage
+	};
+};
+//
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPXSoundZone : public Component
 {

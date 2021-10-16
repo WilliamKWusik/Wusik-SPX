@@ -23,8 +23,19 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		addAndMakeVisible(soundZones.add(new WSPXSoundZone(processor.collection->soundGroups[processor.collection->editingSound]->sounds[ss])));
 	}*/
 
-
-	if (editObject.type == WusikEditObject::kPreset)
+	if (editObject.type == WusikEditObject::kCollection)
+	{
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kString, "Name", &processor.collection->name)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kString, "Author", &processor.collection->author)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kString, "Version", &processor.collection->version)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kString, "Company", &processor.collection->company)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kString, "Tags", &processor.collection->tags)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kString, "Description", &processor.collection->description)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kImage, "Image Icon", &processor.collection->imageIcon)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kImage, "Image About", &processor.collection->imageAbout)));
+		addAndMakeVisible(editOptions.add(new WusikEditOption(WusikEditOption::kString, "Protection Key", &processor.collection->protectionKey)));
+	}
+	else if (editObject.type == WusikEditObject::kPreset)
 	{
 		WSPX_Collection_Preset* preset = (WSPX_Collection_Preset*) editObject.object;
 		//

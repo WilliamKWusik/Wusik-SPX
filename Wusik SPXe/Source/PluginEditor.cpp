@@ -11,17 +11,16 @@
 // ------------------------------------------------------------------------------------------------------------------------- //
 WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcessor& p) : AudioProcessorEditor (&p), processor (p)
 {
-	background = ImageCache::getFromMemory(BinaryData::Interface_png, BinaryData::Interface_pngSize);
-	background2 = ImageCache::getFromMemory(BinaryData::Interface2_png, BinaryData::Interface2_pngSize);
-	background3 = ImageCache::getFromMemory(BinaryData::Interface3_png, BinaryData::Interface3_pngSize);
+	backgroundImage = ImageCache::getFromMemory(BinaryData::Interface_png, BinaryData::Interface_pngSize);
+	redSaveImage = ImageCache::getFromMemory(BinaryData::Interface3_png, BinaryData::Interface3_pngSize);
 	//
-	double multRatio = double(getHeight()) / double(background.getHeight());
+	double multRatio = double(getHeight()) / double(backgroundImage.getHeight());
 	//
-	tempImage = Image(Image::ARGB, background.getWidth(), background.getHeight(), false);
+	tempImage = Image(Image::ARGB, backgroundImage.getWidth(), backgroundImage.getHeight(), false);
 	Graphics gg(tempImage);
-	gg.drawImageAt(background, 0, 0);
+	gg.drawImageAt(backgroundImage, 0, 0);
 	//
-	uiRatio = double(background.getWidth()) / double(background.getHeight());
+	uiRatio = double(backgroundImage.getWidth()) / double(backgroundImage.getHeight());
 	//
 	newLookAndFeel = new LookAndFeelEx();
 	setLookAndFeel(newLookAndFeel);
@@ -72,12 +71,7 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 	//
 	if (processor.collection != nullptr && processor.collection->hasUnsavedChanges)
 	{
-		gg.drawImageAt(background3, background.getWidth() - background3.getWidth(), 0);
-	}
-	//
-	if (showingOptions)
-	{
-		gg.drawImageAt(background2, background.getWidth() - background2.getWidth(), background.getHeight() - background2.getHeight());
+		gg.drawImageAt(redSaveImage, backgroundImage.getWidth() - redSaveImage.getWidth(), 0);
 	}
 	//
 	g.drawImage(tempImage, 0, 0, getWidth(), getHeight(), 0, 0, tempImage.getWidth(), tempImage.getHeight());
@@ -86,7 +80,7 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::resized()
 {
-	double multRatio = double(getHeight()) / double(background.getHeight());
+	double multRatio = double(getHeight()) / double(backgroundImage.getHeight());
 	//
 	// Status Bar //
 	boundsSet(0, 958, 1624, 38, statusBar, multRatio);
@@ -112,6 +106,18 @@ void WusikSpxAudioProcessorEditor::resized()
 	addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
 	boundsSet(1638, 508, 248, 474, soundsTreeView, multRatio);
 	//
+	// Show Edit Objects //
+	if (editObject.type == WusikEditObject::kCollection)
+	{
+		int startxx = 240;
+		int startyy = 120;
+		//
+		for (int bb = 0; bb < editOptions.size(); bb++)
+		{
+			boundsSet(startxx, startyy, 480, 40, editOptions[bb], multRatio);
+			startyy += 46;
+		}
+	}
 	// Sound Zones //
 	{
 		for (int zz = 0; zz < soundZones.size(); zz++)
@@ -132,5 +138,5 @@ void WusikSpxAudioProcessorEditor::resized()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 {
-	AlertWindow::showMessageBox(AlertWindow::NoIcon, "!", "!");
+	WAlert;
 }
