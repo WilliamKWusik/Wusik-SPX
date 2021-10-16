@@ -50,6 +50,8 @@ public:
 	};
 	//
 	#if WSPXEDITOR
+		uint8_t exportBits = 24;
+		uint8_t exportFormat = 0;
 		File soundFile;
 	#endif
 };
@@ -156,9 +158,52 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Sequencer_Step
+{
+public:
+	float volume = 1.0f;
+	float pan = 0.0f;
+	float fine = 0.0f;
+	char tune = 0;
+	float filterFreq = 0.0f;
+	char time = 1;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Sequencer
+{
+public:
+	OwnedArray<WSPX_Sequencer_Step> steps;
+	bool syncBPM = true;
+	float time1 = 1.0f;
+	float time2 = 8.0f;
+	int16 loopStart = 0;
+	float smoothOutput = 0.0f;
+	char type = 0;
+	//
+	enum
+	{
+		kForward = 0,
+		kBackwards,
+		kPingPong,
+		kRandom
+	};
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Channel
+{
+public:
+	float volume = 1.0f;
+	String name;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Preset_Layer
 {
 public:
+	ScopedPointer<WSPX_Sequencer> sequencer;
+	OwnedArray<WSPX_Channel> channels;
 	Array<int16> soundGroupIDs;
 	bool reverse = false;
 	uint8_t keyZoneLow = 0;
@@ -221,8 +266,7 @@ public:
 		OwnedArray<WSPX_Collection_Sound_Group> soundGroups;
 		//
 		bool hasUnsavedChanges = false;
-		int16 editingPreset = -1;
-		int16 editingSound = -1;
+		int16 editingSound = 0;
 	#else
 		ScopedPointer<WSPX_Collection_Preset> preset;
 		//

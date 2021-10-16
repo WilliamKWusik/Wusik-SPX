@@ -7,6 +7,10 @@
               companyName="Wusik.com" companyCopyright="2021" companyWebsite="www.Wusik.com">
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
+      <FILE id="uh9ivI" name="WSPX Components.h" compile="0" resource="0"
+            file="Source/WSPX Components.h"/>
+      <FILE id="IHS2vV" name="WSPX Interface.cpp" compile="1" resource="0"
+            file="Source/WSPX Interface.cpp"/>
       <FILE id="DMFg7q" name="WSPX Sound TreeView.cpp" compile="1" resource="0"
             file="Source/WSPX Sound TreeView.cpp"/>
       <FILE id="amygi3" name="WSPX Preset TreeView.cpp" compile="1" resource="0"

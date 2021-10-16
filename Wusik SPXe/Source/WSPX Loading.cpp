@@ -16,17 +16,31 @@ void WusikSpxAudioProcessor::newCompilation()
 	}
 	//
 	collection = new WSPX_Collection;
-	collection->name = "Empty";
+	collection->name = "Testing WSPX Collection";
 	collection->presets.add(new WSPX_Collection_Preset);
 	//
-	collection->presets.getFirst()->name = "Init";
+	collection->presets.getFirst()->name = "My Preset XYZ";
 	collection->presets.getFirst()->layers.add(new WSPX_Collection_Preset_Layer);
 	collection->presets.getFirst()->layers.getFirst()->soundGroupIDs.add(0);
+	collection->presets.getFirst()->layers.getFirst()->soundGroupIDs.add(1);
 	//
 	collection->soundGroups.add(new WSPX_Collection_Sound_Group);
 	collection->soundGroups.getFirst()->sounds.add(new WSPX_Collection_Sound);
-	collection->soundGroups.getFirst()->name = "Empty Sound";
+	collection->soundGroups.getFirst()->sounds.getLast()->keyZoneHigh = 59;
+	collection->soundGroups.getFirst()->sounds.getLast()->keyRoot = 42;
+	collection->soundGroups.getFirst()->sounds.add(new WSPX_Collection_Sound);
+	collection->soundGroups.getFirst()->sounds.getLast()->keyZoneLow = 60;
+	collection->soundGroups.getFirst()->sounds.getLast()->keyZoneHigh = 88;
+	collection->soundGroups.getFirst()->sounds.getLast()->keyRoot = 78;
+	collection->soundGroups.getFirst()->sounds.add(new WSPX_Collection_Sound);
+	collection->soundGroups.getFirst()->sounds.getLast()->keyZoneLow = 89;
+	collection->soundGroups.getFirst()->sounds.getLast()->keyRoot = 102;
+	collection->soundGroups.getFirst()->name = "Test Sound 1";
+	//
+	collection->soundGroups.add(new WSPX_Collection_Sound_Group);
+	collection->soundGroups.getLast()->sounds.add(new WSPX_Collection_Sound);
+	collection->soundGroups.getLast()->name = "Another Sound 2";
 	//
 	collection->presets.add(new WSPX_Collection_Preset);
-	collection->presets.getLast()->name = "Init 2";
+	collection->presets.getLast()->name = "Init Preset";
 }

@@ -42,6 +42,8 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	resizerConstrainer.setFixedAspectRatio(uiRatio);
 	addAndMakeVisible(resizer = new ResizableCornerComponent(this, &resizerConstrainer));
 	//
+	updateInterface();
+	//
 	double defaultH = 900.0;
     setSize (int(defaultH * uiRatio), int(defaultH));
 }
@@ -49,6 +51,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 // ------------------------------------------------------------------------------------------------------------------------- //
 WusikSpxAudioProcessorEditor::~WusikSpxAudioProcessorEditor()
 {
+	cleanInterface();
 	setLookAndFeel(nullptr);
 }
 //
@@ -75,21 +78,41 @@ void WusikSpxAudioProcessorEditor::resized()
 {
 	double multRatio = double(getHeight()) / double(background.getHeight());
 	//
+	// Collection Name //
 	boundsSet(682, 12, 452, 51, collectionNameLabel, multRatio);
 	collectionNameLabel->setFont(LookAndFeelEx::getCustomFont().withHeight(double(collectionNameLabel->getHeight()) * 0.52));
 	//
+	// Buttons //
 	boundsSet(0, 0, 197, 65, logoButton, multRatio);
 	boundsSet(550, 11, 82, 49, fileButton, multRatio);
 	boundsSet(1185, 12, 84, 50, saveButton, multRatio);
 	boundsSet(682, 12, 452, 51, collectionButton, multRatio);
 	//
+	// Presets TreeView //
 	removeChildComponent(presetsTreeView);
 	addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
 	boundsSet(1638, 50, 248, 384, presetsTreeView, multRatio);
 	//
+	// Sounds TreeView //
 	removeChildComponent(soundsTreeView);
 	addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
 	boundsSet(1638, 508, 248, 474, soundsTreeView, multRatio);
+	//
+	// Sound Zones //
+	{
+		//int ww = 1604;
+		//int hh = 900;
+		//
+		for (int zz = 0; zz < soundZones.size(); zz++)
+		{
+			int xPos = int(double(soundZones[zz]->sound->keyZoneLow) * ((1589.0 * multRatio) / 127.0));
+			int yPos = 0;
+			int ww = int((double(soundZones[zz]->sound->keyZoneHigh + 1) * ((1589.0 * multRatio) / 127.0)) - xPos);
+			int hh = int(900.0 * multRatio);
+			//
+			soundZones[zz]->setBounds(xPos + int(14.0 * multRatio), yPos + int(84.0 * multRatio), ww, hh);
+		}
+	}
 	//
 	resizer->setBounds(getWidth() - 32, getHeight() - 32, 32, 32);
 	resizer->toFront(false);
