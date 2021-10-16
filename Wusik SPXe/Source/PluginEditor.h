@@ -41,11 +41,14 @@ public:
 	OwnedArray<WSPXSoundZone> soundZones;
 	WusikEditObject editObject;
 	OwnedArray<WusikEditOption> editOptions;
+	Component* editOptionsComponent;
+	ScopedPointer<Viewport> editOptionsViewport;
 	//
 	WTransparentButton* logoButton;
 	WTransparentButton* fileButton;
 	WTransparentButton* saveButton;
 	WTransparentButton* collectionButton;
+	WTransparentButton* previewButton;
 	//
 private:
     WusikSpxAudioProcessor& processor;

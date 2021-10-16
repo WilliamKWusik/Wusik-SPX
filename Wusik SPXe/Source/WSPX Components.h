@@ -9,8 +9,55 @@
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "PluginEditor.h"
 //
+// -------------------------------------------------------------------------------------------------------------------------------
 #define WAlert AlertWindow::showMessageBox(AlertWindow::NoIcon, "!", "!")
+#define WConfirmBox(a,b) AlertWindow::showOkCancelBox(AlertWindow::NoIcon, a, b)
+#define WMessageBox(dd,ds) AlertWindow::showMessageBox(AlertWindow::NoIcon, dd,ds)
+#define WShowValue(value) AlertWindow::showMessageBox(AlertWindow::NoIcon, "","" + String::formatted("%d",value))
+#define AskValue(Label1, Label2, Value, ValueLabel, OK, CANCEL, FinalValue) AlertWindow w(Label1, Label2, AlertWindow::NoIcon);\
+	w.addTextEditor("Value", Value, ValueLabel); \
+	w.addButton(OK, 1, KeyPress(KeyPress::returnKey, 0, 0)); \
+	w.addButton(CANCEL, 0, KeyPress(KeyPress::escapeKey, 0, 0)); \
+	if (w.runModalLoop() == 1) FinalValue = w.getTextEditorContents("Value"); else FinalValue = String();
+//
+// -------------------------------------------------------------------------------------------------------------------------------
+class LookAndFeelEx : public LookAndFeel_V4
+{
+public:
+	static const Font getCustomFont()
+	{
+		static auto typeface = Typeface::createSystemTypefaceFor(BinaryData::lucon_ttf, BinaryData::lucon_ttfSize);
+		return Font(typeface);
+	};
+	//
+	static const Font getCustomFontBold()
+	{
+		static auto typeface = Typeface::createSystemTypefaceFor(BinaryData::lucon_ttf, BinaryData::lucon_ttfSize);
+		return Font(typeface);
+	};
+	//
+	Typeface::Ptr getTypefaceForFont(const Font& f) override
+	{
+		return getCustomFont().getTypeface();
+	};
+	//
+	bool areLinesDrawnForTreeView(TreeView&) override
+	{
+		return true;
+	}
+	//
+	void drawTreeviewPlusMinusBox(Graphics& g, const Rectangle<float>& area, Colour backgroundColour, bool isOpen, bool isMouseOver) override
+	{
+		Path p;
+		p.addTriangle(0.0f, 0.0f, 1.0f, isOpen ? 0.0f : 0.5f, isOpen ? 0.5f : 0.0f, 1.0f);
+		//
+		g.setColour(Colours::red.withAlpha(0.66f));
+		g.fillPath(p, p.getTransformToScaleToFit(area.reduced(2, area.getHeight() / 4), true));
+	}
+};
+//
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WusikEditObject
 {
@@ -31,45 +78,98 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WusikEditOptionCallback
+{
+public:
+	virtual void process(WusikSpxAudioProcessor* processor) { };
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WusikEditOptionCallback_UpdateCollectionName : public WusikEditOptionCallback
+{
+public:
+	virtual void process(WusikSpxAudioProcessor* processor);
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WusikEditOption : public Component
 {
 public:
-	WusikEditOption(int _type, String _label, void* _object) : label(_label), object(_object), type(_type) { };
+	WusikEditOption(WusikSpxAudioProcessor* _processor, int _type, String _label, void* _object = nullptr, 
+		String _extraLabel = String(), bool _showEditInstead = false, WusikEditOptionCallback* _callback = nullptr)
+		: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel),
+		callback(_callback), processor(_processor) { };
 	void mouseMove(const MouseEvent& e) override { repaint(); };
 	void mouseExit(const MouseEvent& e) override { repaint(); };
 	void mouseEnter(const MouseEvent& e) override { repaint(); };
 	//
-	void paint(Graphics& g) override
+	void mouseUp(const MouseEvent& e) override 
 	{
-		if (isMouseOver()) g.fillAll(Colours::darkblue.withAlpha(0.42f)); else g.fillAll(Colours::darkblue.withAlpha(0.12f));
-		//
-		g.setColour(Colours::white.withAlpha(0.26f));
-		g.drawRect(0, 0, getWidth(), getHeight(), 1);
-		g.setColour(Colours::white.withAlpha(0.86f));
-		g.drawFittedText(label, 8, 0, (double(getWidth()) * 0.26) - 16, getHeight(), Justification::centredLeft, 1);
-		//
 		if (type == kString)
 		{
-			g.drawFittedText(((String*)object)[0], (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+			String sValue;
+			AskValue(label, extraLabel, ((String*)object)[0], "", "OK", "Cancel", sValue);
+			if (sValue.isNotEmpty()) ((String*)object)[0] = sValue;
 		}
-		else if (type == kImage)
+		//
+		if (callback != nullptr) callback->process(processor);
+		repaint(); 
+	};
+	//
+	void paint(Graphics& g) override
+	{
+		if (type == kLabel)
 		{
-			WSPX_Image* theImage = (WSPX_Image*)object;
-			if (theImage->imageFilename.existsAsFile())
-				g.drawFittedText(theImage->imageFilename.getFileNameWithoutExtension(), (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+			g.fillAll(Colours::darkblue.withAlpha(0.22f));
+			g.setColour(Colours::white.withAlpha(0.94f));
+			g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.52f));
+			g.drawFittedText(label, 0, 4, getWidth(), getHeight(), Justification::centred, 1);
+		}
+		else
+		{
+			if (isMouseOver()) g.fillAll(Colours::darkblue.withAlpha(0.42f)); else g.fillAll(Colours::darkblue.withAlpha(0.12f));
+			//
+			g.setColour(Colours::white.withAlpha(0.26f));
+			g.drawRect(0, 0, getWidth(), getHeight(), 1);
+			g.setColour(Colours::white.withAlpha(0.86f));
+			g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.32f));
+			g.drawFittedText(label, 8, 0, (double(getWidth()) * 0.26) - 16, getHeight(), Justification::centredLeft, 1);
+			//
+			if (showEditInstead)
+			{
+				g.drawFittedText("EDIT", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
+			}
 			else
-				g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+			{
+				if (type == kString)
+				{
+					g.drawFittedText(((String*)object)[0], (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+				}
+				else if (type == kImage)
+				{
+					WSPX_Image* theImage = (WSPX_Image*)object;
+					if (theImage->imageFilename.existsAsFile())
+						g.drawFittedText(theImage->imageFilename.getFileNameWithoutExtension(), (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+					else
+						g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+				}
+			}
 		}
 	};
 	//
 	void* object;
 	String label;
 	int type = 0;
+	bool showEditInstead = false;
+	ScopedPointer<WusikEditOptionCallback> callback = nullptr;
+	WusikSpxAudioProcessor* processor;
+	String extraLabel;
 	//
 	enum
 	{
 		kString,
-		kImage
+		kImage,
+		kLabel
 	};
 };
 //
@@ -208,40 +308,4 @@ public:
 	~WTransparentButton() { removeListener(owner); };
 	void paint(Graphics& g) override { };
 	Button::Listener* owner;
-};
-//
-// -------------------------------------------------------------------------------------------------------------------------------
-class LookAndFeelEx : public LookAndFeel_V4
-{
-public:
-	static const Font getCustomFont()
-	{
-		static auto typeface = Typeface::createSystemTypefaceFor(BinaryData::lucon_ttf, BinaryData::lucon_ttfSize);
-		return Font(typeface);
-	};
-	//
-	static const Font getCustomFontBold()
-	{
-		static auto typeface = Typeface::createSystemTypefaceFor(BinaryData::lucon_ttf, BinaryData::lucon_ttfSize);
-		return Font(typeface);
-	};
-	//
-	Typeface::Ptr getTypefaceForFont(const Font& f) override
-	{
-		return getCustomFont().getTypeface();
-	};
-	//
-	bool areLinesDrawnForTreeView(TreeView&) override
-	{
-		return true;
-	}
-	//
-	void drawTreeviewPlusMinusBox(Graphics& g, const Rectangle<float>& area, Colour backgroundColour, bool isOpen, bool isMouseOver) override
-	{
-		Path p;
-		p.addTriangle(0.0f, 0.0f, 1.0f, isOpen ? 0.0f : 0.5f, isOpen ? 0.5f : 0.0f, 1.0f);
-		//
-		g.setColour(Colours::red.withAlpha(0.66f));
-		g.fillPath(p, p.getTransformToScaleToFit(area.reduced(2, area.getHeight() / 4), true));
-	}
 };

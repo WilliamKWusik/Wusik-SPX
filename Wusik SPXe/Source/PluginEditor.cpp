@@ -44,6 +44,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	addAndMakeVisible(fileButton = new WTransparentButton(this));
 	addAndMakeVisible(saveButton = new WTransparentButton(this));
 	addAndMakeVisible(collectionButton = new WTransparentButton(this));
+	addAndMakeVisible(previewButton = new WTransparentButton(this));
 	//
 	addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
 	addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
@@ -95,6 +96,7 @@ void WusikSpxAudioProcessorEditor::resized()
 	boundsSet(550, 11, 82, 49, fileButton, multRatio);
 	boundsSet(1185, 12, 84, 50, saveButton, multRatio);
 	boundsSet(682, 12, 452, 51, collectionButton, multRatio);
+	boundsSet(1507, 11, 96, 50, previewButton, multRatio);
 	//
 	// Presets TreeView //
 	removeChildComponent(presetsTreeView);
@@ -109,14 +111,20 @@ void WusikSpxAudioProcessorEditor::resized()
 	// Show Edit Objects //
 	if (editObject.type == WusikEditObject::kCollection)
 	{
-		int startxx = 240;
-		int startyy = 120;
+		addAndMakeVisible(editOptionsViewport = new Viewport);
+		editOptionsViewport->setViewedComponent(editOptionsComponent);
+		editOptionsViewport->setScrollBarsShown(true, false);
+		boundsSet(569, 107, 685, 807, editOptionsViewport, multRatio);
+		//
+		int totalH = 0;
 		//
 		for (int bb = 0; bb < editOptions.size(); bb++)
 		{
-			boundsSet(startxx, startyy, 480, 40, editOptions[bb], multRatio);
-			startyy += 46;
+			boundsSet(0, totalH, 685, 52, editOptions[bb], multRatio);
+			totalH += 56;
 		}
+		//
+		editOptionsComponent->setBounds(0, 0, 685, totalH);
 	}
 	// Sound Zones //
 	{
