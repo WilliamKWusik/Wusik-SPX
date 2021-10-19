@@ -111,11 +111,6 @@ void WusikSpxAudioProcessorEditor::resized()
 	// Show Edit Objects //
 	if (editObject.type == WusikEditObject::kCollection)
 	{
-		addAndMakeVisible(editOptionsViewport = new Viewport);
-		editOptionsViewport->setViewedComponent(editOptionsComponent);
-		editOptionsViewport->setScrollBarsShown(true, false);
-		boundsSet(569, 107, 685, 807, editOptionsViewport, multRatio);
-		//
 		int totalH = 0;
 		//
 		for (int bb = 0; bb < editOptions.size(); bb++)
@@ -124,6 +119,7 @@ void WusikSpxAudioProcessorEditor::resized()
 			totalH += 56;
 		}
 		//
+		boundsSet(569, 107, 685, 807, editOptionsViewport, multRatio);
 		editOptionsComponent->setBounds(0, 0, 685, totalH);
 	}
 	// Sound Zones //

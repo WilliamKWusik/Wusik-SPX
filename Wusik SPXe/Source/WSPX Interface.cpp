@@ -38,6 +38,11 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, WusikEditOption::kImage, "Image Icon", &processor.collection->imageIcon)));
 		editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, WusikEditOption::kImage, "Image About", &processor.collection->imageAbout)));
 		editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, WusikEditOption::kString, "Protection Key", &processor.collection->protectionKey, "", true)));
+		//
+		addAndMakeVisible(editOptionsViewport = new Viewport);
+		editOptionsViewport->setViewedComponent(editOptionsComponent);
+		editOptionsViewport->setScrollBarsShown(true, false);
+
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
 	{

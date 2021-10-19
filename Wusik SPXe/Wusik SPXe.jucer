@@ -4,7 +4,7 @@
               reportAppUsage="0" pluginFormats="buildStandalone,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Wusk" pluginCode="Wpxe" pluginChannelConfigs="{0,2}"
-              companyName="Wusik.com" companyCopyright="2021" companyWebsite="www.Wusik.com">
+              companyName="Wusik" companyCopyright="2021" companyWebsite="www.Wusik.com">
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
       <FILE id="uh9ivI" name="WSPX Components.h" compile="0" resource="0"
