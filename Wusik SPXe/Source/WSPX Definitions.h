@@ -9,6 +9,39 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+#if WSPXEDITOR
+	class WS // Small Static Class to handle streams of data (read and write) //
+	{
+	public:
+		static void stream(void* _stream, float& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeFloat(_value); else _value = ((InputStream*)_stream)->readFloat(); }
+		static void stream(void* _stream, bool& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeBool(_value); else _value = ((InputStream*)_stream)->readBool(); }
+		static void stream(void* _stream, char& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeByte(_value); else _value = ((InputStream*)_stream)->readByte(); }
+		static void stream(void* _stream, uint8_t& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeByte(_value); else _value = ((InputStream*)_stream)->readByte(); }
+		static void stream(void* _stream, String& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeString(_value); else _value = ((InputStream*)_stream)->readString(); }
+		static void stream(void* _stream, File& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeString(_value.getFullPathName()); else _value = ((InputStream*)_stream)->readString(); }
+		static void stream(void* _stream, int& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeInt(_value); else _value = ((InputStream*)_stream)->readInt(); }
+		//
+		static void stream(void* _stream, MemoryBlock& _value, int _type) 
+		{ 
+			if (_type == kWrite)
+			{
+				int64 _size = _value.getSize();
+				((OutputStream*)_stream)->writeInt64(_size);
+				((OutputStream*)_stream)->write(_value.getData(), _value.getSize());
+			}
+			else
+			{
+				int64 _size = ((InputStream*)_stream)->readInt64();
+				_value.setSize(_size);
+				if (_size > 0) ((InputStream*)_stream)->read(_value.getData(), (size_t) _size);
+			}
+		}
+		//
+		enum { kRead, kWrite };
+	};
+#endif
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Sound
 {
 public:
@@ -81,6 +114,14 @@ public:
 	Image image;
 	//
 	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int type)
+		{
+			String fileName = imageFilename.getFullPathName();
+			WS::stream(stream, fileName, type);
+			if (type == WS::kRead) imageFilename = fileName;
+			//if (imageFilename.existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
+		};
+		//
 		File imageFilename;
 	#endif
 };
@@ -89,34 +130,6 @@ public:
 class WSPX_Collection_LFO
 {
 public:
-	void save(OutputStream& stream)
-	{
-		stream.writeByte(waveform);
-		stream.writeBool(sync);
-		stream.writeBool(inverted);
-		stream.writeBool(noteOnReset);
-		stream.writeFloat(speed1);
-		stream.writeFloat(speed2);
-		stream.writeFloat(phase);
-		stream.writeFloat(smooth);
-		stream.writeFloat(toVolume);
-		stream.writeFloat(toFilterFreq);
-	};
-	//
-	void load(InputStream& stream)
-	{
-		waveform = stream.readByte();
-		sync = stream.readBool();
-		inverted = stream.readBool();
-		noteOnReset = stream.readBool();
-		speed1 = stream.readFloat();
-		speed2 = stream.readFloat();
-		phase = stream.readFloat();
-		smooth = stream.readFloat();
-		toVolume = stream.readFloat();
-		toFilterFreq = stream.readFloat();
-	};
-	//
 	uint8_t waveform = 0;
 	bool sync = true;
 	bool inverted = false;
@@ -127,6 +140,22 @@ public:
 	float smooth = 0.0f;
 	float toVolume = 0.0f;
 	float toFilterFreq = 0.0f;
+	//
+	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int _type)
+		{
+			WS::stream(stream, waveform, _type);
+			WS::stream(stream, sync, _type);
+			WS::stream(stream, inverted, _type);
+			WS::stream(stream, noteOnReset, _type);
+			WS::stream(stream, speed1, _type);
+			WS::stream(stream, speed2, _type);
+			WS::stream(stream, phase, _type);
+			WS::stream(stream, smooth, _type);
+			WS::stream(stream, toVolume, _type);
+			WS::stream(stream, toFilterFreq, _type);
+		}
+	#endif
 	//
 	enum
 	{
@@ -143,32 +172,6 @@ public:
 class WSPX_Collection_Envelope
 {
 public:
-	void save(OutputStream& stream)
-	{
-		stream.writeByte(type);
-		stream.writeFloat(attack);
-		stream.writeFloat(decay);
-		stream.writeFloat(sustain);
-		stream.writeFloat(release);
-		stream.writeFloat(velocity);
-		stream.writeFloat(maxSeconds);
-		stream.writeFloat(keyTrack);
-		stream.writeFloat(velTrack);
-	};
-	//
-	void load(InputStream& stream)
-	{
-		type = stream.readByte();
-		attack = stream.readFloat();
-		decay = stream.readFloat();
-		sustain = stream.readFloat();
-		release = stream.readFloat();
-		velocity = stream.readFloat();
-		maxSeconds = stream.readFloat();
-		keyTrack = stream.readFloat();
-		velTrack = stream.readFloat();
-	};
-	//
 	uint8_t type = 0;
 	float attack = 0.0f;
 	float decay = 0.0f;
@@ -178,6 +181,21 @@ public:
 	float maxSeconds = 6.0f;
 	float keyTrack = 0.0f;
 	float velTrack = 0.0f;
+	//
+	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int _type)
+		{
+			WS::stream(stream, type, _type);
+			WS::stream(stream, attack, _type);
+			WS::stream(stream, decay, _type);
+			WS::stream(stream, sustain, _type);
+			WS::stream(stream, release, _type);
+			WS::stream(stream, velocity, _type);
+			WS::stream(stream, maxSeconds, _type);
+			WS::stream(stream, keyTrack, _type);
+			WS::stream(stream, velTrack, _type);
+		}
+	#endif
 	//
 	enum
 	{
@@ -191,34 +209,6 @@ public:
 class WSPX_Collection_Filter
 {
 public:
-	void save(OutputStream& stream)
-	{
-		stream.writeByte(type);
-		envelope.save(stream);
-		stream.writeFloat(frequency);
-		stream.writeFloat(rezonance);
-		stream.writeFloat(smooth);
-		stream.writeFloat(drive);
-		stream.writeFloat(sampleAndHold);
-		stream.writeFloat(feedback);
-		stream.writeFloat(delay);
-		stream.writeFloat(toEnvelope);
-	};
-	//
-	void load(InputStream& stream)
-	{
-		type = stream.readByte();
-		envelope.load(stream);
-		frequency = stream.readFloat();
-		rezonance = stream.readFloat();
-		smooth = stream.readFloat();
-		drive = stream.readFloat();
-		sampleAndHold = stream.readFloat();
-		feedback = stream.readFloat();
-		delay = stream.readFloat();
-		toEnvelope = stream.readFloat();
-	};
-	//
 	uint8_t type = 0;
 	WSPX_Collection_Envelope envelope;
 	float frequency = 1.0f;
@@ -229,6 +219,23 @@ public:
 	float feedback = 0.0f;
 	float delay = 0.0f;
 	float toEnvelope = 0.0f;
+	//
+	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int _type)
+		{
+			WS::stream(stream, type, _type);
+			WS::stream(stream, frequency, _type);
+			WS::stream(stream, rezonance, _type);
+			WS::stream(stream, smooth, _type);
+			WS::stream(stream, drive, _type);
+			WS::stream(stream, sampleAndHold, _type);
+			WS::stream(stream, feedback, _type);
+			WS::stream(stream, delay, _type);
+			WS::stream(stream, toEnvelope, _type);
+			//
+			envelope.streamWSPXe(stream, _type);
+		}
+	#endif
 	//
 	enum
 	{
@@ -249,6 +256,18 @@ public:
 	char tune = 0;
 	float filterFreq = 0.0f;
 	char time = 1;
+	//
+	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int type)
+		{
+			WS::stream(stream, volume, type);
+			WS::stream(stream, pan, type);
+			WS::stream(stream, fine, type);
+			WS::stream(stream, tune, type);
+			WS::stream(stream, filterFreq, type);
+			WS::stream(stream, time, type);
+		}
+	#endif
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -259,9 +278,13 @@ public:
 	bool syncBPM = true;
 	float time1 = 1.0f;
 	float time2 = 8.0f;
-	int16 loopStart = 0;
+	int loopStart = 0;
 	float smoothOutput = 0.0f;
 	char type = 0;
+	//
+	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int type);
+	#endif
 	//
 	enum
 	{
@@ -284,9 +307,9 @@ public:
 class WSPX_Collection_Preset_Layer
 {
 public:
-	ScopedPointer<WSPX_Sequencer> sequencer;
+	WSPX_Sequencer sequencer;
 	OwnedArray<WSPX_Channel> channels;
-	Array<int16> soundGroupIDs;
+	Array<int> soundGroupIDs;
 	WSPX_Collection_LFO lfos[2];
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
@@ -304,6 +327,10 @@ public:
 	float glide = 0.0f;
 	bool autoGlide = true;
 	MemoryBlock scripting;
+	//
+	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int type);
+	#endif
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -312,12 +339,16 @@ class WSPX_Collection_Preset
 public:
 	OwnedArray<WSPX_Collection_Preset_Layer> layers;
 	OwnedArray<WSPX_Collection_Effect> effects;
-	ScopedPointer<WSPX_Image> imagePresetIcon;
+	WSPX_Image imagePresetIcon;
 	String name, tags, author, description;
 	float volume = 1.0f;
 	float pan = 0.0f;
 	float fineTune = 0.0f;
 	char coarseTune = 0;
+	//
+	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int type);
+	#endif
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -340,6 +371,8 @@ public:
 	File file;
 	//
 	#if WSPXEDITOR
+		void streamWSPXe(void* stream, int type);
+		//
 		OwnedArray<WSPX_Collection_Preset> presets;
 		OwnedArray<WSPX_Collection_Sound_Group> soundGroups;
 		bool hasUnsavedChanges = false;

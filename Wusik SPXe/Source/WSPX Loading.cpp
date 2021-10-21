@@ -54,25 +54,10 @@ bool WusikSpxAudioProcessor::loadCompilation(InputStream& stream)
 	collection = new WSPX_Collection;
 	//
 	String header = stream.readString();
-	int version = stream.readByte();
 	//
 	if (header.containsIgnoreCase("WSPXe"))
 	{
-		collection->name = stream.readString();
-		collection->author = stream.readString();
-		collection->description = stream.readString();
-		collection->company = stream.readString();
-		collection->tags = stream.readString();
-		collection->version = stream.readString();
-		collection->file = stream.readString();
-		collection->exportedFile = stream.readString();
-		collection->protectionKey = stream.readString();
-		collection->imageAbout.imageFilename = stream.readString();
-		collection->imageIcon.imageFilename = stream.readString();
-		//
-		int totalPresets = stream.readInt();
-		int totalSoundGroups = stream.readInt();
-		//
+		collection->streamWSPXe((void*)&stream, WS::kRead);
 		return true;
 	}
 	else
