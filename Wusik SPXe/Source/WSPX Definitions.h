@@ -89,6 +89,34 @@ public:
 class WSPX_Collection_LFO
 {
 public:
+	void save(OutputStream& stream)
+	{
+		stream.writeByte(waveform);
+		stream.writeBool(sync);
+		stream.writeBool(inverted);
+		stream.writeBool(noteOnReset);
+		stream.writeFloat(speed1);
+		stream.writeFloat(speed2);
+		stream.writeFloat(phase);
+		stream.writeFloat(smooth);
+		stream.writeFloat(toVolume);
+		stream.writeFloat(toFilterFreq);
+	};
+	//
+	void load(InputStream& stream)
+	{
+		waveform = stream.readByte();
+		sync = stream.readBool();
+		inverted = stream.readBool();
+		noteOnReset = stream.readBool();
+		speed1 = stream.readFloat();
+		speed2 = stream.readFloat();
+		phase = stream.readFloat();
+		smooth = stream.readFloat();
+		toVolume = stream.readFloat();
+		toFilterFreq = stream.readFloat();
+	};
+	//
 	uint8_t waveform = 0;
 	bool sync = true;
 	bool inverted = false;
@@ -115,6 +143,32 @@ public:
 class WSPX_Collection_Envelope
 {
 public:
+	void save(OutputStream& stream)
+	{
+		stream.writeByte(type);
+		stream.writeFloat(attack);
+		stream.writeFloat(decay);
+		stream.writeFloat(sustain);
+		stream.writeFloat(release);
+		stream.writeFloat(velocity);
+		stream.writeFloat(maxSeconds);
+		stream.writeFloat(keyTrack);
+		stream.writeFloat(velTrack);
+	};
+	//
+	void load(InputStream& stream)
+	{
+		type = stream.readByte();
+		attack = stream.readFloat();
+		decay = stream.readFloat();
+		sustain = stream.readFloat();
+		release = stream.readFloat();
+		velocity = stream.readFloat();
+		maxSeconds = stream.readFloat();
+		keyTrack = stream.readFloat();
+		velTrack = stream.readFloat();
+	};
+	//
 	uint8_t type = 0;
 	float attack = 0.0f;
 	float decay = 0.0f;
@@ -137,6 +191,34 @@ public:
 class WSPX_Collection_Filter
 {
 public:
+	void save(OutputStream& stream)
+	{
+		stream.writeByte(type);
+		envelope.save(stream);
+		stream.writeFloat(frequency);
+		stream.writeFloat(rezonance);
+		stream.writeFloat(smooth);
+		stream.writeFloat(drive);
+		stream.writeFloat(sampleAndHold);
+		stream.writeFloat(feedback);
+		stream.writeFloat(delay);
+		stream.writeFloat(toEnvelope);
+	};
+	//
+	void load(InputStream& stream)
+	{
+		type = stream.readByte();
+		envelope.load(stream);
+		frequency = stream.readFloat();
+		rezonance = stream.readFloat();
+		smooth = stream.readFloat();
+		drive = stream.readFloat();
+		sampleAndHold = stream.readFloat();
+		feedback = stream.readFloat();
+		delay = stream.readFloat();
+		toEnvelope = stream.readFloat();
+	};
+	//
 	uint8_t type = 0;
 	WSPX_Collection_Envelope envelope;
 	float frequency = 1.0f;
@@ -261,6 +343,7 @@ public:
 		OwnedArray<WSPX_Collection_Preset> presets;
 		OwnedArray<WSPX_Collection_Sound_Group> soundGroups;
 		bool hasUnsavedChanges = false;
+		File exportedFile;
 	#else
 		ScopedPointer<WSPX_Collection_Preset> preset;
 		//

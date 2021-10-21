@@ -160,7 +160,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 		if (!processor.collection->file.existsAsFile())
 		{
 			saveFile = false;
-			FileChooser browseFile("Save WSPXe Collection File\n(this is not the final WSPX file format)", processor.collection->file, "*.WSPXe");
+			FileChooser browseFile("Save WSPXe Collection File (this is not the final WSPX file format)", processor.collection->file, "*.WSPXe");
 			//
 			if (browseFile.browseForFileToSave(true))
 			{
@@ -180,6 +180,82 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			//
 			statusBar->setText(processor.collection->name, NotificationType::dontSendNotification);
 			repaint();
+		}
+	}
+	else if (buttonThatWasClicked == fileButton)
+	{
+		PopupMenu mm;
+		mm.addItem(1, "Load");
+		mm.addItem(2, "New");
+		mm.addSeparator();
+		mm.addItem(4, "Save");
+		mm.addItem(6, "Save As");
+		mm.addSeparator();
+		mm.addItem(8, "Export");
+		//
+		int result = mm.show();
+		if (result > 0)
+		{
+			bool updateTheInterface = false;
+			if (result == 1 || result == 2) cleanInterface();
+			//
+			if (result == 2)
+			{
+				processor.newCompilation();
+			}
+			else if (result == 1)
+			{
+				if (!processor.collection->hasUnsavedChanges || AlertWindow::showOkCancelBox(AlertWindow::NoIcon, "There are unsaved changes!", "Are you sure you want to continue?"))
+				{
+					FileChooser browseFile("Load WSPXe Collection File", processor.collection->file, "*.WSPXe");
+					//
+					if (browseFile.browseForFileToOpen())
+					{
+						FileInputStream stream(browseFile.getResult());
+						processor.loadCompilation(stream);
+					}
+				}
+			}
+			else if (result == 4)
+			{
+				buttonClicked(saveButton);
+			}
+			else if (result == 6)
+			{
+				FileChooser browseFile("Save WSPXe Collection File (this is not the final WSPX file format)", processor.collection->file, "*.WSPXe");
+				//
+				if (browseFile.browseForFileToSave(true))
+				{
+					processor.collection->file = browseFile.getResult();
+					processor.collection->file.deleteFile();
+					//
+					FileOutputStream stream(processor.collection->file);
+					processor.saveCompilation(stream);
+					//
+					statusBar->setText(processor.collection->name, NotificationType::dontSendNotification);
+					repaint();
+				}
+			}
+			else if (result == 8)
+			{
+				FileChooser browseFile("Export To WSPX Collection File", processor.collection->exportedFile, "*.WSPX");
+				//
+				if (browseFile.browseForFileToSave(true))
+				{
+					processor.collection->exportedFile = browseFile.getResult();
+					WAlert;
+				}
+			}
+			//
+			if (result == 1 || result == 2)
+			{
+				double multRatio = double(getHeight()) / double(backgroundImage.getHeight());
+				addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
+				addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
+				editObject.type = WusikEditObject::kCollection;
+				updateInterface();
+				resized();
+			}
 		}
 	}
 	else

@@ -12,7 +12,10 @@ void WusikSpxAudioProcessor::newCompilation()
 {
 	if (collection != nullptr && collection->hasUnsavedChanges)
 	{
-
+		if (!AlertWindow::showOkCancelBox(AlertWindow::NoIcon, "There are unsaved changes!", "Are you sure you want to continue?"))
+		{
+			return;
+		}
 	}
 	//
 	collection = new WSPX_Collection;
@@ -43,4 +46,38 @@ void WusikSpxAudioProcessor::newCompilation()
 	//
 	collection->presets.add(new WSPX_Collection_Preset);
 	collection->presets.getLast()->name = "Init Preset";
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+bool WusikSpxAudioProcessor::loadCompilation(InputStream& stream)
+{
+	collection = new WSPX_Collection;
+	//
+	String header = stream.readString();
+	int version = stream.readByte();
+	//
+	if (header.containsIgnoreCase("WSPXe"))
+	{
+		collection->name = stream.readString();
+		collection->author = stream.readString();
+		collection->description = stream.readString();
+		collection->company = stream.readString();
+		collection->tags = stream.readString();
+		collection->version = stream.readString();
+		collection->file = stream.readString();
+		collection->exportedFile = stream.readString();
+		collection->protectionKey = stream.readString();
+		collection->imageAbout.imageFilename = stream.readString();
+		collection->imageIcon.imageFilename = stream.readString();
+		//
+		int totalPresets = stream.readInt();
+		int totalSoundGroups = stream.readInt();
+		//
+		return true;
+	}
+	else
+	{
+		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Error loading file!", "Wrong header information.");
+		return false;
+	}
 }

@@ -12,9 +12,13 @@
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::cleanInterface()
 {
+	presetsTreeView = nullptr;
+	soundsTreeView = nullptr;
 	editOptionsViewport = nullptr;
 	editOptionsComponent = nullptr;
+	//
 	soundZones.clear();
+	editOptions.clear();
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
