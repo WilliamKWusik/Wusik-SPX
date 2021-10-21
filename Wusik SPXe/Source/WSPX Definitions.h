@@ -10,6 +10,7 @@
 #define WIGNORE_SET_STATE 0
 #define WVERSION "1.0.0 BETA 00"
 extern bool isWSPXEditor;
+extern String collectionFile;
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 #if WSPXEDITOR
@@ -38,6 +39,30 @@ extern bool isWSPXEditor;
 				_value.setSize(_size);
 				if (_size > 0) ((InputStream*)_stream)->read(_value.getData(), (size_t) _size);
 			}
+		}
+		//
+		static void streamRelativePath(void* _stream, String& _value, int _type) 
+		{ 
+			if (_type == kWrite) ((OutputStream*)_stream)->writeString(pathRelativeToCollection(_value));
+			else _value = pathFromCollectionLocation(((InputStream*)_stream)->readString());
+		}
+		//
+		static String pathRelativeToCollection(File path)
+		{
+			return path.getRelativePathFrom(File(collectionFile).getParentDirectory());
+		}
+		//
+		static String pathFromCollectionLocation(File path)
+		{
+			AlertWindow::showMessageBox(AlertWindow::NoIcon, "", collectionFile);
+
+			AlertWindow::showMessageBox(AlertWindow::NoIcon, path.getFullPathName(),
+				File(collectionFile).getParentDirectory().getChildFile(path.getFullPathName()).getFullPathName());
+
+			AlertWindow::showMessageBox(AlertWindow::NoIcon, path.getFullPathName(),
+			path.getChildFile(File(collectionFile).getParentDirectory().getFullPathName()).getFullPathName());
+
+			return path.getChildFile(File(collectionFile).getParentDirectory().getFullPathName()).getFullPathName();
 		}
 		//
 		enum { kRead, kWrite };
@@ -134,14 +159,15 @@ class WSPX_Image
 public:
 	void streamData(void* stream, int type)
 	{
-		String fileName = imageFilename.getFullPathName();
-		WS::stream(stream, fileName, type);
-		if (type == WS::kRead) imageFilename = fileName;
-		if (imageFilename.existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
+		//String fileName = imageFilename.getFullPathName();
+		//WS//::stream(stream, fileName, type);
+		//if (type == WS::kRead) imageFilename = fileName;
+		WS::streamRelativePath(stream, imageFilename, type);
+		if (File(imageFilename).existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
 	};
 	//
 	Image image;
-	File imageFilename;
+	String imageFilename;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

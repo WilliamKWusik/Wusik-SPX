@@ -8,6 +8,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 //
+extern String collectionFile = "";
 #if WSPXEDITOR
 	extern bool isWSPXEditor = true;
 #else

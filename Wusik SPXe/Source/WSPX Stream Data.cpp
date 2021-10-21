@@ -25,6 +25,7 @@ void WSPX_Collection::streamData(void* stream, int type)
 	WS::stream(stream, file, type);
 	WS::stream(stream, exportedFile, type);
 	WS::stream(stream, protectionKey, type);
+	collectionFile = file.getFullPathName();
 	//
 	imageAbout.streamData(stream, type);
 	imageIcon.streamData(stream, type);
