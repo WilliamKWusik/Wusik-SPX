@@ -57,7 +57,7 @@ bool WusikSpxAudioProcessor::loadCompilation(InputStream& stream)
 	//
 	if (header.containsIgnoreCase("WSPXe"))
 	{
-		collection->streamWSPXe((void*)&stream, WS::kRead);
+		collection->streamData((void*)&stream, WS::kRead);
 		return true;
 	}
 	else

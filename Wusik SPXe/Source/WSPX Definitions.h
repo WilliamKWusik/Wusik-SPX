@@ -7,6 +7,7 @@
 //
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
+extern bool isWSPXEditor;
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 #if WSPXEDITOR
@@ -15,11 +16,11 @@
 	public:
 		static void stream(void* _stream, float& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeFloat(_value); else _value = ((InputStream*)_stream)->readFloat(); }
 		static void stream(void* _stream, bool& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeBool(_value); else _value = ((InputStream*)_stream)->readBool(); }
-		static void stream(void* _stream, char& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeByte(_value); else _value = ((InputStream*)_stream)->readByte(); }
 		static void stream(void* _stream, uint8_t& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeByte(_value); else _value = ((InputStream*)_stream)->readByte(); }
 		static void stream(void* _stream, String& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeString(_value); else _value = ((InputStream*)_stream)->readString(); }
 		static void stream(void* _stream, File& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeString(_value.getFullPathName()); else _value = ((InputStream*)_stream)->readString(); }
 		static void stream(void* _stream, int& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeInt(_value); else _value = ((InputStream*)_stream)->readInt(); }
+		static void stream(void* _stream, int64& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeInt64(_value); else _value = ((InputStream*)_stream)->readInt64(); }
 		//
 		static void stream(void* _stream, MemoryBlock& _value, int _type) 
 		{ 
@@ -45,27 +46,30 @@
 class WSPX_Collection_Sound
 {
 public:
-	MemoryBlock samples;
+	void streamData(void* stream, int type);
+	//
+	MemoryBlock soundData;
+	int64 totalSamples = 0;
 	bool roundRobin = false;
 	bool random = false;
 	bool isRelease = false;
 	bool reverse = false;
-	uint8_t keySwitch = 0;
-	uint8_t keySwitchType = 0;
+	int keySwitch = 0;
+	int keySwitchType = 0;
 	int64 loopStart = 0;
 	int64 loopEnd = 0;
-	uint8_t loopType = 0;
+	int loopType = 0;
 	float randomProbability = 1.0f;
-	uint8_t keyZoneLow = 0;
-	uint8_t keyZoneHigh = 127;
-	uint8_t velZoneLow = 0;
-	uint8_t velZoneHigh = 127;
-	uint8_t keyRoot = 60;
+	int keyZoneLow = 0;
+	int keyZoneHigh = 127;
+	int velZoneLow = 0;
+	int velZoneHigh = 127;
+	int keyRoot = 60;
 	float fineTune = 0.0f;
-	char coarseTune = 0;
-	uint8_t bits = 24;
-	uint8_t format = 0;
-	uint8_t channels = 0;
+	float coarseTune = 0.0f;
+	int bits = 24;
+	int format = 0;
+	int channels = 0;
 	Array<float> channelPan;
 	//
 	enum
@@ -83,8 +87,8 @@ public:
 	};
 	//
 	#if WSPXEDITOR
-		uint8_t exportBits = 24;
-		uint8_t exportFormat = 0;
+		int exportBits = 24;
+		int exportFormat = 0;
 		File soundFile;
 	#endif
 };
@@ -93,8 +97,23 @@ public:
 class WSPX_Collection_Sound_Group
 {
 public:
+	void streamData(void* stream, int type)
+	{
+		int totalSounds = sounds.size();
+		WS::stream(stream, totalSounds, type);
+		WS::stream(stream, name, type);
+		WS::stream(stream, tags, type);
+		WS::stream(stream, chokeGroup, type);
+		//
+		for (int ss = 0; ss < totalSounds; ss++)
+		{
+			if (type == WS::kRead) sounds.add(new WSPX_Collection_Sound);
+			sounds[ss]->streamData(stream, type);
+		}
+	};
+	//
 	OwnedArray<WSPX_Collection_Sound> sounds;
-	char chokeGroup = 0;
+	int chokeGroup = 0;
 	String name, tags;
 };
 //
@@ -111,26 +130,37 @@ public:
 class WSPX_Image
 {
 public:
-	Image image;
+	void streamData(void* stream, int type)
+	{
+		String fileName = imageFilename.getFullPathName();
+		WS::stream(stream, fileName, type);
+		if (type == WS::kRead) imageFilename = fileName;
+		if (isWSPXEditor && imageFilename.existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
+	};
 	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int type)
-		{
-			String fileName = imageFilename.getFullPathName();
-			WS::stream(stream, fileName, type);
-			if (type == WS::kRead) imageFilename = fileName;
-			//if (imageFilename.existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
-		};
-		//
-		File imageFilename;
-	#endif
+	Image image;
+	File imageFilename;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_LFO
 {
 public:
-	uint8_t waveform = 0;
+	void streamData(void* stream, int _type)
+	{
+		WS::stream(stream, waveform, _type);
+		WS::stream(stream, sync, _type);
+		WS::stream(stream, inverted, _type);
+		WS::stream(stream, noteOnReset, _type);
+		WS::stream(stream, speed1, _type);
+		WS::stream(stream, speed2, _type);
+		WS::stream(stream, phase, _type);
+		WS::stream(stream, smooth, _type);
+		WS::stream(stream, toVolume, _type);
+		WS::stream(stream, toFilterFreq, _type);
+	}
+	//
+	int waveform = 0;
 	bool sync = true;
 	bool inverted = false;
 	bool noteOnReset = false;
@@ -140,22 +170,6 @@ public:
 	float smooth = 0.0f;
 	float toVolume = 0.0f;
 	float toFilterFreq = 0.0f;
-	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int _type)
-		{
-			WS::stream(stream, waveform, _type);
-			WS::stream(stream, sync, _type);
-			WS::stream(stream, inverted, _type);
-			WS::stream(stream, noteOnReset, _type);
-			WS::stream(stream, speed1, _type);
-			WS::stream(stream, speed2, _type);
-			WS::stream(stream, phase, _type);
-			WS::stream(stream, smooth, _type);
-			WS::stream(stream, toVolume, _type);
-			WS::stream(stream, toFilterFreq, _type);
-		}
-	#endif
 	//
 	enum
 	{
@@ -172,7 +186,20 @@ public:
 class WSPX_Collection_Envelope
 {
 public:
-	uint8_t type = 0;
+	void streamData(void* stream, int _type)
+	{
+		WS::stream(stream, type, _type);
+		WS::stream(stream, attack, _type);
+		WS::stream(stream, decay, _type);
+		WS::stream(stream, sustain, _type);
+		WS::stream(stream, release, _type);
+		WS::stream(stream, velocity, _type);
+		WS::stream(stream, maxSeconds, _type);
+		WS::stream(stream, keyTrack, _type);
+		WS::stream(stream, velTrack, _type);
+	}
+	//
+	int type = 0;
 	float attack = 0.0f;
 	float decay = 0.0f;
 	float sustain = 1.0f;
@@ -181,21 +208,6 @@ public:
 	float maxSeconds = 6.0f;
 	float keyTrack = 0.0f;
 	float velTrack = 0.0f;
-	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int _type)
-		{
-			WS::stream(stream, type, _type);
-			WS::stream(stream, attack, _type);
-			WS::stream(stream, decay, _type);
-			WS::stream(stream, sustain, _type);
-			WS::stream(stream, release, _type);
-			WS::stream(stream, velocity, _type);
-			WS::stream(stream, maxSeconds, _type);
-			WS::stream(stream, keyTrack, _type);
-			WS::stream(stream, velTrack, _type);
-		}
-	#endif
 	//
 	enum
 	{
@@ -209,7 +221,22 @@ public:
 class WSPX_Collection_Filter
 {
 public:
-	uint8_t type = 0;
+	void streamData(void* stream, int _type)
+	{
+		WS::stream(stream, type, _type);
+		WS::stream(stream, frequency, _type);
+		WS::stream(stream, rezonance, _type);
+		WS::stream(stream, smooth, _type);
+		WS::stream(stream, drive, _type);
+		WS::stream(stream, sampleAndHold, _type);
+		WS::stream(stream, feedback, _type);
+		WS::stream(stream, delay, _type);
+		WS::stream(stream, toEnvelope, _type);
+		//
+		envelope.streamData(stream, _type);
+	}
+	//
+	int type = 0;
 	WSPX_Collection_Envelope envelope;
 	float frequency = 1.0f;
 	float rezonance = 0.2f;
@@ -219,23 +246,6 @@ public:
 	float feedback = 0.0f;
 	float delay = 0.0f;
 	float toEnvelope = 0.0f;
-	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int _type)
-		{
-			WS::stream(stream, type, _type);
-			WS::stream(stream, frequency, _type);
-			WS::stream(stream, rezonance, _type);
-			WS::stream(stream, smooth, _type);
-			WS::stream(stream, drive, _type);
-			WS::stream(stream, sampleAndHold, _type);
-			WS::stream(stream, feedback, _type);
-			WS::stream(stream, delay, _type);
-			WS::stream(stream, toEnvelope, _type);
-			//
-			envelope.streamWSPXe(stream, _type);
-		}
-	#endif
 	//
 	enum
 	{
@@ -250,41 +260,37 @@ public:
 class WSPX_Sequencer_Step
 {
 public:
+	void streamData(void* stream, int type)
+	{
+		WS::stream(stream, volume, type);
+		WS::stream(stream, pan, type);
+		WS::stream(stream, fine, type);
+		WS::stream(stream, tune, type);
+		WS::stream(stream, filterFreq, type);
+		WS::stream(stream, time, type);
+	}
+	//
 	float volume = 1.0f;
 	float pan = 0.0f;
 	float fine = 0.0f;
-	char tune = 0;
+	int tune = 0;
 	float filterFreq = 0.0f;
-	char time = 1;
-	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int type)
-		{
-			WS::stream(stream, volume, type);
-			WS::stream(stream, pan, type);
-			WS::stream(stream, fine, type);
-			WS::stream(stream, tune, type);
-			WS::stream(stream, filterFreq, type);
-			WS::stream(stream, time, type);
-		}
-	#endif
+	int time = 1;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Sequencer
 {
 public:
+	void streamData(void* stream, int type);
+	//
 	OwnedArray<WSPX_Sequencer_Step> steps;
 	bool syncBPM = true;
 	float time1 = 1.0f;
 	float time2 = 8.0f;
 	int loopStart = 0;
 	float smoothOutput = 0.0f;
-	char type = 0;
-	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int type);
-	#endif
+	int type = 0;
 	//
 	enum
 	{
@@ -307,6 +313,8 @@ public:
 class WSPX_Collection_Preset_Layer
 {
 public:
+	void streamData(void* stream, int type);
+	//
 	WSPX_Sequencer sequencer;
 	OwnedArray<WSPX_Channel> channels;
 	Array<int> soundGroupIDs;
@@ -314,29 +322,27 @@ public:
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
 	bool reverse = false;
-	uint8_t keyZoneLow = 0;
-	uint8_t keyZoneHigh = 127;
-	uint8_t velZoneLow = 0;
-	uint8_t velZoneHigh = 127;
+	int keyZoneLow = 0;
+	int keyZoneHigh = 127;
+	int velZoneLow = 0;
+	int velZoneHigh = 127;
 	float volume = 1.0f;
 	float pan = 0.0f;
 	float fineTune = 0.0f;
-	char coarseTune = 0;
-	uint8_t voices = 16;
-	uint8_t output = 0; // Main Out //
+	float coarseTune = 0.0f;
+	int voices = 16;
+	int output = 0; // Main Out //
 	float glide = 0.0f;
 	bool autoGlide = true;
 	MemoryBlock scripting;
-	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int type);
-	#endif
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Preset
 {
 public:
+	void streamData(void* stream, int type);
+	//
 	OwnedArray<WSPX_Collection_Preset_Layer> layers;
 	OwnedArray<WSPX_Collection_Effect> effects;
 	WSPX_Image imagePresetIcon;
@@ -344,11 +350,7 @@ public:
 	float volume = 1.0f;
 	float pan = 0.0f;
 	float fineTune = 0.0f;
-	char coarseTune = 0;
-	//
-	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int type);
-	#endif
+	float coarseTune = 0;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -363,16 +365,15 @@ public:
 class WSPX_Collection
 {
 public:
+	void streamData(void* stream, int type);
+	//
 	WSPX_Image imageAbout;
 	WSPX_Image imageIcon;
-	//
 	String name, description, author, company, tags, version;
 	String protectionKey;
 	File file;
 	//
 	#if WSPXEDITOR
-		void streamWSPXe(void* stream, int type);
-		//
 		OwnedArray<WSPX_Collection_Preset> presets;
 		OwnedArray<WSPX_Collection_Sound_Group> soundGroups;
 		bool hasUnsavedChanges = false;

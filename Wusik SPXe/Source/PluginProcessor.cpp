@@ -8,6 +8,12 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 //
+#if WSPXEDITOR
+	extern bool isWSPXEditor = true;
+#else
+	extern bool isWSPXEditor = false;
+#endif
+//
 // ------------------------------------------------------------------------------------------------------------------------- //
 WusikSpxAudioProcessor::WusikSpxAudioProcessor()
 {
