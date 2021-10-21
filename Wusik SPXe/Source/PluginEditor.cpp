@@ -24,6 +24,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	//
 	newLookAndFeel = new LookAndFeelEx();
 	setLookAndFeel(newLookAndFeel);
+	LookAndFeel::setDefaultLookAndFeel(newLookAndFeel);
 	//
 	addAndMakeVisible(collectionNameLabel = new Label());
 	collectionNameLabel->setColour(Label::ColourIds::textColourId, Colours::white.withAlpha(0.66f));
@@ -60,6 +61,7 @@ WusikSpxAudioProcessorEditor::~WusikSpxAudioProcessorEditor()
 {
 	cleanInterface();
 	setLookAndFeel(nullptr);
+	LookAndFeel::setDefaultLookAndFeel(nullptr);
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

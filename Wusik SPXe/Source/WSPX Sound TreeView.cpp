@@ -52,8 +52,8 @@ void WSPXSoundTreeItem::paintItem(Graphics& g, int width, int height)
 	else if (level == kLevel_Sound_Groups) g.drawText(processor.collection->soundGroups[soundGroup]->name, 0, 0, width, height, Justification::left);
 	else if (level == kLevel_Sounds)
 	{
-		if (processor.collection->soundGroups[soundGroup]->sounds[sound]->soundFile.existsAsFile())
-			g.drawFittedText(processor.collection->soundGroups[soundGroup]->sounds[sound]->soundFile.getFileNameWithoutExtension(), 0, 0, width, height, Justification::left, 1);
+		if (File(processor.collection->soundGroups[soundGroup]->sounds[sound]->soundFile).existsAsFile())
+			g.drawFittedText(File(processor.collection->soundGroups[soundGroup]->sounds[sound]->soundFile).getFileNameWithoutExtension(), 0, 0, width, height, Justification::left, 1);
 		else 
 			g.drawText("No File", 0, 0, width, height, Justification::left);
 	}

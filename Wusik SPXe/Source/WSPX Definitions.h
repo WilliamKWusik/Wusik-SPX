@@ -41,28 +41,13 @@ extern String collectionFile;
 			}
 		}
 		//
-		static void streamRelativePath(void* _stream, String& _value, int _type) 
+		static String pathRelativeToCollection(File path) { return path.getRelativePathFrom(File(collectionFile).getParentDirectory()); }
+		static String pathFromCollectionLocation(String path) { return File(collectionFile).getParentDirectory().getChildFile(path).getFullPathName(); }
+		//
+		static void streamRelativePath(void* _stream, String& _value, int _type)
 		{ 
 			if (_type == kWrite) ((OutputStream*)_stream)->writeString(pathRelativeToCollection(_value));
 			else _value = pathFromCollectionLocation(((InputStream*)_stream)->readString());
-		}
-		//
-		static String pathRelativeToCollection(File path)
-		{
-			return path.getRelativePathFrom(File(collectionFile).getParentDirectory());
-		}
-		//
-		static String pathFromCollectionLocation(File path)
-		{
-			AlertWindow::showMessageBox(AlertWindow::NoIcon, "", collectionFile);
-
-			AlertWindow::showMessageBox(AlertWindow::NoIcon, path.getFullPathName(),
-				File(collectionFile).getParentDirectory().getChildFile(path.getFullPathName()).getFullPathName());
-
-			AlertWindow::showMessageBox(AlertWindow::NoIcon, path.getFullPathName(),
-			path.getChildFile(File(collectionFile).getParentDirectory().getFullPathName()).getFullPathName());
-
-			return path.getChildFile(File(collectionFile).getParentDirectory().getFullPathName()).getFullPathName();
 		}
 		//
 		enum { kRead, kWrite };
@@ -116,7 +101,7 @@ public:
 	#if WSPXEDITOR
 		int exportBits = 24;
 		int exportFormat = 0;
-		File soundFile;
+		String soundFile;
 	#endif
 };
 //
@@ -145,12 +130,36 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Effect
+{
+public:
+	virtual void process(AudioSampleBuffer& buffer) { };
+	virtual void streamData(void* stream, int _type) { };
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Effect
 {
 public:
+	void streamData(void* stream, int _type);
+	//
+	ScopedPointer<WSPX_Effect> effect;
+	int type = kNone;
 	float dry = 0.0f;
 	float wet = 1.0f;
 	bool parallel = false;
+	//
+	enum
+	{
+		kNone = 0,
+		kReverb,
+		kChorus,
+		kDelay,
+		kDistortion,
+		kPhaser,
+		kFilter,
+		kConvolution
+	};
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -159,9 +168,6 @@ class WSPX_Image
 public:
 	void streamData(void* stream, int type)
 	{
-		//String fileName = imageFilename.getFullPathName();
-		//WS//::stream(stream, fileName, type);
-		//if (type == WS::kRead) imageFilename = fileName;
 		WS::streamRelativePath(stream, imageFilename, type);
 		if (File(imageFilename).existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
 	};
@@ -333,6 +339,12 @@ public:
 class WSPX_Channel
 {
 public:
+	void streamData(void* stream, int type)
+	{
+		WS::stream(stream, volume, type);
+		WS::stream(stream, name, type);
+	};
+	//
 	float volume = 1.0f;
 	String name;
 };

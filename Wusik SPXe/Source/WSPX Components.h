@@ -145,6 +145,36 @@ public:
 		}
 	};
 	//
+	Font getAlertWindowTitleFont() override { return getCustomFont().withHeight(42.0f * ratioValue); }
+	Font getAlertWindowMessageFont() override { return getCustomFont().withHeight(30.0f * ratioValue); }
+	Font getAlertWindowFont() override { return getCustomFont().withHeight(22.0f * ratioValue); }
+	//
+	void drawButtonText(Graphics& g, TextButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
+	{
+		Font font = getCustomFont().withHeight(button.getHeight() * 0.72f * ratioValue);
+		g.setFont(font);
+		g.setColour(Colours::white.withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f));
+
+		if (shouldDrawButtonAsHighlighted) g.setColour(Colour::fromString("FFFFEEEE"));
+
+		const int yIndent = jmin(4, button.proportionOfHeight(0.3f));
+		const int cornerSize = jmin(button.getHeight(), button.getWidth()) / 2;
+
+		const int fontHeight = roundToInt(font.getHeight() * 0.6f);
+		const int leftIndent = jmin(fontHeight, 2 + cornerSize / (button.isConnectedOnLeft() ? 4 : 2));
+		const int rightIndent = jmin(fontHeight, 2 + cornerSize / (button.isConnectedOnRight() ? 4 : 2));
+		const int textWidth = button.getWidth() - leftIndent - rightIndent;
+
+		int leJustification = Justification::centred;
+		if (button.getConnectedEdgeFlags() == TextButton::ConnectedOnLeft) leJustification = Justification::right;
+		if (button.getConnectedEdgeFlags() == TextButton::ConnectedOnRight) leJustification = Justification::left;
+
+		if (textWidth > 0)
+			g.drawFittedText(button.getButtonText(),
+				leftIndent, yIndent, textWidth, button.getHeight() - yIndent * 2,
+				leJustification, 2);
+	};
+	//
 	double ratioValue = 1.0;
 };
 //
@@ -152,9 +182,10 @@ public:
 class WusikEditObject
 {
 public:
-	void set(char _type, void* _object = nullptr) { type = _type; object = _object; };
+	void set(char _type, int _index, void* _object = nullptr) { type = _type; object = _object; index = _index; };
 	char type = kCollection;
 	void* object = nullptr;
+	int index = 0;
 	//
 	enum
 	{
@@ -210,7 +241,7 @@ public:
 			bool loadImage = true;
 			WSPX_Image* theImage = (WSPX_Image*)object;
 			//
-			if (theImage->imageFilename.existsAsFile())
+			if (File(theImage->imageFilename).existsAsFile())
 			{
 				loadImage = false;
 				PopupMenu mm;
@@ -223,22 +254,22 @@ public:
 				{
 					if (result == 2)
 					{
-						theImage->imageFilename = File();
+						theImage->imageFilename = String();
 						theImage->image = Image();
 						processor->collection->hasUnsavedChanges = true;
 					}
 					else if (result == 4) loadImage = true;
-					else if (result == 1) theImage->imageFilename.startAsProcess();
+					else if (result == 1) File(theImage->imageFilename).startAsProcess();
 				}
 			}
 			//
 			if (loadImage)
 			{
-				FileChooser browseFile("Load Image", theImage->imageFilename.getParentDirectory().getFullPathName(), "*.png;*.jpg");
+				FileChooser browseFile("Load Image", File(theImage->imageFilename).getParentDirectory().getFullPathName(), "*.png;*.jpg");
 				//
 				if (browseFile.browseForFileToOpen())
 				{
-					theImage->imageFilename = browseFile.getResult();
+					theImage->imageFilename = browseFile.getResult().getFullPathName();
 					theImage->image = ImageFileFormat::loadFrom(theImage->imageFilename);
 					processor->collection->hasUnsavedChanges = true;
 				}
@@ -281,8 +312,8 @@ public:
 				else if (type == kImage)
 				{
 					WSPX_Image* theImage = (WSPX_Image*)object;
-					if (theImage->imageFilename.existsAsFile())
-						g.drawFittedText(theImage->imageFilename.getFileNameWithoutExtension(), (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+					if (File(theImage->imageFilename).existsAsFile())
+						g.drawFittedText(File(theImage->imageFilename).getFileNameWithoutExtension(), (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
 					else
 						g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
 				}

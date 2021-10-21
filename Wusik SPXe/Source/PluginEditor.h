@@ -49,6 +49,7 @@ public:
 	ScopedPointer<Viewport> editOptionsViewport;
 	bool prevHasUnsavedChanges = false;
 	double multRatio = 1.0;
+	bool keepTreeViews = false;
 	//
 	WTransparentButton* logoButton;
 	WTransparentButton* fileButton;

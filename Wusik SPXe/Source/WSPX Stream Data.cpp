@@ -103,8 +103,7 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type)
 	for (int ch = 0; ch < totalChannels; ch++)
 	{
 		if (type == WS::kRead) channels.add(new WSPX_Channel);
-		WS::stream(stream, channels[ch]->name, type);
-		WS::stream(stream, channels[ch]->volume, type);
+		channels[ch]->streamData(stream, type);
 	}
 	//
 	int totalSoundGroupIDs = soundGroupIDs.size();
@@ -170,10 +169,21 @@ void WSPX_Collection_Sound::streamData(void* stream, int type)
 	{
 		WS::stream(stream, exportBits, type);
 		WS::stream(stream, exportFormat, type);
-		WS::stream(stream, soundFile, type);
+		WS::streamRelativePath(stream, soundFile, type);
 	}
 	else
 	{
 		//
 	}
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WSPX_Collection_Effect::streamData(void* stream, int _type)
+{
+	WS::stream(stream, type, type);
+	WS::stream(stream, dry, type);
+	WS::stream(stream, wet, type);
+	WS::stream(stream, parallel, type);
+	//
+	if (effect != nullptr) effect->streamData(stream, type);
 }

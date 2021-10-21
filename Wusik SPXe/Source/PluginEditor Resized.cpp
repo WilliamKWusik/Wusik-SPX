@@ -29,16 +29,21 @@ void WusikSpxAudioProcessorEditor::resized()
 	boundsSet(682, 12, 452, 51, collectionButton, multRatio);
 	boundsSet(1507, 11, 96, 50, previewButton, multRatio);
 	//
-	// Presets TreeView //
-	addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
-	boundsSet(1638, 50, 248, 384, presetsTreeView, multRatio);
+	if (!keepTreeViews)
+	{
+		// Presets TreeView //
+		addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
+		boundsSet(1638, 50, 248, 384, presetsTreeView, multRatio);
+		//
+		// Sounds TreeView //
+		addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
+		boundsSet(1638, 508, 248, 474, soundsTreeView, multRatio);
+	}
 	//
-	// Sounds TreeView //
-	addAndMakeVisible(soundsTreeView = new WusikTreeHolder(processor, false, multRatio));
-	boundsSet(1638, 508, 248, 474, soundsTreeView, multRatio);
+	keepTreeViews = false;
 	//
 	// Show Edit Objects //
-	if (editObject.type == WusikEditObject::kCollection)
+	if (editObject.type != WusikEditObject::kNone)
 	{
 		int totalH = 0;
 		//
