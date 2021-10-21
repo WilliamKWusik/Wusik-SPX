@@ -29,7 +29,7 @@ public:
 	//
 	Image backgroundImage;
 	Image redSaveImage; // UnSaved Changes //
-	Image tempImage;
+	Image originalBackgroundImage;
 	double uiRatio = 1.0;
 	ResizableCornerComponent* resizer;
 	ComponentBoundsConstrainer resizerConstrainer;
@@ -43,6 +43,7 @@ public:
 	OwnedArray<WusikEditOption> editOptions;
 	Component* editOptionsComponent;
 	ScopedPointer<Viewport> editOptionsViewport;
+	bool prevHasUnsavedChanges = false;
 	//
 	WTransparentButton* logoButton;
 	WTransparentButton* fileButton;

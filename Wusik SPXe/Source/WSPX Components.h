@@ -95,10 +95,10 @@ public:
 class WusikEditOption : public Component
 {
 public:
-	WusikEditOption(WusikSpxAudioProcessor* _processor, int _type, String _label, void* _object = nullptr, 
+	WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, void* _object = nullptr, 
 		String _extraLabel = String(), bool _showEditInstead = false, WusikEditOptionCallback* _callback = nullptr)
 		: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel),
-		callback(_callback), processor(_processor) { };
+		callback(_callback), processor(_processor), editor(_editor) { };
 	void mouseMove(const MouseEvent& e) override { repaint(); };
 	void mouseExit(const MouseEvent& e) override { repaint(); };
 	void mouseEnter(const MouseEvent& e) override { repaint(); };
@@ -109,11 +109,54 @@ public:
 		{
 			String sValue;
 			AskValue(label, extraLabel, ((String*)object)[0], "", "OK", "Cancel", sValue);
-			if (sValue.isNotEmpty()) ((String*)object)[0] = sValue;
+			if (sValue.isNotEmpty())
+			{
+				((String*)object)[0] = sValue;
+				processor->collection->hasUnsavedChanges = true;
+			}
+		}
+		else if (type == kImage)
+		{
+			bool loadImage = true;
+			WSPX_Image* theImage = (WSPX_Image*)object;
+			//
+			if (theImage->imageFilename.existsAsFile())
+			{
+				loadImage = false;
+				PopupMenu mm;
+				mm.addItem(1, "View Image");
+				mm.addItem(2, "Remove Image");
+				mm.addItem(4, "Replace Image");
+				//
+				int result = mm.show();
+				if (result > 0)
+				{
+					if (result == 2)
+					{
+						theImage->imageFilename = File();
+						theImage->image = Image();
+						processor->collection->hasUnsavedChanges = true;
+					}
+					else if (result == 4) loadImage = true;
+					else if (result == 1) theImage->imageFilename.startAsProcess();
+				}
+			}
+			//
+			if (loadImage)
+			{
+				FileChooser browseFile("Load Image", theImage->imageFilename.getParentDirectory().getFullPathName(), "*.png;*.jpg");
+				//
+				if (browseFile.browseForFileToOpen())
+				{
+					theImage->imageFilename = browseFile.getResult();
+					theImage->image = ImageFileFormat::loadFrom(theImage->imageFilename);
+					processor->collection->hasUnsavedChanges = true;
+				}
+			}
 		}
 		//
 		if (callback != nullptr) callback->process(processor);
-		repaint(); 
+		editor->repaint();
 	};
 	//
 	void paint(Graphics& g) override
@@ -164,6 +207,7 @@ public:
 	ScopedPointer<WusikEditOptionCallback> callback = nullptr;
 	WusikSpxAudioProcessor* processor;
 	String extraLabel;
+	Component* editor;
 	//
 	enum
 	{

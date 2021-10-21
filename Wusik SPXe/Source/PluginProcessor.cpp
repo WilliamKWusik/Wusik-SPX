@@ -35,7 +35,8 @@ AudioProcessorEditor* WusikSpxAudioProcessor::createEditor()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    //
+	MemoryOutputStream stream(destData, false);
+	saveCompilation(stream);
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

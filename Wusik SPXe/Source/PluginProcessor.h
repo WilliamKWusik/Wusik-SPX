@@ -32,6 +32,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 	void newCompilation();
+	void saveCompilation(OutputStream& stream);
 	//
 	ScopedPointer<WSPX_Collection> collection;
 	//

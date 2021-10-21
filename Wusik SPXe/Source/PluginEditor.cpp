@@ -16,8 +16,8 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	//
 	double multRatio = double(getHeight()) / double(backgroundImage.getHeight());
 	//
-	tempImage = Image(Image::ARGB, backgroundImage.getWidth(), backgroundImage.getHeight(), false);
-	Graphics gg(tempImage);
+	originalBackgroundImage = Image(Image::ARGB, backgroundImage.getWidth(), backgroundImage.getHeight(), false);
+	Graphics gg(originalBackgroundImage);
 	gg.drawImageAt(backgroundImage, 0, 0);
 	//
 	uiRatio = double(backgroundImage.getWidth()) / double(backgroundImage.getHeight());
@@ -68,14 +68,25 @@ WusikSpxAudioProcessorEditor::~WusikSpxAudioProcessorEditor()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 {
-	Graphics gg(tempImage);
-	//
-	if (processor.collection != nullptr && processor.collection->hasUnsavedChanges)
+	if (processor.collection != nullptr)
 	{
-		gg.drawImageAt(redSaveImage, backgroundImage.getWidth() - redSaveImage.getWidth(), 0);
+		if (prevHasUnsavedChanges != processor.collection->hasUnsavedChanges)
+		{
+			prevHasUnsavedChanges = processor.collection->hasUnsavedChanges;
+			Graphics gg(originalBackgroundImage);
+			//
+			if (processor.collection->hasUnsavedChanges)
+			{
+				gg.drawImageAt(redSaveImage, backgroundImage.getWidth() - redSaveImage.getWidth(), 0);
+			}
+			else
+			{
+				gg.drawImageAt(backgroundImage, 0, 0);
+			}
+		}
 	}
 	//
-	g.drawImage(tempImage, 0, 0, getWidth(), getHeight(), 0, 0, tempImage.getWidth(), tempImage.getHeight());
+	g.drawImage(originalBackgroundImage, 0, 0, getWidth(), getHeight(), 0, 0, originalBackgroundImage.getWidth(), originalBackgroundImage.getHeight());
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -142,5 +153,37 @@ void WusikSpxAudioProcessorEditor::resized()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 {
-	WAlert;
+	if (buttonThatWasClicked == saveButton)
+	{
+		bool saveFile = true;
+		//
+		if (!processor.collection->file.existsAsFile())
+		{
+			saveFile = false;
+			FileChooser browseFile("Save WSPXe Collection File\n(this is not the final WSPX file format)", processor.collection->file, "*.WSPXe");
+			//
+			if (browseFile.browseForFileToSave(true))
+			{
+				saveFile = true;
+				processor.collection->file = browseFile.getResult();
+			}
+		}
+		//
+		if (saveFile)
+		{
+			File backupFile(File::addTrailingSeparator(processor.collection->file.getParentDirectory().getFullPathName()) + processor.collection->file.getFileNameWithoutExtension() + ".WSPXeBackup");
+			backupFile.deleteFile();
+			processor.collection->file.moveFileTo(backupFile);
+			//
+			FileOutputStream stream(processor.collection->file);
+			processor.saveCompilation(stream);
+			//
+			statusBar->setText(processor.collection->name, NotificationType::dontSendNotification);
+			repaint();
+		}
+	}
+	else
+	{
+		WAlert;
+	}
 }
