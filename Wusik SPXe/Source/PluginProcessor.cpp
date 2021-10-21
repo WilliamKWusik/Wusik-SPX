@@ -48,8 +48,12 @@ void WusikSpxAudioProcessor::getStateInformation (MemoryBlock& destData)
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-	//MemoryInputStream stream(data, sizeInBytes, false);
-	//loadCompilation(stream);
+	#if WIGNORE_SET_STATE
+		return;
+	#endif
+	//
+	MemoryInputStream stream(data, sizeInBytes, false);
+	loadCompilation(stream);
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

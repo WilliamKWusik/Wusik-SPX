@@ -7,6 +7,10 @@
               companyName="Wusik" companyCopyright="2021" companyWebsite="www.Wusik.com">
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
+      <FILE id="OzMepl" name="PluginEditor ButtonClicked.cpp" compile="1"
+            resource="0" file="Source/PluginEditor ButtonClicked.cpp"/>
+      <FILE id="Va19DE" name="PluginEditor Resized.cpp" compile="1" resource="0"
+            file="Source/PluginEditor Resized.cpp"/>
       <FILE id="qRkl5n" name="WSPX Stream Data.cpp" compile="1" resource="0"
             file="Source/WSPX Stream Data.cpp"/>
       <FILE id="uh9ivI" name="WSPX Components.h" compile="0" resource="0"

@@ -7,6 +7,8 @@
 //
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
+#define WIGNORE_SET_STATE 0
+#define WVERSION "1.0.0 BETA 00"
 extern bool isWSPXEditor;
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -135,7 +137,7 @@ public:
 		String fileName = imageFilename.getFullPathName();
 		WS::stream(stream, fileName, type);
 		if (type == WS::kRead) imageFilename = fileName;
-		if (isWSPXEditor && imageFilename.existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
+		if (imageFilename.existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
 	};
 	//
 	Image image;

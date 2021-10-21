@@ -46,7 +46,6 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
 		editOptionsViewport->setScrollBarsShown(true, false);
-
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
 	{
@@ -57,6 +56,9 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			
 		}
 	}
+	//
+	resized();
+	repaint();
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
