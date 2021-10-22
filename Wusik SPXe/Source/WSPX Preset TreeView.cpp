@@ -70,20 +70,24 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 {
 	if (level > kLevel_AddPreset && !isOpen()) setOpen(true);
 	//
+	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
+	bool redoInterface = false;
+	//
 	if (level == kLevel_Presets)
 	{
-		WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
 		editor->editObject.set(WusikEditObject::kPreset, preset, (void*)processor.collection->presets[preset]);
-		editor->keepTreeViews = true;
-		editor->cleanInterface();
-		editor->updateInterface();
+		redoInterface = true;
 	}
 	//
 	if (level == kLevel_Preset_Layers)
 	{
-		WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
 		editor->editObject.set(WusikEditObject::kPresetLayer, layer, (void*)processor.collection->presets[preset]->layers[layer]);
-		editor->keepTreeViews = true;
+		redoInterface = true;
+	}
+	//
+	if (redoInterface)
+	{
+		editor->redoTreeViewsOnResize = false;
 		editor->cleanInterface();
 		editor->updateInterface();
 	}

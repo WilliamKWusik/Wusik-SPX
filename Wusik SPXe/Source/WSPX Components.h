@@ -10,6 +10,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "WSPX Look And Feel.h"
+#include "WSPX Knob.h"
 //
 // -------------------------------------------------------------------------------------------------------------------------------
 #define WAlert AlertWindow::showMessageBox(AlertWindow::NoIcon, "!", "!")
@@ -22,215 +24,11 @@
 	w.addButton(CANCEL, 0, KeyPress(KeyPress::escapeKey, 0, 0)); \
 	if (w.runModalLoop() == 1) FinalValue = w.getTextEditorContents("Value"); else FinalValue = String();
 //
-// -------------------------------------------------------------------------------------------------------------------------------
-class LookAndFeelEx : public LookAndFeel_V4
-{
-public:
-	static const Font getCustomFont()
-	{
-		static auto typeface = Typeface::createSystemTypefaceFor(BinaryData::lucon_ttf, BinaryData::lucon_ttfSize);
-		return Font(typeface);
-	};
-	//
-	static const Font getCustomFontBold()
-	{
-		static auto typeface = Typeface::createSystemTypefaceFor(BinaryData::lucon_ttf, BinaryData::lucon_ttfSize);
-		return Font(typeface);
-	};
-	//
-	Typeface::Ptr getTypefaceForFont(const Font& f) override
-	{
-		return getCustomFont().getTypeface();
-	};
-	//
-	bool areLinesDrawnForTreeView(TreeView&) override
-	{
-		return true;
-	}
-	//
-	void drawTreeviewPlusMinusBox(Graphics& g, const Rectangle<float>& area, Colour backgroundColour, bool isOpen, bool isMouseOver) override
-	{
-		Path p;
-		p.addTriangle(0.0f, 0.0f, 1.0f, isOpen ? 0.0f : 0.5f, isOpen ? 0.5f : 0.0f, 1.0f);
-		//
-		g.setColour(Colours::red.withAlpha(0.66f));
-		g.fillPath(p, p.getTransformToScaleToFit(area.reduced(2, area.getHeight() / 4), true));
-	}
-	//
-	Font getPopupMenuFont() override
-	{
-		return getCustomFont().withHeight(24.0f * ratioValue);
-	};
-	//
-	void drawPopupMenuItem(Graphics& g, const Rectangle<int>& area, const bool isSeparator, const bool isActive, const bool isHighlighted, const bool isTicked, const bool hasSubMenu, const String& text, const String& shortcutKeyText, const Drawable* icon, const Colour* const textColourToUse) override
-	{
-		Colour textColour = Colours::white.withAlpha(0.90f);
-		//
-		if (isSeparator)
-		{
-			auto r = area.reduced(5, 0);
-			r.removeFromTop(roundToInt((r.getHeight() * 0.5f) - 0.5f));
-
-			g.setColour(textColour.withAlpha(0.3f));
-			g.fillRect(r.removeFromTop(1));
-		}
-		else
-		{
-			//Colour textColour = (textColourToUse == nullptr ? textColour : *textColourToUse);
-
-			auto r = area.reduced(1);
-
-			if (isHighlighted && isActive)
-			{
-				g.setColour(Colour::fromString("FFFFECC1").withAlpha(0.22f));
-				g.fillRect(r);
-				g.setColour(Colours::white);
-			}
-			else
-			{
-				g.setColour(textColour.withMultipliedAlpha(isActive ? 1.0f : 0.5f));
-			}
-
-			r.reduce(jmin(5, area.getWidth() / 20), 0);
-
-			auto font = getPopupMenuFont();
-
-			auto maxFontHeight = r.getHeight() / 1.3f;
-
-			if (font.getHeight() > maxFontHeight)
-				font.setHeight(maxFontHeight);
-
-			g.setFont(font);
-
-			auto iconArea = r.removeFromLeft(roundToInt(maxFontHeight)).toFloat();
-
-			if (icon != nullptr)
-			{
-				icon->drawWithin(g, iconArea, RectanglePlacement::centred | RectanglePlacement::onlyReduceInSize, 1.0f);
-				r.removeFromLeft(roundToInt(maxFontHeight * 0.5f));
-			}
-			else if (isTicked)
-			{
-				auto tick = getTickShape(1.0f);
-				g.fillPath(tick, tick.getTransformToScaleToFit(iconArea.reduced(iconArea.getWidth() / 5, 0).toFloat(), true));
-			}
-
-			if (hasSubMenu)
-			{
-				auto arrowH = 0.6f * getPopupMenuFont().getAscent();
-
-				auto x = static_cast<float> (r.removeFromRight((int)arrowH).getX());
-				auto halfH = static_cast<float> (r.getCentreY());
-
-				Path path;
-				path.startNewSubPath(x, halfH - arrowH * 0.5f);
-				path.lineTo(x + arrowH * 0.6f, halfH);
-				path.lineTo(x, halfH + arrowH * 0.5f);
-
-				g.strokePath(path, PathStrokeType(2.0f));
-			}
-
-			r.removeFromRight(3);
-			g.drawFittedText(text, r, Justification::centredLeft, 1);
-
-			if (shortcutKeyText.isNotEmpty())
-			{
-				auto f2 = font;
-				f2.setHeight(f2.getHeight() * 0.75f);
-				f2.setHorizontalScale(0.95f);
-				g.setFont(f2);
-
-				g.drawText(shortcutKeyText, r, Justification::centredRight, true);
-			}
-		}
-	};
-	//
-	Font getAlertWindowTitleFont() override { return getCustomFont().withHeight(42.0f * ratioValue); }
-	Font getAlertWindowMessageFont() override { return getCustomFont().withHeight(30.0f * ratioValue); }
-	Font getAlertWindowFont() override { return getCustomFont().withHeight(22.0f * ratioValue); }
-	//
-	void drawButtonText(Graphics& g, TextButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
-	{
-		Font font = getCustomFont().withHeight(button.getHeight() * 0.72f * ratioValue);
-		g.setFont(font);
-		g.setColour(Colours::white.withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f));
-
-		if (shouldDrawButtonAsHighlighted) g.setColour(Colour::fromString("FFFFEEEE"));
-
-		const int yIndent = jmin(4, button.proportionOfHeight(0.3f));
-		const int cornerSize = jmin(button.getHeight(), button.getWidth()) / 2;
-
-		const int fontHeight = roundToInt(font.getHeight() * 0.6f);
-		const int leftIndent = jmin(fontHeight, 2 + cornerSize / (button.isConnectedOnLeft() ? 4 : 2));
-		const int rightIndent = jmin(fontHeight, 2 + cornerSize / (button.isConnectedOnRight() ? 4 : 2));
-		const int textWidth = button.getWidth() - leftIndent - rightIndent;
-
-		int leJustification = Justification::centred;
-		if (button.getConnectedEdgeFlags() == TextButton::ConnectedOnLeft) leJustification = Justification::right;
-		if (button.getConnectedEdgeFlags() == TextButton::ConnectedOnRight) leJustification = Justification::left;
-
-		if (textWidth > 0)
-			g.drawFittedText(button.getButtonText(),
-				leftIndent, yIndent, textWidth, button.getHeight() - yIndent * 2,
-				leJustification, 2);
-	};
-	//
-	double ratioValue = 1.0;
-};
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
-class WKnob : public Component // Fixed to Horizontal Mode //
-{
-public:
-	void mouseDown(const MouseEvent& e) override
-	{
-		startDragValue = value[0];
-		if (e.mods.isCtrlDown()) value[0] = 0.5f;
-		if (e.mods.isMiddleButtonDown()) value[0] = 0.5f;
-		repaint();
-	};
-	//
-	void mouseDrag(const MouseEvent& e) override
-	{
-		float xMultiply = 1.0f;
-		if (e.mods.isShiftDown() || e.mods.isRightButtonDown()) xMultiply = 0.1f;
-		//
-		value[0] = jlimit(0.0f, 1.0f, startDragValue + (float(e.getDistanceFromDragStartX()) * 0.006f * xMultiply));
-		repaint();
-		processor->setParameterNotifyingHost(parameterIndex, value[0]);
-	};
-	//
-	void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override
-	{
-		value[0] = jlimit(0.0f, 1.0f, value[0] + (float(wheel.deltaY) * 0.1f));
-		repaint();
-		processor->setParameterNotifyingHost(parameterIndex, value[0]);
-	};
-	//
-	void paint(Graphics& g) override
-	{
-		static int oneFrameH = knob->getHeight() / 128;
-		g.setImageResamplingQuality(Graphics::highResamplingQuality);
-		g.drawImage(knob[0], double(getWidth()) * 0.3, 0, double(getWidth()) * 0.7, getHeight(), 0, int(127.0f * value[0]) * oneFrameH, knob->getWidth(), oneFrameH);
-		//
-		String xText = String(value[0], 3);
-		g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.6));
-		g.setColour(Colours::white.withAlpha(0.82f));
-		g.drawFittedText(xText, Rectangle<int>(0, 0, double(getWidth()) * 0.3, getHeight()), Justification::centredLeft, 1);
-	}
-	//
-	int parameterIndex = 0;
-	AudioProcessor* processor;
-	Image* knob;
-	float* value;
-	float startDragValue = 1.0f;
-};
-//
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WusikEditObject
 {
 public:
-	void set(char _type, int _index, void* _object = nullptr) { type = _type; object = _object; index = _index; };
+	void set(char _type, int _index, void* _object = nullptr) { type = _type; object = _object; index = _index; }
 	char type = kCollection;
 	void* object = nullptr;
 	int index = 0;
@@ -250,7 +48,7 @@ public:
 class WusikEditOptionCallback
 {
 public:
-	virtual void process(WusikSpxAudioProcessor* processor) { };
+	virtual void process(WusikSpxAudioProcessor* processor) { }
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -264,14 +62,25 @@ public:
 class WusikEditOption : public Component
 {
 public:
-	WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, void* _object = nullptr, String _extraLabel = String(), bool _showEditInstead = false, WusikEditOptionCallback* _callback = nullptr);
-	void mouseMove(const MouseEvent& e) override { repaint(); };
-	void mouseExit(const MouseEvent& e) override { repaint(); };
-	void mouseEnter(const MouseEvent& e) override { repaint(); };
+	WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, void* _object = nullptr, 
+		String _extraLabel = String(), bool _showEditInstead = false, WusikEditOptionCallback* _callback = nullptr, int _min = 0, 
+		int _max = 1, String _popupList = String());
 	//
-	void mouseUp(const MouseEvent& e) override 
+	void mouseMove(const MouseEvent& e) override { repaint(); }
+	void mouseExit(const MouseEvent& e) override { repaint(); }
+	void mouseEnter(const MouseEvent& e) override { repaint(); }
+	//
+	void mouseUp(const MouseEvent& e) override
 	{
-		if (type == kString)
+		if (type == kPopupList)
+		{
+			// popupList
+		}
+		else if (type == kOnOffButton)
+		{
+			if (((float*)object)[0] > 0.0f) ((float*)object)[0] = 0.0f; else ((float*)object)[0] = 1.0f;
+		}
+		else if (type == kString)
 		{
 			String sValue;
 			AskValue(label, extraLabel, ((String*)object)[0], "", "OK", "Cancel", sValue);
@@ -323,7 +132,7 @@ public:
 		//
 		if (callback != nullptr) callback->process(processor);
 		editor->repaint();
-	};
+	}
 	//
 	void paint(Graphics& g) override
 	{
@@ -336,7 +145,7 @@ public:
 		}
 		else
 		{
-			if (isMouseOver()) g.fillAll(Colours::darkblue.withAlpha(0.42f)); else g.fillAll(Colours::darkblue.withAlpha(0.12f));
+			if (isMouseOver(true)) g.fillAll(Colours::darkblue.withAlpha(0.42f)); else g.fillAll(Colours::darkblue.withAlpha(0.12f));
 			//
 			g.setColour(Colours::white.withAlpha(0.26f));
 			g.drawRect(0, 0, getWidth(), getHeight(), 1);
@@ -344,7 +153,24 @@ public:
 			g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.32f));
 			g.drawFittedText(label, 8, 0, (double(getWidth()) * 0.26) - 16, getHeight(), Justification::centredLeft, 1);
 			//
-			if (showEditInstead)
+			if (type == kPopupList)
+			{
+				//popupList
+			}
+			else if (type == kOnOffButton)
+			{
+				if (((float*)object)[0] > 0.0f)
+				{
+					g.drawFittedText("ENABLED", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
+				}
+				else
+				{
+					g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.28f));
+					g.setColour(Colours::white.withAlpha(0.46f));
+					g.drawFittedText("DISABLED", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
+				}
+			}
+			else if (showEditInstead)
 			{
 				g.drawFittedText("EDIT", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
@@ -362,31 +188,38 @@ public:
 					else
 						g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
 				}
-				else if (type == kSlider || type == kSliderBipolar)
+				else if (type >= kSlider && type <= kSliderIntegerBipolar)
 				{
 					slider->setBounds(getWidth() - (double(getWidth()) * 0.42), 12, double(getWidth()) * 0.40, getHeight() - 16);
 				}
 			}
 		}
-	};
+	}
 	//
 	void* object;
 	String label;
-	WKnob* slider = nullptr;
+	WSlider* slider = nullptr;
 	int type = 0;
+	int min = 0;
+	int max = 1;
 	bool showEditInstead = false;
 	ScopedPointer<WusikEditOptionCallback> callback = nullptr;
 	WusikSpxAudioProcessor* processor;
 	String extraLabel;
 	Component* editor;
+	String popupList;
 	//
 	enum
 	{
 		kString,
 		kImage,
 		kLabel,
+		kPopupList,
 		kSlider,
-		kSliderBipolar
+		kSliderBipolar,
+		kSliderInteger,
+		kSliderIntegerBipolar,
+		kOnOffButton
 	};
 };
 //
@@ -394,14 +227,14 @@ public:
 class WSPXSoundZone : public Component
 {
 public:
-	WSPXSoundZone(WSPX_Collection_Sound* _sound) : sound(_sound) { };
+	WSPXSoundZone(WSPX_Collection_Sound* _sound) : sound(_sound) { }
 	//
 	void paint(Graphics& g) override
 	{
 		g.fillAll(Colours::yellow.withAlpha(0.22f));
 		g.setColour(Colours::white.withAlpha(0.66f));
 		g.drawRect(0, 0, getWidth(), getHeight(), 2);
-	};
+	}
 	//
 	WSPX_Collection_Sound* sound;
 };
@@ -414,7 +247,7 @@ public:
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
-	int getItemHeight() const override { return 24.0 * ui_ratio; };
+	int getItemHeight() const override { return 24.0 * ui_ratio; }
 	//
 	WusikSpxAudioProcessor& processor;
 	int16 preset = 0;
@@ -461,7 +294,7 @@ public:
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
-	int getItemHeight() const override { return 24.0 * ui_ratio; };
+	int getItemHeight() const override { return 24.0 * ui_ratio; }
 	//
 	WusikSpxAudioProcessor& processor;
 	int16 soundGroup = 0;
@@ -521,8 +354,8 @@ public:
 class WTransparentButton : public TextButton
 {
 public:
-	WTransparentButton(Button::Listener* _owner) : TextButton(""), owner(_owner) { addListener(owner); };
-	~WTransparentButton() { removeListener(owner); };
-	void paint(Graphics& g) override { };
+	WTransparentButton(Button::Listener* _owner) : TextButton(""), owner(_owner) { addListener(owner); }
+	~WTransparentButton() { removeListener(owner); }
+	void paint(Graphics& g) override { }
 	Button::Listener* owner;
 };

@@ -47,12 +47,11 @@ void WSPX_Collection::streamData(void* stream, int type)
 			soundGroups[ss]->streamData(stream, type);
 		}
 	}
-};
+}
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPX_Collection_Preset::streamData(void* stream, int type)
 {
-	int totalEffects = effects.size();
 	int totalLayers = layers.size();
 	//
 	WS::stream(stream, name, type);
@@ -63,9 +62,13 @@ void WSPX_Collection_Preset::streamData(void* stream, int type)
 	WS::stream(stream, pan, type);
 	WS::stream(stream, fineTune, type);
 	WS::stream(stream, coarseTune, type);
-	WS::stream(stream, totalEffects, type);
 	WS::stream(stream, totalLayers, type);
 	WS::stream(stream, imagePresetIcon.imageFilename, type);
+	//
+	for (int ee = 0; ee < 4; ee++)
+	{
+		effects[ee].streamData(stream, type);
+	}
 	//
 	for (int ll = 0; ll < totalLayers; ll++)
 	{	
@@ -185,5 +188,11 @@ void WSPX_Collection_Effect::streamData(void* stream, int _type)
 	WS::stream(stream, wet, type);
 	WS::stream(stream, parallel, type);
 	//
-	if (effect != nullptr) effect->streamData(stream, type);
+	for (int ee = 0; ee < 4; ee++)
+	{
+		bool hasEffect = effect[ee] != nullptr;
+		WS::stream(stream, hasEffect, type);
+		//
+		if (effect[ee] != nullptr) effect[ee]->streamData(stream, type);
+	}
 }

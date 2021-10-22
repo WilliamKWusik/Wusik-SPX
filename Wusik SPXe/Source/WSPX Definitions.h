@@ -64,27 +64,32 @@ public:
 	int64 totalSamples = 0;
 	float volume = 1.0f;
 	float pan = 0.5f;
-	bool roundRobin = false;
-	bool random = false;
-	bool isRelease = false;
-	bool reverse = false;
-	int keySwitch = 0;
+	float roundRobin = 0.0f;
+	float random = 0.0f;
+	float isRelease = 0.0f;
+	float reverse = 0.0f;
+	float keySwitch = 0.0f;
+	float randomProbability = 1.0f;
+	float keyZoneLow = 0.0f;
+	float keyZoneHigh = 1.0f;
+	float velZoneLow = 0.0f;
+	float velZoneHigh = 1.0f;
+	float keyRoot = (1.0f / 127.0f) * 60.0f;
+	float fineTune = 0.5f;
+	float coarseTune = 0.5f;
+	//
 	int keySwitchType = 0;
 	int64 loopStart = 0;
 	int64 loopEnd = 0;
 	int loopType = 0;
-	float randomProbability = 1.0f;
-	int keyZoneLow = 0;
-	int keyZoneHigh = 127;
-	int velZoneLow = 0;
-	int velZoneHigh = 127;
-	int keyRoot = 60;
-	float fineTune = 0.5f;
-	int coarseTune = 0;
 	int bits = 24;
 	int format = 0;
 	int channels = 0;
 	Array<float> channelPan;
+	//
+	const String formats = "Binary\nFlac\nGZIP";
+	const String keySwitchTypes = "Normal\nMomentary\nLatch";
+	const String loopTypes = "Normal\nPingPong";
 	//
 	enum
 	{
@@ -124,10 +129,10 @@ public:
 			if (type == WS::kRead) sounds.add(new WSPX_Collection_Sound);
 			sounds[ss]->streamData(stream, type);
 		}
-	};
+	}
 	//
 	OwnedArray<WSPX_Collection_Sound> sounds;
-	int chokeGroup = 0;
+	float chokeGroup = 0.0f;
 	String name, tags;
 };
 //
@@ -135,8 +140,10 @@ public:
 class WSPX_Effect
 {
 public:
-	virtual void process(AudioSampleBuffer& buffer) { };
-	virtual void streamData(void* stream, int _type) { };
+	virtual void process(AudioSampleBuffer& buffer) { }
+	virtual void streamData(void* stream, int _type) { }
+	//
+	float volume = 1.0f;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -145,11 +152,12 @@ class WSPX_Collection_Effect
 public:
 	void streamData(void* stream, int _type);
 	//
-	ScopedPointer<WSPX_Effect> effect;
+	ScopedPointer<WSPX_Effect> effect[4]; // Up to 4 effects running in series or parallel //
+	const String types = "None\nReverb\nChorus\nDelay\nDistortion\nPhaser\nFilter\nConvolution";
 	int type = kNone;
 	float dry = 0.0f;
 	float wet = 1.0f;
-	bool parallel = false;
+	float parallel = 0.0f;
 	//
 	enum
 	{
@@ -172,7 +180,7 @@ public:
 	{
 		WS::streamRelativePath(stream, imageFilename, type);
 		if (File(imageFilename).existsAsFile()) image = ImageFileFormat::loadFrom(imageFilename);
-	};
+	}
 	//
 	Image image;
 	String imageFilename;
@@ -196,12 +204,13 @@ public:
 		WS::stream(stream, toFilterFreq, _type);
 	}
 	//
+	const String waveforms = "Sine\nSawtooth\nPulse\nRandom\nNoise\nTriangle";
 	int waveform = 0;
-	bool sync = true;
-	bool inverted = false;
-	bool noteOnReset = false;
-	float speed1 = 1.0f;
-	float speed2 = 4.0f;
+	float sync = 1.0f;
+	float inverted = 0.0f;
+	float noteOnReset = 0.0f;
+	float speed1 = 0.1f;
+	float speed2 = 0.1f;
 	float phase = 0.0f;
 	float smooth = 0.0f;
 	float toVolume = 0.0f;
@@ -235,15 +244,16 @@ public:
 		WS::stream(stream, velTrack, _type);
 	}
 	//
+	const String types = "Linear\nExp\nLog";
 	int type = 0;
 	float attack = 0.0f;
 	float decay = 0.0f;
 	float sustain = 1.0f;
 	float release = 0.28f;
 	float velocity = 1.0f;
-	float maxSeconds = 6.0f;
-	float keyTrack = 0.0f;
-	float velTrack = 0.0f;
+	float maxSeconds = 0.2f;
+	float keyTrack = 0.5f;
+	float velTrack = 0.5f;
 	//
 	enum
 	{
@@ -272,8 +282,9 @@ public:
 		envelope.streamData(stream, _type);
 	}
 	//
-	int type = 0;
 	WSPX_Collection_Envelope envelope;
+	const String types = "LowPass\nBandPass\nHighPass\nNotch";
+	int type = 0;
 	float frequency = 1.0f;
 	float rezonance = 0.2f;
 	float smooth = 0.4f;
@@ -309,9 +320,9 @@ public:
 	float volume = 1.0f;
 	float pan = 0.5f;
 	float fine = 0.5f;
-	int tune = 0;
+	float tune = 0.0f;
 	float filterFreq = 0.0f;
-	int time = 1;
+	float time = 0.0f;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -320,11 +331,12 @@ class WSPX_Sequencer
 public:
 	void streamData(void* stream, int type);
 	//
+	const String types = "Forward\nBackwards\nPingPong\nRandom";
 	OwnedArray<WSPX_Sequencer_Step> steps;
-	bool syncBPM = true;
-	float time1 = 1.0f;
-	float time2 = 8.0f;
-	int loopStart = 0;
+	float syncBPM = 1.0f;
+	float time1 = 0.1f;
+	float time2 = 0.1f;
+	float loopStart = 0.0f;
 	float smoothOutput = 0.0f;
 	int type = 0;
 	//
@@ -345,7 +357,7 @@ public:
 	{
 		WS::stream(stream, volume, type);
 		WS::stream(stream, name, type);
-	};
+	}
 	//
 	float volume = 1.0f;
 	String name;
@@ -363,19 +375,19 @@ public:
 	WSPX_Collection_LFO lfos[2];
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
-	bool reverse = false;
-	int keyZoneLow = 0;
-	int keyZoneHigh = 127;
-	int velZoneLow = 0;
-	int velZoneHigh = 127;
+	float reverse = 0.0f;
+	float keyZoneLow = 0.0f;
+	float keyZoneHigh = 1.0f;
+	float velZoneLow = 0.0f;
+	float velZoneHigh = 1.0f;
 	float volume = 1.0f;
 	float pan = 0.5f;
 	float fineTune = 0.5f;
-	int coarseTune = 0.0f;
-	int voices = 16;
-	int output = 0; // Main Out //
+	float coarseTune = 0.5f;
+	float voices = (1.0f / 128.0f) * 16.0f;
+	float output = 0.0f; // Main Out //
 	float glide = 0.0f;
-	bool autoGlide = true;
+	float autoGlide = 1.0f;
 	MemoryBlock scripting;
 };
 //
@@ -386,13 +398,14 @@ public:
 	void streamData(void* stream, int type);
 	//
 	OwnedArray<WSPX_Collection_Preset_Layer> layers;
-	OwnedArray<WSPX_Collection_Effect> effects;
+	WSPX_Collection_Effect effects[4]; // Up to 4 Sends with up to 4 internal effects //
 	WSPX_Image imagePresetIcon;
 	String name, tags, author, description;
+	//
 	float volume = 1.0f;
 	float pan = 0.5f;
 	float fineTune = 0.5f;
-	int coarseTune = 0;
+	float coarseTune = 0.5f;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

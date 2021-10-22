@@ -8,12 +8,18 @@
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
       <GROUP id="{4E0B4FE7-CB62-8E58-1336-AFC179239A14}" name="Images">
+        <FILE id="EJcHCy" name="SliderBack.png" compile="0" resource="1" file="../Interface/SliderBack.png"/>
+        <FILE id="hdPSYA" name="SliderFilled.png" compile="0" resource="1"
+              file="../Interface/SliderFilled.png"/>
+        <FILE id="v2rb2n" name="SliderThumb.png" compile="0" resource="1" file="../Interface/SliderThumb.png"/>
         <FILE id="NRkjqL" name="Interface3.png" compile="0" resource="1" file="../Interface/Interface3.png"/>
         <FILE id="dFpSUw" name="lucon.ttf" compile="0" resource="1" file="Source/lucon.ttf"/>
         <FILE id="J2O08T" name="Interface.png" compile="0" resource="1" file="../Interface/Interface.png"/>
         <FILE id="eweZFQ" name="Logo.png" compile="0" resource="1" file="Source/Logo.png"/>
-        <FILE id="tA1guH" name="Slider.png" compile="0" resource="1" file="../Interface/Slider.png"/>
       </GROUP>
+      <FILE id="NoqJdT" name="WSPX Knob.h" compile="0" resource="0" file="Source/WSPX Knob.h"/>
+      <FILE id="XLD4ID" name="WSPX Look And Feel.h" compile="0" resource="0"
+            file="Source/WSPX Look And Feel.h"/>
       <FILE id="OzMepl" name="PluginEditor ButtonClicked.cpp" compile="1"
             resource="0" file="Source/PluginEditor ButtonClicked.cpp"/>
       <FILE id="Va19DE" name="PluginEditor Resized.cpp" compile="1" resource="0"

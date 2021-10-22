@@ -21,12 +21,12 @@ public:
 	void showAbout()
 	{
 		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Wusik WSPX Editor", "Created by William Kalfelz @ Wusik.com (c) 2021\n\nVersion " + String(WVERSION));
-	};
+	}
 	//
 	void boundsSet(int xx, int yy, int ww, int hh, Component* compo, double multRatio)
 	{
 		compo->setBounds(double(xx) * multRatio, double(yy) * multRatio, double(ww) * multRatio, double(hh) * multRatio);
-	};
+	}
 	//
 	void updateInterface();
 	void cleanInterface();
@@ -34,7 +34,7 @@ public:
 	Image backgroundImage;
 	Image redSaveImage; // UnSaved Changes //
 	Image originalBackgroundImage;
-	Image horizontalSlider;
+	Image sliderBackground, sliderFilled, sliderThumb;
 	double uiRatio = 1.0;
 	ResizableCornerComponent* resizer;
 	ComponentBoundsConstrainer resizerConstrainer;
@@ -50,7 +50,7 @@ public:
 	ScopedPointer<Viewport> editOptionsViewport;
 	bool prevHasUnsavedChanges = false;
 	double multRatio = 1.0;
-	bool keepTreeViews = false;
+	bool redoTreeViewsOnResize = true;
 	//
 	WTransparentButton* logoButton;
 	WTransparentButton* fileButton;

@@ -14,7 +14,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 	if (buttonThatWasClicked == logoButton) showAbout();
 	else if (buttonThatWasClicked == collectionButton)
 	{
-		keepTreeViews = true;
+		redoTreeViewsOnResize = false;
 		cleanInterface();
 		editObject.type = WusikEditObject::kCollection;
 		updateInterface();
@@ -65,11 +65,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 		if (result > 0)
 		{
 			bool updateTheInterface = false;
-			if (result == 1 || result == 2)
-			{
-				keepTreeViews = true;
-				cleanInterface();
-			}
+			if (result == 1 || result == 2) cleanInterface();
 			//
 			if (result == 2)
 			{

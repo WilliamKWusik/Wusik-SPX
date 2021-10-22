@@ -29,7 +29,7 @@ void WusikSpxAudioProcessorEditor::resized()
 	boundsSet(682, 12, 452, 51, collectionButton, multRatio);
 	boundsSet(1507, 11, 96, 50, previewButton, multRatio);
 	//
-	if (!keepTreeViews)
+	if (redoTreeViewsOnResize)
 	{
 		// Presets TreeView //
 		addAndMakeVisible(presetsTreeView = new WusikTreeHolder(processor, true, multRatio));
@@ -40,7 +40,7 @@ void WusikSpxAudioProcessorEditor::resized()
 		boundsSet(1638, 508, 248, 474, soundsTreeView, multRatio);
 	}
 	//
-	keepTreeViews = false;
+	redoTreeViewsOnResize = true;
 	//
 	// Show Edit Objects //
 	if (editObject.type != WusikEditObject::kNone)

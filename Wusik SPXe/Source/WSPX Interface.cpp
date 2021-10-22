@@ -12,7 +12,7 @@
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::cleanInterface()
 {
-	if (!keepTreeViews)
+	if (redoTreeViewsOnResize)
 	{
 		presetsTreeView = nullptr;
 		soundsTreeView = nullptr;
@@ -37,6 +37,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	#define AddCompoCallback(type, name, variable, label, callback) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, callback)))
 	#define AddCompo(type, name, variable) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable)))
 	#define AddCompo2(type, name, variable, label, showEditInsteead, callback) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, showEditInsteead, callback)))
+	#define AddCompo4(type, name, variable, label, min, max) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, min, max)))
+	#define AddCompo6(type, name, variable, label, PopupList) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, 0, 1, PopupList)))
 	//
 	if (editObject.type == WusikEditObject::kCollection)
 	{
@@ -69,7 +71,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Volume", &preset->volume);
 		AddCompo(kSliderBipolar, "Pan", &preset->pan);
 		AddCompo(kSliderBipolar, "Fine Tune", &preset->fineTune);
-		//AddCompo(kSlider, "Coarse Tune", &preset->coarseTune);
+		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &preset->coarseTune, "", -48, 48);
 		//
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
@@ -84,12 +86,54 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Volume", &layer->volume);
 		AddCompo(kSliderBipolar, "Pan", &layer->pan);
 		AddCompo(kSliderBipolar, "Fine Tune", &layer->fineTune);
-		//AddCompo(kSlider, "Coarse Tune", &layer->coarseTune);
+		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &layer->coarseTune, "", -48, 48);
+		AddCompo4(kSliderInteger, "Voices", &layer->voices, "", 1, 128);
 		AddCompo(kSlider, "Glide", &layer->glide);
+		AddCompo(kOnOffButton, "Auto Glide", &layer->autoGlide);
+		AddCompo(kOnOffButton, "Reverse", &layer->reverse);
+		//
+		AddCompoLabel("Zones");
+		AddCompo4(kSliderInteger, "Key Zone Low", &layer->keyZoneLow, "", 0, 127);
+		AddCompo4(kSliderInteger, "Key Zone High", &layer->keyZoneHigh, "", 0, 127);
+		AddCompo4(kSliderInteger, "Vel Zone Low", &layer->velZoneLow, "", 0, 127);
+		AddCompo4(kSliderInteger, "Vel Zone High", &layer->velZoneHigh, "", 0, 127);
+		//
+		AddCompoLabel("AMP Envelope");
+		AddCompo(kSlider, "Attack", &layer->ampEnvelope.attack);
+		AddCompo(kSlider, "Decay", &layer->ampEnvelope.decay);
+		AddCompo(kSlider, "Sustain", &layer->ampEnvelope.sustain);
+		AddCompo(kSlider, "Release", &layer->ampEnvelope.release);
+		AddCompo(kSlider, "Max Seconds", &layer->ampEnvelope.maxSeconds);
+		AddCompo(kSlider, "Velocity %", &layer->ampEnvelope.velocity);
+		AddCompo(kSliderBipolar, "Key Track", &layer->ampEnvelope.keyTrack);
+		AddCompo(kSliderBipolar, "Velocity Track", &layer->ampEnvelope.velTrack);
+		//
+		AddCompoLabel("Filter");
+		AddCompo6(kPopupList, "Type", &layer->filter.type, "", layer->filter.types);
+		AddCompo(kSlider, "Frequency", &layer->filter.frequency);
+		AddCompo(kSlider, "Rezonance", &layer->filter.rezonance);
+		AddCompo(kSlider, "Smooth", &layer->filter.smooth);
+		AddCompo(kSlider, "Feedback", &layer->filter.feedback);
+		AddCompo(kSlider, "Feedback Delay", &layer->filter.delay);
+		AddCompo(kSlider, "Sample and Hold", &layer->filter.sampleAndHold);
+		AddCompo(kSliderBipolar, "To Envelope", &layer->filter.toEnvelope);
+		//
+		AddCompoLabel("Filter Envelope");
+		AddCompo(kSlider, "Attack", &layer->filter.envelope.attack);
+		AddCompo(kSlider, "Decay", &layer->filter.envelope.decay);
+		AddCompo(kSlider, "Sustain", &layer->filter.envelope.sustain);
+		AddCompo(kSlider, "Release", &layer->filter.envelope.release);
+		AddCompo(kSlider, "Max Seconds", &layer->filter.envelope.maxSeconds);
+		AddCompo(kSlider, "Velocity %", &layer->filter.envelope.velocity);
+		AddCompo(kSliderBipolar, "Key Track", &layer->filter.envelope.keyTrack);
+		AddCompo(kSliderBipolar, "Velocity Track", &layer->filter.envelope.velTrack);
+		AddCompo6(kPopupList, "Type", &layer->filter.envelope.type, "", layer->filter.envelope.types);
 		//
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
 		editOptionsViewport->setScrollBarsShown(true, false);
+		editOptionsViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colours::darkblue);
+		editOptionsViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::trackColourId, Colours::darkblue);
 	}
 	//
 	resized();
@@ -104,16 +148,21 @@ void WusikEditOptionCallback_UpdateCollectionName::process(WusikSpxAudioProcesso
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, void* _object, String _extraLabel, bool _showEditInstead, WusikEditOptionCallback* _callback)
-	: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel), callback(_callback), processor(_processor), editor(_editor)
+WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, 
+	void* _object, String _extraLabel, bool _showEditInstead, WusikEditOptionCallback* _callback, int _min, int _max, String _popupList)
+	: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel), 
+	callback(_callback), processor(_processor), editor(_editor), min(_min), max(_max), popupList(_popupList)
 {
 	if (type == kSlider || type == kSliderBipolar)
 	{
-		slider = new WKnob;
-		slider->processor = processor;
-		slider->knob = &((WusikSpxAudioProcessorEditor*)processor->getActiveEditor())->horizontalSlider;
-		slider->value = (float*)object;
-		slider->bipolar = (type == kSliderBipolar);
+		WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor->getActiveEditor();
+		slider = new WSlider(editor->sliderBackground, editor->sliderFilled, editor->sliderThumb, ((float*)object)[0], type == kSliderBipolar);
+		addAndMakeVisible(slider);
+	}
+	else if (type == kSliderInteger || type == kSliderIntegerBipolar)
+	{
+		WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor->getActiveEditor();
+		slider = new WSlider(editor->sliderBackground, editor->sliderFilled, editor->sliderThumb, ((float*)object)[0], (type == kSliderIntegerBipolar), true, min, max);
 		addAndMakeVisible(slider);
 	}
 }
