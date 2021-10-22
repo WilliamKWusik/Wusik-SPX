@@ -34,6 +34,7 @@ public:
 	Image backgroundImage;
 	Image redSaveImage; // UnSaved Changes //
 	Image originalBackgroundImage;
+	Image horizontalSlider;
 	double uiRatio = 1.0;
 	ResizableCornerComponent* resizer;
 	ComponentBoundsConstrainer resizerConstrainer;

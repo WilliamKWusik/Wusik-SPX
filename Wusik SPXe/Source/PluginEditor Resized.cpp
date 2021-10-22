@@ -49,12 +49,12 @@ void WusikSpxAudioProcessorEditor::resized()
 		//
 		for (int bb = 0; bb < editOptions.size(); bb++)
 		{
-			boundsSet(0, totalH, 685, 52, editOptions[bb], multRatio);
+			boundsSet(0, totalH, 660, 52, editOptions[bb], multRatio);
 			totalH += 56;
 		}
 		//
-		boundsSet(569, 107, 685, 807, editOptionsViewport, multRatio);
-		editOptionsComponent->setBounds(0, 0, 685, totalH);
+		boundsSet(569, 107, 690, 807, editOptionsViewport, multRatio);
+		editOptionsComponent->setBounds(0, 0, editOptionsViewport->getWidth(), double(totalH) * multRatio);
 	}
 	// Sound Zones //
 	{

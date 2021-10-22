@@ -13,6 +13,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 {
 	backgroundImage = ImageCache::getFromMemory(BinaryData::Interface_png, BinaryData::Interface_pngSize);
 	redSaveImage = ImageCache::getFromMemory(BinaryData::Interface3_png, BinaryData::Interface3_pngSize);
+	horizontalSlider = ImageCache::getFromMemory(BinaryData::Slider_png, BinaryData::Slider_pngSize);
 	//
 	multRatio = double(getHeight()) / double(backgroundImage.getHeight());
 	//

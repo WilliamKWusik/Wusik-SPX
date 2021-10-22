@@ -7,7 +7,7 @@
 //
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
-#define WIGNORE_SET_STATE 0
+#define WIGNORE_SET_STATE 1
 #define WVERSION "1.0.0 BETA 00"
 extern bool isWSPXEditor;
 extern String collectionFile;
@@ -62,6 +62,8 @@ public:
 	//
 	MemoryBlock soundData;
 	int64 totalSamples = 0;
+	float volume = 1.0f;
+	float pan = 0.5f;
 	bool roundRobin = false;
 	bool random = false;
 	bool isRelease = false;
@@ -77,8 +79,8 @@ public:
 	int velZoneLow = 0;
 	int velZoneHigh = 127;
 	int keyRoot = 60;
-	float fineTune = 0.0f;
-	float coarseTune = 0.0f;
+	float fineTune = 0.5f;
+	int coarseTune = 0;
 	int bits = 24;
 	int format = 0;
 	int channels = 0;
@@ -279,7 +281,7 @@ public:
 	float sampleAndHold = 0.0f;
 	float feedback = 0.0f;
 	float delay = 0.0f;
-	float toEnvelope = 0.0f;
+	float toEnvelope = 0.5f;
 	//
 	enum
 	{
@@ -305,8 +307,8 @@ public:
 	}
 	//
 	float volume = 1.0f;
-	float pan = 0.0f;
-	float fine = 0.0f;
+	float pan = 0.5f;
+	float fine = 0.5f;
 	int tune = 0;
 	float filterFreq = 0.0f;
 	int time = 1;
@@ -367,9 +369,9 @@ public:
 	int velZoneLow = 0;
 	int velZoneHigh = 127;
 	float volume = 1.0f;
-	float pan = 0.0f;
-	float fineTune = 0.0f;
-	float coarseTune = 0.0f;
+	float pan = 0.5f;
+	float fineTune = 0.5f;
+	int coarseTune = 0.0f;
 	int voices = 16;
 	int output = 0; // Main Out //
 	float glide = 0.0f;
@@ -388,9 +390,9 @@ public:
 	WSPX_Image imagePresetIcon;
 	String name, tags, author, description;
 	float volume = 1.0f;
-	float pan = 0.0f;
-	float fineTune = 0.0f;
-	float coarseTune = 0;
+	float pan = 0.5f;
+	float fineTune = 0.5f;
+	int coarseTune = 0;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

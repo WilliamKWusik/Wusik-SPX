@@ -179,6 +179,54 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WKnob : public Component // Fixed to Horizontal Mode //
+{
+public:
+	void mouseDown(const MouseEvent& e) override
+	{
+		startDragValue = value[0];
+		if (e.mods.isCtrlDown()) value[0] = 0.5f;
+		if (e.mods.isMiddleButtonDown()) value[0] = 0.5f;
+		repaint();
+	};
+	//
+	void mouseDrag(const MouseEvent& e) override
+	{
+		float xMultiply = 1.0f;
+		if (e.mods.isShiftDown() || e.mods.isRightButtonDown()) xMultiply = 0.1f;
+		//
+		value[0] = jlimit(0.0f, 1.0f, startDragValue + (float(e.getDistanceFromDragStartX()) * 0.006f * xMultiply));
+		repaint();
+		processor->setParameterNotifyingHost(parameterIndex, value[0]);
+	};
+	//
+	void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override
+	{
+		value[0] = jlimit(0.0f, 1.0f, value[0] + (float(wheel.deltaY) * 0.1f));
+		repaint();
+		processor->setParameterNotifyingHost(parameterIndex, value[0]);
+	};
+	//
+	void paint(Graphics& g) override
+	{
+		static int oneFrameH = knob->getHeight() / 128;
+		g.setImageResamplingQuality(Graphics::highResamplingQuality);
+		g.drawImage(knob[0], double(getWidth()) * 0.3, 0, double(getWidth()) * 0.7, getHeight(), 0, int(127.0f * value[0]) * oneFrameH, knob->getWidth(), oneFrameH);
+		//
+		String xText = String(value[0], 3);
+		g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.6));
+		g.setColour(Colours::white.withAlpha(0.82f));
+		g.drawFittedText(xText, Rectangle<int>(0, 0, double(getWidth()) * 0.3, getHeight()), Justification::centredLeft, 1);
+	}
+	//
+	int parameterIndex = 0;
+	AudioProcessor* processor;
+	Image* knob;
+	float* value;
+	float startDragValue = 1.0f;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WusikEditObject
 {
 public:
@@ -216,10 +264,7 @@ public:
 class WusikEditOption : public Component
 {
 public:
-	WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, void* _object = nullptr, 
-		String _extraLabel = String(), bool _showEditInstead = false, WusikEditOptionCallback* _callback = nullptr)
-		: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel),
-		callback(_callback), processor(_processor), editor(_editor) { };
+	WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, void* _object = nullptr, String _extraLabel = String(), bool _showEditInstead = false, WusikEditOptionCallback* _callback = nullptr);
 	void mouseMove(const MouseEvent& e) override { repaint(); };
 	void mouseExit(const MouseEvent& e) override { repaint(); };
 	void mouseEnter(const MouseEvent& e) override { repaint(); };
@@ -317,12 +362,17 @@ public:
 					else
 						g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
 				}
+				else if (type == kSlider || type == kSliderBipolar)
+				{
+					slider->setBounds(getWidth() - (double(getWidth()) * 0.42), 12, double(getWidth()) * 0.40, getHeight() - 16);
+				}
 			}
 		}
 	};
 	//
 	void* object;
 	String label;
+	WKnob* slider = nullptr;
 	int type = 0;
 	bool showEditInstead = false;
 	ScopedPointer<WusikEditOptionCallback> callback = nullptr;
@@ -334,7 +384,9 @@ public:
 	{
 		kString,
 		kImage,
-		kLabel
+		kLabel,
+		kSlider,
+		kSliderBipolar
 	};
 };
 //

@@ -66,6 +66,10 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kString, "Author", &preset->author);
 		AddCompo(kString, "Description", &preset->description);
 		AddCompo(kString, "Tags", &preset->tags);
+		AddCompo(kSlider, "Volume", &preset->volume);
+		AddCompo(kSliderBipolar, "Pan", &preset->pan);
+		AddCompo(kSliderBipolar, "Fine Tune", &preset->fineTune);
+		//AddCompo(kSlider, "Coarse Tune", &preset->coarseTune);
 		//
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
@@ -77,6 +81,11 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		editOptionsComponent = new Component;
 		AddCompoLabel("Layer #" + String(editObject.index + 1) + " Details");
+		AddCompo(kSlider, "Volume", &layer->volume);
+		AddCompo(kSliderBipolar, "Pan", &layer->pan);
+		AddCompo(kSliderBipolar, "Fine Tune", &layer->fineTune);
+		//AddCompo(kSlider, "Coarse Tune", &layer->coarseTune);
+		AddCompo(kSlider, "Glide", &layer->glide);
 		//
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
@@ -92,4 +101,19 @@ void WusikEditOptionCallback_UpdateCollectionName::process(WusikSpxAudioProcesso
 {
 	((WusikSpxAudioProcessorEditor*)processor->getActiveEditor())->
 		collectionNameLabel->setText(processor->collection->name, NotificationType::dontSendNotification);
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, void* _object, String _extraLabel, bool _showEditInstead, WusikEditOptionCallback* _callback)
+	: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel), callback(_callback), processor(_processor), editor(_editor)
+{
+	if (type == kSlider || type == kSliderBipolar)
+	{
+		slider = new WKnob;
+		slider->processor = processor;
+		slider->knob = &((WusikSpxAudioProcessorEditor*)processor->getActiveEditor())->horizontalSlider;
+		slider->value = (float*)object;
+		slider->bipolar = (type == kSliderBipolar);
+		addAndMakeVisible(slider);
+	}
 }

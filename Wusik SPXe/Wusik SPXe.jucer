@@ -7,6 +7,13 @@
               companyName="Wusik" companyCopyright="2021" companyWebsite="www.Wusik.com">
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
+      <GROUP id="{4E0B4FE7-CB62-8E58-1336-AFC179239A14}" name="Images">
+        <FILE id="NRkjqL" name="Interface3.png" compile="0" resource="1" file="../Interface/Interface3.png"/>
+        <FILE id="dFpSUw" name="lucon.ttf" compile="0" resource="1" file="Source/lucon.ttf"/>
+        <FILE id="J2O08T" name="Interface.png" compile="0" resource="1" file="../Interface/Interface.png"/>
+        <FILE id="eweZFQ" name="Logo.png" compile="0" resource="1" file="Source/Logo.png"/>
+        <FILE id="tA1guH" name="Slider.png" compile="0" resource="1" file="../Interface/Slider.png"/>
+      </GROUP>
       <FILE id="OzMepl" name="PluginEditor ButtonClicked.cpp" compile="1"
             resource="0" file="Source/PluginEditor ButtonClicked.cpp"/>
       <FILE id="Va19DE" name="PluginEditor Resized.cpp" compile="1" resource="0"
@@ -21,10 +28,6 @@
             file="Source/WSPX Sound TreeView.cpp"/>
       <FILE id="amygi3" name="WSPX Preset TreeView.cpp" compile="1" resource="0"
             file="Source/WSPX Preset TreeView.cpp"/>
-      <FILE id="NRkjqL" name="Interface3.png" compile="0" resource="1" file="../Interface/Interface3.png"/>
-      <FILE id="dFpSUw" name="lucon.ttf" compile="0" resource="1" file="Source/lucon.ttf"/>
-      <FILE id="J2O08T" name="Interface.png" compile="0" resource="1" file="../Interface/Interface.png"/>
-      <FILE id="eweZFQ" name="Logo.png" compile="0" resource="1" file="Source/Logo.png"/>
       <FILE id="y9S8ov" name="WSPX Saving.cpp" compile="1" resource="0" file="Source/WSPX Saving.cpp"/>
       <FILE id="XeWQuz" name="WSPX Loading.cpp" compile="1" resource="0"
             file="Source/WSPX Loading.cpp"/>
