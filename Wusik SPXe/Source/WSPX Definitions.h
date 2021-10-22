@@ -202,6 +202,11 @@ public:
 		WS::stream(stream, smooth, _type);
 		WS::stream(stream, toVolume, _type);
 		WS::stream(stream, toFilterFreq, _type);
+		WS::stream(stream, toPan, _type);
+		WS::stream(stream, toEffect1, _type);
+		WS::stream(stream, toEffect2, _type);
+		WS::stream(stream, toEffect3, _type);
+		WS::stream(stream, toEffect4, _type);
 	}
 	//
 	const String waveforms = "Sine\nSawtooth\nPulse\nRandom\nNoise\nTriangle";
@@ -215,6 +220,11 @@ public:
 	float smooth = 0.0f;
 	float toVolume = 0.0f;
 	float toFilterFreq = 0.0f;
+	float toPan = 0.0f;
+	float toEffect1 = 0.0;
+	float toEffect2 = 0.0;
+	float toEffect3 = 0.0;
+	float toEffect4 = 0.0;
 	//
 	enum
 	{

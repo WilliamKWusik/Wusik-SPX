@@ -68,6 +68,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kString, "Author", &preset->author);
 		AddCompo(kString, "Description", &preset->description);
 		AddCompo(kString, "Tags", &preset->tags);
+		AddCompo(kImage, "Preset Image Icon", &preset->imagePresetIcon);
 		AddCompo(kSlider, "Volume", &preset->volume);
 		AddCompo(kSliderBipolar, "Pan", &preset->pan);
 		AddCompo(kSliderBipolar, "Fine Tune", &preset->fineTune);
@@ -107,6 +108,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Velocity %", &layer->ampEnvelope.velocity);
 		AddCompo(kSliderBipolar, "Key Track", &layer->ampEnvelope.keyTrack);
 		AddCompo(kSliderBipolar, "Velocity Track", &layer->ampEnvelope.velTrack);
+		AddCompo6(kPopupList, "Type", &layer->ampEnvelope.type, "", layer->ampEnvelope.types);
 		//
 		AddCompoLabel("Filter");
 		AddCompo6(kPopupList, "Type", &layer->filter.type, "", layer->filter.types);
@@ -128,6 +130,27 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSliderBipolar, "Key Track", &layer->filter.envelope.keyTrack);
 		AddCompo(kSliderBipolar, "Velocity Track", &layer->filter.envelope.velTrack);
 		AddCompo6(kPopupList, "Type", &layer->filter.envelope.type, "", layer->filter.envelope.types);
+		//
+		//
+		for (int ll = 0; ll < 2; ll++)
+		{
+			AddCompoLabel("LFO " + String(ll + 1));
+			AddCompo6(kPopupList, "Waveform", &layer->lfos[ll].waveform, "", layer->lfos[ll].waveforms);
+			AddCompo(kSlider, "Speed 1", &layer->lfos[ll].speed1);
+			AddCompo(kSlider, "Speed 2", &layer->lfos[ll].speed2);
+			AddCompo(kOnOffButton, "Sync to BPM", &layer->lfos[ll].sync);
+			AddCompo(kSlider, "Phase", &layer->lfos[ll].phase);
+			AddCompo(kSlider, "Smooth", &layer->lfos[ll].smooth);
+			AddCompo(kSlider, "To Filter Frequency", &layer->lfos[ll].toFilterFreq);
+			AddCompo(kSlider, "To Volume", &layer->lfos[ll].toVolume);
+			AddCompo(kSlider, "To Pan", &layer->lfos[ll].toPan);
+			AddCompo(kSlider, "To Effect Send 1", &layer->lfos[ll].toEffect1);
+			AddCompo(kSlider, "To Effect Send 2", &layer->lfos[ll].toEffect2);
+			AddCompo(kSlider, "To Effect Send 3", &layer->lfos[ll].toEffect3);
+			AddCompo(kSlider, "To Effect Send 4", &layer->lfos[ll].toEffect4);
+			AddCompo(kOnOffButton, "Note On Reset", &layer->lfos[ll].noteOnReset);
+			AddCompo(kOnOffButton, "Inverted", &layer->lfos[ll].inverted);
+		}
 		//
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
@@ -151,7 +174,7 @@ void WusikEditOptionCallback_UpdateCollectionName::process(WusikSpxAudioProcesso
 WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, 
 	void* _object, String _extraLabel, bool _showEditInstead, WusikEditOptionCallback* _callback, int _min, int _max, String _popupList)
 	: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel), 
-	callback(_callback), processor(_processor), editor(_editor), min(_min), max(_max), popupList(_popupList)
+	callback(_callback), processor(_processor), editor(_editor), min(_min), max(_max)
 {
 	if (type == kSlider || type == kSliderBipolar)
 	{
@@ -164,5 +187,9 @@ WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* 
 		WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor->getActiveEditor();
 		slider = new WSlider(editor->sliderBackground, editor->sliderFilled, editor->sliderThumb, ((float*)object)[0], (type == kSliderIntegerBipolar), true, min, max);
 		addAndMakeVisible(slider);
+	}
+	else if (type == kPopupList)
+	{
+		popupList = StringArray::fromLines(_popupList);
 	}
 }

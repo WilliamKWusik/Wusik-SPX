@@ -74,7 +74,19 @@ public:
 	{
 		if (type == kPopupList)
 		{
-			// popupList
+			int index = jlimit(0, popupList.size() - 1, int(((float*)object)[0] * float(popupList.size() - 1)));
+			PopupMenu mm;
+			//
+			for (int tt = 0; tt < popupList.size(); tt++)
+			{
+				mm.addItem(tt + 1, popupList[tt], true, index == tt);
+			}
+			//
+			int result = mm.show();
+			if (result > 0)
+			{
+				((float*)object)[0] = float(result - 1) / float(popupList.size() - 1);
+			}
 		}
 		else if (type == kOnOffButton)
 		{
@@ -155,7 +167,9 @@ public:
 			//
 			if (type == kPopupList)
 			{
-				//popupList
+				int index = ((float*)object)[0] * float(popupList.size() - 1);
+				String xText = popupList[jlimit(0, popupList.size() - 1, int(index))];
+				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
 			else if (type == kOnOffButton)
 			{
@@ -207,7 +221,7 @@ public:
 	WusikSpxAudioProcessor* processor;
 	String extraLabel;
 	Component* editor;
-	String popupList;
+	StringArray popupList;
 	//
 	enum
 	{

@@ -110,4 +110,15 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 				processor.collection->imageAbout.image.getWidth(), processor.collection->imageAbout.image.getHeight());
 		}
 	}
+	//
+	if (processor.collection != nullptr && editObject.type == WusikEditObject::kPreset)
+	{
+		Image* presetImage = &((WSPX_Collection_Preset*)editObject.object)->imagePresetIcon.image;
+		if (presetImage->getWidth() > 0)
+		{
+			g.setColour(Colours::darkblue.withAlpha(0.88f));
+			g.fillRect(Rectangle<int>((1282.0 - 4.0) * multRatio, (108.0 - 4.0) * multRatio, (314.0 + 8.0) * multRatio, (314.0 + 8.0) * multRatio));
+			g.drawImage(*presetImage, 1282.0 * multRatio, 108.0 * multRatio, 314.0 * multRatio, 314.0 * multRatio, 0, 0, presetImage->getWidth(), presetImage->getHeight());
+		}
+	}
 }
