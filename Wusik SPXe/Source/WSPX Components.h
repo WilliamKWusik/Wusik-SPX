@@ -241,7 +241,7 @@ public:
 class WSPXSoundZone : public Component
 {
 public:
-	WSPXSoundZone(WSPX_Collection_Sound* _sound) : sound(_sound) { }
+	WSPXSoundZone(WSPX_Collection_Sound_File* _sound) : sound(_sound) { }
 	//
 	void paint(Graphics& g) override
 	{
@@ -250,16 +250,15 @@ public:
 		g.drawRect(0, 0, getWidth(), getHeight(), 2);
 	}
 	//
-	WSPX_Collection_Sound* sound;
+	WSPX_Collection_Sound_File* sound;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPXPresetTreeItem : public TreeViewItem
 {
 public:
-	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), 
-		WSPX_Collection_Preset* _preset = nullptr, int _specialItem = 0, WSPX_Collection_Preset_Layer* _layer = nullptr, 
-		WSPX_Collection_Sound_Group* _soundGroup = nullptr, WSPX_Collection_Sound* _sound = nullptr);
+	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), WSPX_Collection_Preset* _preset = nullptr,
+		int _specialItem = 0, WSPX_Collection_Preset_Layer* _layer = nullptr, WSPX_Collection_Sound* _soundGroup = nullptr);
 	//
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
@@ -270,8 +269,7 @@ public:
 	WusikSpxAudioProcessor& processor;
 	WSPX_Collection_Preset* preset = nullptr;
 	WSPX_Collection_Preset_Layer* layer = nullptr;
-	WSPX_Collection_Sound_Group* soundGroup = nullptr;
-	WSPX_Collection_Sound* sound = nullptr;
+	WSPX_Collection_Sound* soundGroup = nullptr;
 	int level = 0;
 	int specialItem = 0;
 	double ui_ratio = 1.0;
@@ -279,11 +277,11 @@ public:
 	//
 	enum
 	{
-		kLevel_AddPreset = 0,
+		kLevel_Add_Preset = 0,
 		kLevel_Presets,
 		kLevel_Preset_Layers,
-		kLevel_Sound_Groups,
-		kLevel_Sound_Groups_Options,
+		kLevel_Sound_Links,
+		kLevel_Sound_Links_Options,
 		//
 		kRegular_Item = 0,
 		//
@@ -297,7 +295,7 @@ public:
 		kPreset_Layers,
 		//
 		kPreset_Layer_Remove = 1,
-		kPreset_Layer_Add_Sound_Group,
+		kPreset_Layer_Add_Sound_Link,
 		//
 		kSound_Group_Remove = 1
 	};
@@ -311,7 +309,7 @@ class WSPXSoundTreeItem : public TreeViewItem
 {
 public:
 	WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), 
-		int _specialItem = 0, WSPX_Collection_Sound_Group* _soundGroup = nullptr, WSPX_Collection_Sound* _sound = nullptr);
+		int _specialItem = 0, WSPX_Collection_Sound* _soundGroup = nullptr, WSPX_Collection_Sound_File* _sound = nullptr);
 	//
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
@@ -319,8 +317,8 @@ public:
 	int getItemHeight() const override { return 24.0 * ui_ratio; }
 	//
 	WusikSpxAudioProcessor& processor;
-	WSPX_Collection_Sound_Group* soundGroup = nullptr;
-	WSPX_Collection_Sound* sound = nullptr;
+	WSPX_Collection_Sound* soundGroup = nullptr;
+	WSPX_Collection_Sound_File* sound = nullptr;
 	int level = 0;
 	int specialItem = 0;
 	double ui_ratio = 1.0;
@@ -328,7 +326,7 @@ public:
 	//
 	enum
 	{
-		kLevel_AddSound = 0,
+		kLevel_Add_Sound = 0,
 		kLevel_Sound_Groups,
 		kLevel_Sounds,
 		kLevel_Sounds_Options,
@@ -354,9 +352,9 @@ public:
 		addAndMakeVisible(tree);
 		//
 		if (isPresetTreeView)
-			tree.setRootItem(new WSPXPresetTreeItem(processor, _ui_ratio, WSPXPresetTreeItem::kLevel_AddPreset, "Add Preset"));
+			tree.setRootItem(new WSPXPresetTreeItem(processor, _ui_ratio, WSPXPresetTreeItem::kLevel_Add_Preset, "Add Preset"));
 		else 
-			tree.setRootItem(new WSPXSoundTreeItem(processor, _ui_ratio, WSPXSoundTreeItem::kLevel_AddSound, "Add Sound"));
+			tree.setRootItem(new WSPXSoundTreeItem(processor, _ui_ratio, WSPXSoundTreeItem::kLevel_Add_Sound, "Add Sound"));
 		//
 		tree.getRootItem()->setOpen(true);
 		tree.setColour(TreeView::linesColourId, Colours::white);

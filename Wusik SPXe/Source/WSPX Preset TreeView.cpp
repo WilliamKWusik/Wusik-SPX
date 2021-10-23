@@ -11,12 +11,11 @@
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name, 
-	WSPX_Collection_Preset* _preset, int _specialItem, WSPX_Collection_Preset_Layer* _layer, 
-	WSPX_Collection_Sound_Group* _soundGroup, WSPX_Collection_Sound* _sound)
+	WSPX_Collection_Preset* _preset, int _specialItem, WSPX_Collection_Preset_Layer* _layer, WSPX_Collection_Sound* _soundGroup)
 	: processor(_processor), preset(_preset), level(_level), ui_ratio(_ui_ratio), soundGroup(_soundGroup), 
-	layer(_layer), specialItem(_specialItem), sound(_sound), name(_name)
+	layer(_layer), specialItem(_specialItem), name(_name)
 {
-	if (level == kLevel_AddPreset)
+	if (level == kLevel_Add_Preset)
 	{
 		for (int pp = 0; pp < processor.collection->presets.size(); pp++)
 		{
@@ -38,18 +37,17 @@ WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, doubl
 	}
 	else if (level == kLevel_Preset_Layers && specialItem == kRegular_Item)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Remove", preset, kPreset_Layer_Remove, layer));
-		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "Add Group", preset, kPreset_Layer_Add_Sound_Group, layer));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "Remove", preset, kPreset_Layer_Remove, layer));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "Link Sound", preset, kPreset_Layer_Add_Sound_Link, layer));
 		//
-		for (int ss = 0; ss < layer->soundGroupIDs.size(); ss++)
+		for (int ss = 0; ss < layer->soundLinks.size(); ss++)
 		{
-			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", preset, kRegular_Item, layer, 
-				processor.collection->soundGroups[layer->soundGroupIDs[ss]]));
+			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, processor.collection->sounds[ss]));
 		}
 	}
-	else if (level == kLevel_Sound_Groups && specialItem == kRegular_Item)
+	else if (level == kLevel_Sound_Links && specialItem == kRegular_Item)
 	{
-		//addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups_Options, "Remove", preset, kSound_Group_Remove, layer, sound));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links_Options, "Remove", preset, kSound_Group_Remove, layer, soundGroup));
 	}
 }
 //
@@ -67,17 +65,17 @@ void WSPXPresetTreeItem::paintItem(Graphics& g, int width, int height)
 		g.drawText(name, 0, 0, width, height, Justification::left);
 	}
 	else if (level == kLevel_Presets) g.drawFittedText(preset->name, 0, 0, width, height, Justification::left, 1);
-	else if (level == kLevel_Sound_Groups) g.drawFittedText("Snd Group", 0, 0, width, height, Justification::left, 1);
+	else if (level == kLevel_Sound_Links) g.drawFittedText("Snd Link", 0, 0, width, height, Justification::left, 1);
 	else if (level == kLevel_Preset_Layers) g.drawFittedText("Layer", 0, 0, width, height, Justification::left, 1);
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 {
-	if (level > kLevel_AddPreset && !isOpen()) setOpen(true);
+	if (level > kLevel_Add_Preset && !isOpen()) setOpen(true);
 	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
 	//
-	if (level == kLevel_AddPreset)
+	if (level == kLevel_Add_Preset)
 	{
 		if (WConfirmBox("Add New Preset", "Are you sure?"))
 		{
@@ -96,7 +94,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.indexOf(preset), (void*) preset);
 		editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 	}
-	else if (level == kLevel_Sound_Groups)
+	else if (level == kLevel_Sound_Links)
 	{
 		if (specialItem == kPreset_Layer_Remove)
 		{
@@ -109,14 +107,51 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 			}
 			else reselectParent();
 		}
+		else if (specialItem == kPreset_Layer_Add_Sound_Link)
+		{
+			StringArray soundItems;
+			for (int gg = 0; gg < processor.collection->sounds.size(); gg++)
+			{
+				soundItems.add("Sound " + String(gg + 1) + ": " + processor.collection->sounds[gg]->name);
+			}
+			//
+			AlertWindow w("Link Sound", "", AlertWindow::NoIcon);
+			w.addComboBox("Sound", soundItems);
+			w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+			w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+			w.setAlwaysOnTop(true);
+			//
+			int result = w.runModalLoop();
+			if (result == 1)
+			{
+				int selectedSound = w.getComboBoxComponent("Sound")->getSelectedItemIndex();
+				layer->soundLinks.add(processor.collection->sounds[selectedSound]);
+				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
+				//
+				getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setOpen(true);
+				getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+				//
+				editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)layer->soundLinks.getLast());
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			}
+			else reselectParent();
+		}
+		else
+		{
+			editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)soundGroup);
+			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+		}
 	}
-	else if (level == kLevel_Sound_Groups_Options)
+	else if (level == kLevel_Sound_Links_Options)
 	{
 		if (specialItem == kSound_Group_Remove)
 		{
-			if (WConfirmBox("Remove Sound Group", "Are you sure?"))
+			if (WConfirmBox("Remove Sound Link", "Are you sure?"))
 			{
-				return;
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Remove_Sound_Link,
+					processor.collection->presets.indexOf(preset), preset->layers.indexOf(layer), 
+					layer->soundLinks.indexOf(soundGroup), getParentItem()->getIndexInParent(), (void*)getParentItem());
+				return; // we exit quickly as this is about to go down //
 			}
 			else reselectParent();
 		}

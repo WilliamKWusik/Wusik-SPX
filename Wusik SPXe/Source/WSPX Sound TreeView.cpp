@@ -11,14 +11,14 @@
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name, 
-	int _specialItem, WSPX_Collection_Sound_Group* _soundGroup, WSPX_Collection_Sound* _sound)
+	int _specialItem, WSPX_Collection_Sound* _soundGroup, WSPX_Collection_Sound_File* _sound)
 	: processor(_processor), level(_level), ui_ratio(_ui_ratio), soundGroup(_soundGroup), specialItem(_specialItem),  sound(_sound), name(_name)
 {
-	if (level == kLevel_AddSound)
+	if (level == kLevel_Add_Sound)
 	{
-		for (int gg = 0; gg < processor.collection->soundGroups.size(); gg++)
+		for (int gg = 0; gg < processor.collection->sounds.size(); gg++)
 		{
-			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", kRegular_Item, processor.collection->soundGroups[gg]));
+			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", kRegular_Item, processor.collection->sounds[gg]));
 		}
 	}
 	else if (level == kLevel_Sound_Groups)
@@ -26,9 +26,9 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "Remove", kSound_Group_Remove, soundGroup));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "Load File", kSound_Group_Add_Sound, soundGroup));
 		//
-		for (int ss = 0; ss < soundGroup->sounds.size(); ss++)
+		for (int ss = 0; ss < soundGroup->soundFiles.size(); ss++)
 		{
-			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "", kRegular_Item, soundGroup, soundGroup->sounds[ss]));
+			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "", kRegular_Item, soundGroup, soundGroup->soundFiles[ss]));
 		}
 	}
 	else if (level == kLevel_Sounds && name.isEmpty())
@@ -63,5 +63,5 @@ void WSPXSoundTreeItem::paintItem(Graphics& g, int width, int height)
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 {
-	if (level > kLevel_AddSound) setOpen(!isOpen());
+	if (level > kLevel_Add_Sound) setOpen(!isOpen());
 }

@@ -13,7 +13,7 @@ void WSPX_Collection::streamData(void* stream, int type)
 {
 	int xVersion = 1; // The file version //
 	int totalPresets = presets.size();
-	int totalSoundGroups = soundGroups.size();
+	int totalsounds = sounds.size();
 	//
 	WS::stream(stream, xVersion, type);
 	WS::stream(stream, name, type);
@@ -31,7 +31,7 @@ void WSPX_Collection::streamData(void* stream, int type)
 	imageIcon.streamData(stream, type);
 	//
 	WS::stream(stream, totalPresets, type);
-	WS::stream(stream, totalSoundGroups, type);
+	WS::stream(stream, totalsounds, type);
 	//
 	if (isWSPXEditor)
 	{
@@ -41,10 +41,10 @@ void WSPX_Collection::streamData(void* stream, int type)
 			presets[pp]->streamData(stream, type);
 		}
 		//
-		for (int ss = 0; ss < totalSoundGroups; ss++)
+		for (int ss = 0; ss < totalsounds; ss++)
 		{
-			if (type == WS::kRead) soundGroups.add(new WSPX_Collection_Sound_Group);
-			soundGroups[ss]->streamData(stream, type);
+			if (type == WS::kRead) sounds.add(new WSPX_Collection_Sound);
+			sounds[ss]->streamData(stream, type);
 		}
 	}
 }
@@ -109,13 +109,13 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type)
 		channels[ch]->streamData(stream, type);
 	}
 	//
-	int totalSoundGroupIDs = soundGroupIDs.size();
-	WS::stream(stream, totalSoundGroupIDs, type);
-	for (int ss = 0; ss < totalSoundGroupIDs; ss++)
+	/*int totalsounds = sounds.size();
+	WS::stream(stream, totalsounds, type);
+	for (int ss = 0; ss < totalsounds; ss++)
 	{
-		if (type == WS::kRead) soundGroupIDs.add(0);
-		WS::stream(stream, soundGroupIDs.getRawDataPointer()[ss], type);
-	}
+		if (type == WS::kRead) sounds.add(0);
+		WS::stream(stream, sounds.getRawDataPointer()[ss], type);
+	}*/
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -137,7 +137,7 @@ void WSPX_Sequencer::streamData(void* stream, int type)
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WSPX_Collection_Sound::streamData(void* stream, int type)
+void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 {
 	WS::stream(stream, roundRobin, type);
 	WS::stream(stream, random, type);

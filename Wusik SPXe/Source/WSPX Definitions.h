@@ -54,7 +54,7 @@ extern String collectionFile;
 #endif
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Collection_Sound
+class WSPX_Collection_Sound_File
 {
 public:
 	void streamData(void* stream, int type);
@@ -112,12 +112,12 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Collection_Sound_Group
+class WSPX_Collection_Sound
 {
 public:
 	void streamData(void* stream, int type)
 	{
-		int totalSounds = sounds.size();
+		int totalSounds = soundFiles.size();
 		WS::stream(stream, totalSounds, type);
 		WS::stream(stream, name, type);
 		WS::stream(stream, tags, type);
@@ -125,12 +125,12 @@ public:
 		//
 		for (int ss = 0; ss < totalSounds; ss++)
 		{
-			if (type == WS::kRead) sounds.add(new WSPX_Collection_Sound);
-			sounds[ss]->streamData(stream, type);
+			if (type == WS::kRead) soundFiles.add(new WSPX_Collection_Sound_File);
+			soundFiles[ss]->streamData(stream, type);
 		}
 	}
 	//
-	OwnedArray<WSPX_Collection_Sound> sounds;
+	OwnedArray<WSPX_Collection_Sound_File> soundFiles;
 	float chokeGroup = 0.0f;
 	String name, tags;
 };
@@ -380,7 +380,7 @@ public:
 	//
 	WSPX_Sequencer sequencer;
 	OwnedArray<WSPX_Channel> channels;
-	Array<int> soundGroupIDs;
+	Array<WSPX_Collection_Sound*> soundLinks;
 	WSPX_Collection_LFO lfos[2];
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
@@ -441,7 +441,7 @@ public:
 	//
 	#if WSPXEDITOR
 		OwnedArray<WSPX_Collection_Preset> presets;
-		OwnedArray<WSPX_Collection_Sound_Group> soundGroups;
+		OwnedArray<WSPX_Collection_Sound> sounds;
 		bool hasUnsavedChanges = false;
 		File exportedFile;
 	#else

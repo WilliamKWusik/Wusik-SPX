@@ -28,10 +28,12 @@ void WusikSpxAudioProcessorEditor::cleanInterface()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::updateInterface()
 {
-	/*for (int ss = 0; ss < processor.collection->soundGroups[processor.collection->editingSound]->sounds.size(); ss++)
+	/*for (int ss = 0; ss < processor.collection->sounds[processor.collection->editingSound]->sounds.size(); ss++)
 	{
-		addAndMakeVisible(soundZones.add(new WSPXSoundZone(processor.collection->soundGroups[processor.collection->editingSound]->sounds[ss])));
+		addAndMakeVisible(soundZones.add(new WSPXSoundZone(processor.collection->sounds[processor.collection->editingSound]->sounds[ss])));
 	}*/
+
+	editOptionsComponent = nullptr;
 
 	#define AddCompoLabel(label) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kLabel, label)))
 	#define AddCompoCallback(type, name, variable, label, callback) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, callback)))
@@ -53,10 +55,17 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kImage, "Image Icon", &processor.collection->imageIcon);
 		AddCompo(kImage, "Image About", &processor.collection->imageAbout);
 		AddCompo2(kString, "Protection Key", &processor.collection->protectionKey, "", true, nullptr);
+	}
+	else if (editObject.type == WusikEditObject::kSoundGroup)
+	{
+		WSPX_Collection_Sound* soundGroup = (WSPX_Collection_Sound*)editObject.object;
 		//
-		addAndMakeVisible(editOptionsViewport = new Viewport);
-		editOptionsViewport->setViewedComponent(editOptionsComponent);
-		editOptionsViewport->setScrollBarsShown(true, false);
+		editOptionsComponent = new Component;
+		AddCompoLabel("Sound Details");
+		AddCompo(kString, "Name", &soundGroup->name);
+		AddCompo(kString, "Tags", &soundGroup->tags);
+		AddCompo4(kSliderInteger, "Choke Group", &soundGroup->chokeGroup, "", 0, 128);
+
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
 	{
@@ -73,17 +82,13 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSliderBipolar, "Pan", &preset->pan);
 		AddCompo(kSliderBipolar, "Fine Tune", &preset->fineTune);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &preset->coarseTune, "", -48, 48);
-		//
-		addAndMakeVisible(editOptionsViewport = new Viewport);
-		editOptionsViewport->setViewedComponent(editOptionsComponent);
-		editOptionsViewport->setScrollBarsShown(true, false);
 	}
 	else if (editObject.type == WusikEditObject::kPresetLayer)
 	{
 		WSPX_Collection_Preset_Layer* layer = (WSPX_Collection_Preset_Layer*)editObject.object;
 		//
 		editOptionsComponent = new Component;
-		AddCompoLabel("Layer #" + String(editObject.index + 1) + " Details");
+		AddCompoLabel("Layer Details");
 		AddCompo(kSlider, "Volume", &layer->volume);
 		AddCompo(kSliderBipolar, "Pan", &layer->pan);
 		AddCompo(kSliderBipolar, "Fine Tune", &layer->fineTune);
@@ -157,7 +162,10 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kOnOffButton, "Sync to BPM", &layer->sequencer.sync);
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
-		//
+	}
+	//
+	if (editOptionsComponent != nullptr)
+	{
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
 		editOptionsViewport->setScrollBarsShown(true, false);
@@ -240,13 +248,17 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		cleanInterface();
 		updateInterface();
 	}
-	/*else if (timerAction.get() == kTimerAction_Remove_SoundGroup)
+	else if (timerAction.get() == kTimerAction_Remove_Sound_Link)
 	{
 		editObject.set(WusikEditObject::kCollection, 0);
+		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*)timerActionValueObject;
+		treeViewItem->getParentItem()->removeSubItem(timerActionValue4);
+		processor.collection->presets[timerActionValue1]->layers[timerActionValue2]->soundLinks.remove(timerActionValue3);
+		//
+		redoTreeViewsOnResize = false;
 		cleanInterface();
-		processor.collection->presets[timerActionValue1]->layers[timerActionValue2]->soundGroupIDs.remove(timerActionValue3);
 		updateInterface();
-	}*/
+	}
 	//
 	timerAction.set(kTimerAction_None);
 }
