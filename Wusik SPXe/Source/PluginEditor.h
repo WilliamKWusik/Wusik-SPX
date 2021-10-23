@@ -10,7 +10,7 @@
 #include "WSPX Components.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WusikSpxAudioProcessorEditor  : public AudioProcessorEditor, public Button::Listener
+class WusikSpxAudioProcessorEditor  : public AudioProcessorEditor, public Button::Listener, public Timer
 {
 public:
     WusikSpxAudioProcessorEditor (WusikSpxAudioProcessor&);
@@ -28,8 +28,21 @@ public:
 		compo->setBounds(double(xx) * multRatio, double(yy) * multRatio, double(ww) * multRatio, double(hh) * multRatio);
 	}
 	//
+	void createAction(int _type, int _value1 = 0, int _value2 = 0, int _value3 = 0, int _value4 = 0, void* _object = nullptr)
+	{
+		stopTimer();
+		timerActionValue1 = _value1;
+		timerActionValue2 = _value2;
+		timerActionValue3 = _value3;
+		timerActionValue4 = _value4;
+		timerActionValueObject = _object;
+		timerAction.set(_type);
+		startTimer(200);
+	}
+	//
 	void updateInterface();
 	void cleanInterface();
+	void timerCallback() override;
 	//
 	Image backgroundImage;
 	Image redSaveImage; // UnSaved Changes //
@@ -52,11 +65,29 @@ public:
 	double multRatio = 1.0;
 	bool redoTreeViewsOnResize = true;
 	//
+	Atomic<int> timerAction = 0;
+	int timerActionValue1 = 0;
+	int timerActionValue2 = 0;
+	int timerActionValue3 = 0;
+	int timerActionValue4 = 0;
+	void* timerActionValueObject = nullptr;
+	//
 	WTransparentButton* logoButton;
 	WTransparentButton* fileButton;
 	WTransparentButton* saveButton;
 	WTransparentButton* collectionButton;
 	WTransparentButton* previewButton;
+	//
+	enum
+	{
+		kTimerAction_None,
+		kTimerAction_Remove_Preset,
+		kTimerAction_Remove_Layer,
+		kTimerAction_Remove_SoundGroup,
+		kTimerAction_Update_Interface,
+		kTimerAction_Update_Interface_Show_Collection,
+		kTimerAction_Update_Preset_Layers
+	};
 	//
 private:
     WusikSpxAudioProcessor& processor;

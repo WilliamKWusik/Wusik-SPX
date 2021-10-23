@@ -62,6 +62,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 // ------------------------------------------------------------------------------------------------------------------------- //
 WusikSpxAudioProcessorEditor::~WusikSpxAudioProcessorEditor()
 {
+	stopTimer();
 	cleanInterface();
 	setLookAndFeel(nullptr);
 	LookAndFeel::setDefaultLookAndFeel(nullptr);

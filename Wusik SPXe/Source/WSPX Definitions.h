@@ -19,7 +19,6 @@ extern String collectionFile;
 	public:
 		static void stream(void* _stream, float& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeFloat(_value); else _value = ((InputStream*)_stream)->readFloat(); }
 		static void stream(void* _stream, bool& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeBool(_value); else _value = ((InputStream*)_stream)->readBool(); }
-		static void stream(void* _stream, uint8_t& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeByte(_value); else _value = ((InputStream*)_stream)->readByte(); }
 		static void stream(void* _stream, String& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeString(_value); else _value = ((InputStream*)_stream)->readString(); }
 		static void stream(void* _stream, File& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeString(_value.getFullPathName()); else _value = ((InputStream*)_stream)->readString(); }
 		static void stream(void* _stream, int& _value, int _type) { if (_type == kWrite) ((OutputStream*)_stream)->writeInt(_value); else _value = ((InputStream*)_stream)->readInt(); }
@@ -31,7 +30,7 @@ extern String collectionFile;
 			{
 				int64 _size = _value.getSize();
 				((OutputStream*)_stream)->writeInt64(_size);
-				((OutputStream*)_stream)->write(_value.getData(), _value.getSize());
+				if (_size > 0) ((OutputStream*)_stream)->write(_value.getData(), _value.getSize());
 			}
 			else
 			{
@@ -341,14 +340,14 @@ class WSPX_Sequencer
 public:
 	void streamData(void* stream, int type);
 	//
-	const String types = "Forward\nBackwards\nPingPong\nRandom";
+	const String modes = "Forward\nBackwards\nPingPong\nRandom";
 	OwnedArray<WSPX_Sequencer_Step> steps;
-	float syncBPM = 1.0f;
-	float time1 = 0.1f;
-	float time2 = 0.1f;
+	float sync = 1.0f;
+	float speed1 = 0.1f;
+	float speed2 = 0.1f;
 	float loopStart = 0.0f;
 	float smoothOutput = 0.0f;
-	int type = 0;
+	int mode = 0;
 	//
 	enum
 	{
@@ -410,7 +409,8 @@ public:
 	OwnedArray<WSPX_Collection_Preset_Layer> layers;
 	WSPX_Collection_Effect effects[4]; // Up to 4 Sends with up to 4 internal effects //
 	WSPX_Image imagePresetIcon;
-	String name, tags, author, description;
+	String name = "Init Preset";
+	String tags, author, description;
 	//
 	float volume = 1.0f;
 	float pan = 0.5f;
@@ -434,7 +434,8 @@ public:
 	//
 	WSPX_Image imageAbout;
 	WSPX_Image imageIcon;
-	String name, description, author, company, tags, version;
+	String name = "Init Collection";
+	String description, author, company, tags, version;
 	String protectionKey;
 	File file;
 	//

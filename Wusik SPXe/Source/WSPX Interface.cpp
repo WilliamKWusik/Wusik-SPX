@@ -131,7 +131,6 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSliderBipolar, "Velocity Track", &layer->filter.envelope.velTrack);
 		AddCompo6(kPopupList, "Type", &layer->filter.envelope.type, "", layer->filter.envelope.types);
 		//
-		//
 		for (int ll = 0; ll < 2; ll++)
 		{
 			AddCompoLabel("LFO " + String(ll + 1));
@@ -151,6 +150,13 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			AddCompo(kOnOffButton, "Note On Reset", &layer->lfos[ll].noteOnReset);
 			AddCompo(kOnOffButton, "Inverted", &layer->lfos[ll].inverted);
 		}
+		//
+		AddCompoLabel("Sequencer");
+		AddCompo(kSlider, "Speed 1", &layer->sequencer.speed1);
+		AddCompo(kSlider, "Speed 1", &layer->sequencer.speed2);
+		AddCompo(kOnOffButton, "Sync to BPM", &layer->sequencer.sync);
+		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
+		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
 		//
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
@@ -192,4 +198,41 @@ WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* 
 	{
 		popupList = StringArray::fromLines(_popupList);
 	}
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WusikSpxAudioProcessorEditor::timerCallback()
+{
+	stopTimer();
+	//
+	if (timerAction.get() == kTimerAction_Update_Interface || timerAction.get() == kTimerAction_Update_Interface_Show_Collection)
+	{
+		if (timerAction.get() == kTimerAction_Update_Interface_Show_Collection) editObject.set(WusikEditObject::kCollection, 0);
+		//
+		cleanInterface();
+		updateInterface();
+	}
+	else if (timerAction.get() == kTimerAction_Remove_Preset)
+	{
+		editObject.set(WusikEditObject::kCollection, 0);
+		cleanInterface();
+		processor.collection->presets.remove(timerActionValue1);
+		updateInterface();
+	}
+	else if (timerAction.get() == kTimerAction_Remove_Layer)
+	{
+		editObject.set(WusikEditObject::kPresetLayer, timerActionValue2, (void*)processor.collection->presets[timerActionValue1]->layers[timerActionValue2]);
+		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*) timerActionValueObject;
+		treeViewItem->getParentItem()->removeSubItem(timerActionValue3);
+		processor.collection->presets[timerActionValue1]->layers.remove(timerActionValue2);
+	}
+	/*else if (timerAction.get() == kTimerAction_Remove_SoundGroup)
+	{
+		editObject.set(WusikEditObject::kCollection, 0);
+		cleanInterface();
+		processor.collection->presets[timerActionValue1]->layers[timerActionValue2]->soundGroupIDs.remove(timerActionValue3);
+		updateInterface();
+	}*/
+	//
+	timerAction.set(kTimerAction_None);
 }

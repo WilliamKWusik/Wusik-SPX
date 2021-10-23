@@ -28,8 +28,8 @@
 class WusikEditObject
 {
 public:
-	void set(char _type, int _index, void* _object = nullptr) { type = _type; object = _object; index = _index; }
-	char type = kCollection;
+	void set(int _type, int _index, void* _object = nullptr) { type = _type; object = _object; index = _index; }
+	int type = kCollection;
 	void* object = nullptr;
 	int index = 0;
 	//
@@ -257,19 +257,22 @@ public:
 class WSPXPresetTreeItem : public TreeViewItem
 {
 public:
-	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, uint8_t _level, String _name = String(), int16 _preset = 0, uint8_t _specialItem = 0, int16 _layer = 0, int16 _soundGroup = 0, int16 _sound = 0);
+	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), 
+		WSPX_Collection_Preset* _preset = nullptr, int _specialItem = 0, WSPX_Collection_Preset_Layer* _layer = nullptr, 
+		WSPX_Collection_Sound_Group* _soundGroup = nullptr, WSPX_Collection_Sound* _sound = nullptr);
+	//
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
 	int getItemHeight() const override { return 24.0 * ui_ratio; }
 	//
 	WusikSpxAudioProcessor& processor;
-	int16 preset = 0;
-	int16 layer = 0;
-	int16 soundGroup = 0;
-	int16 sound = 0;
-	uint8_t level = 0;
-	uint8_t specialItem = 0;
+	WSPX_Collection_Preset* preset = nullptr;
+	WSPX_Collection_Preset_Layer* layer = nullptr;
+	WSPX_Collection_Sound_Group* soundGroup = nullptr;
+	WSPX_Collection_Sound* sound = nullptr;
+	int level = 0;
+	int specialItem = 0;
 	double ui_ratio = 1.0;
 	String name;
 	//
@@ -287,6 +290,8 @@ public:
 		//
 		kPreset_Remove = 1,
 		kPreset_Duplicate,
+		kPreset_Move_Up,
+		kPreset_Move_Down,
 		kPreset_Add_Layer,
 		kPreset_Layers,
 		//
@@ -304,17 +309,19 @@ private:
 class WSPXSoundTreeItem : public TreeViewItem
 {
 public:
-	WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, uint8_t _level, String _name = String(), uint8_t _specialItem = 0, int16 _soundGroup = 0, int16 _sound = 0);
+	WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), 
+		int _specialItem = 0, WSPX_Collection_Sound_Group* _soundGroup = nullptr, WSPX_Collection_Sound* _sound = nullptr);
+	//
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
 	int getItemHeight() const override { return 24.0 * ui_ratio; }
 	//
 	WusikSpxAudioProcessor& processor;
-	int16 soundGroup = 0;
-	int16 sound = 0;
-	uint8_t level = 0;
-	uint8_t specialItem = 0;
+	WSPX_Collection_Sound_Group* soundGroup = nullptr;
+	WSPX_Collection_Sound* sound = nullptr;
+	int level = 0;
+	int specialItem = 0;
 	double ui_ratio = 1.0;
 	String name;
 	//
@@ -345,10 +352,10 @@ public:
 	{
 		addAndMakeVisible(tree);
 		//
-		if (isPresetTreeView) 
-			tree.setRootItem(new WSPXPresetTreeItem(processor, _ui_ratio, WSPXPresetTreeItem::kLevel_AddPreset, "Add Preset", WSPXPresetTreeItem::kAdd_Preset));
+		if (isPresetTreeView)
+			tree.setRootItem(new WSPXPresetTreeItem(processor, _ui_ratio, WSPXPresetTreeItem::kLevel_AddPreset, "Add Preset"));
 		else 
-			tree.setRootItem(new WSPXSoundTreeItem(processor, _ui_ratio, WSPXSoundTreeItem::kLevel_AddSound, "Add Sound", WSPXSoundTreeItem::kSound_Group_Add_Sound));
+			tree.setRootItem(new WSPXSoundTreeItem(processor, _ui_ratio, WSPXSoundTreeItem::kLevel_AddSound, "Add Sound"));
 		//
 		tree.getRootItem()->setOpen(true);
 		tree.setColour(TreeView::linesColourId, Colours::white);

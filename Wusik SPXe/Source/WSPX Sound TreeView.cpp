@@ -10,14 +10,15 @@
 #include "PluginEditor.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, uint8_t _level, String _name, uint8_t _specialItem, int16 _soundGroup, int16 _sound)
-	: processor(_processor), level(_level), ui_ratio(_ui_ratio), soundGroup(_soundGroup), specialItem(_specialItem), sound(_sound), name(_name)
+WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name, 
+	int _specialItem, WSPX_Collection_Sound_Group* _soundGroup, WSPX_Collection_Sound* _sound)
+	: processor(_processor), level(_level), ui_ratio(_ui_ratio), soundGroup(_soundGroup), specialItem(_specialItem),  sound(_sound), name(_name)
 {
 	if (level == kLevel_AddSound)
 	{
 		for (int gg = 0; gg < processor.collection->soundGroups.size(); gg++)
 		{
-			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", kRegular_Item, gg));
+			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", kRegular_Item, processor.collection->soundGroups[gg]));
 		}
 	}
 	else if (level == kLevel_Sound_Groups)
@@ -25,9 +26,9 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "Remove", kSound_Group_Remove, soundGroup));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "Load File", kSound_Group_Add_Sound, soundGroup));
 		//
-		for (int ss = 0; ss < processor.collection->soundGroups[soundGroup]->sounds.size(); ss++)
+		for (int ss = 0; ss < soundGroup->sounds.size(); ss++)
 		{
-			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "", kRegular_Item, soundGroup, ss));
+			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "", kRegular_Item, soundGroup, soundGroup->sounds[ss]));
 		}
 	}
 	else if (level == kLevel_Sounds && name.isEmpty())
@@ -49,11 +50,11 @@ void WSPXSoundTreeItem::paintItem(Graphics& g, int width, int height)
 		g.setColour(Colours::lightblue.withAlpha(0.82f));
 		g.drawText(name, 0, 0, width, height, Justification::left);
 	}
-	else if (level == kLevel_Sound_Groups) g.drawText(processor.collection->soundGroups[soundGroup]->name, 0, 0, width, height, Justification::left);
+	else if (level == kLevel_Sound_Groups) g.drawText(soundGroup->name, 0, 0, width, height, Justification::left);
 	else if (level == kLevel_Sounds)
 	{
-		if (File(processor.collection->soundGroups[soundGroup]->sounds[sound]->soundFile).existsAsFile())
-			g.drawFittedText(File(processor.collection->soundGroups[soundGroup]->sounds[sound]->soundFile).getFileNameWithoutExtension(), 0, 0, width, height, Justification::left, 1);
+		if (File(sound->soundFile).existsAsFile())
+			g.drawFittedText(File(sound->soundFile).getFileNameWithoutExtension(), 0, 0, width, height, Justification::left, 1);
 		else 
 			g.drawText("No File", 0, 0, width, height, Justification::left);
 	}

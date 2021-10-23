@@ -122,12 +122,12 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type)
 void WSPX_Sequencer::streamData(void* stream, int type)
 {
 	int totalSteps = steps.size();
-	WS::stream(stream, syncBPM, type);
-	WS::stream(stream, time1, type);
-	WS::stream(stream, time2, type);
+	WS::stream(stream, sync, type);
+	WS::stream(stream, speed1, type);
+	WS::stream(stream, speed2, type);
 	WS::stream(stream, loopStart, type);
 	WS::stream(stream, smoothOutput, type);
-	WS::stream(stream, type, type);
+	WS::stream(stream, mode, type);
 	//
 	for (int tt = 0; tt < totalSteps; tt++)
 	{
@@ -183,16 +183,17 @@ void WSPX_Collection_Sound::streamData(void* stream, int type)
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPX_Collection_Effect::streamData(void* stream, int _type)
 {
-	WS::stream(stream, type, type);
-	WS::stream(stream, dry, type);
-	WS::stream(stream, wet, type);
-	WS::stream(stream, parallel, type);
+	WS::stream(stream, type, _type);
+	WS::stream(stream, dry, _type);
+	WS::stream(stream, wet, _type);
+	WS::stream(stream, parallel, _type);
 	//
 	for (int ee = 0; ee < 4; ee++)
 	{
-		bool hasEffect = effect[ee] != nullptr;
-		WS::stream(stream, hasEffect, type);
+		bool hasEffect = false;
+		WS::stream(stream, hasEffect, _type);
 		//
-		if (effect[ee] != nullptr) effect[ee]->streamData(stream, type);
+		// if (type == WS::kRead)
+		// if (effect[ee] != nullptr) effect[ee]->streamData(stream, type);
 	}
 }
