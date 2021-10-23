@@ -212,19 +212,33 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		cleanInterface();
 		updateInterface();
 	}
+	else if (timerAction.get() == kTimerAction_Update_Interface_Not_TreeViews)
+	{
+		redoTreeViewsOnResize = false;
+		cleanInterface();
+		updateInterface();
+	}
 	else if (timerAction.get() == kTimerAction_Remove_Preset)
 	{
 		editObject.set(WusikEditObject::kCollection, 0);
-		cleanInterface();
+		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*)timerActionValueObject;
+		treeViewItem->getParentItem()->removeSubItem(timerActionValue2);
 		processor.collection->presets.remove(timerActionValue1);
+		//
+		redoTreeViewsOnResize = false;
+		cleanInterface();
 		updateInterface();
 	}
 	else if (timerAction.get() == kTimerAction_Remove_Layer)
 	{
-		editObject.set(WusikEditObject::kPresetLayer, timerActionValue2, (void*)processor.collection->presets[timerActionValue1]->layers[timerActionValue2]);
+		editObject.set(WusikEditObject::kCollection, 0);
 		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*) timerActionValueObject;
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue3);
 		processor.collection->presets[timerActionValue1]->layers.remove(timerActionValue2);
+		//
+		redoTreeViewsOnResize = false;
+		cleanInterface();
+		updateInterface();
 	}
 	/*else if (timerAction.get() == kTimerAction_Remove_SoundGroup)
 	{

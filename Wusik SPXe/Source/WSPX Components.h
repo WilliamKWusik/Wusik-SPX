@@ -265,6 +265,7 @@ public:
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
 	int getItemHeight() const override { return 24.0 * ui_ratio; }
+	void reselectParent() { getParentItem()->setSelected(true, true, NotificationType::dontSendNotification); }
 	//
 	WusikSpxAudioProcessor& processor;
 	WSPX_Collection_Preset* preset = nullptr;

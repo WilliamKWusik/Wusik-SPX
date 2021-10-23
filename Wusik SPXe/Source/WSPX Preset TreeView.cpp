@@ -43,7 +43,8 @@ WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, doubl
 		//
 		for (int ss = 0; ss < layer->soundGroupIDs.size(); ss++)
 		{
-			//addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", preset, kRegular_Item, layer, layer->soundGroupIDs[ss]));
+			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", preset, kRegular_Item, layer, 
+				processor.collection->soundGroups[layer->soundGroupIDs[ss]]));
 		}
 	}
 	else if (level == kLevel_Sound_Groups && specialItem == kRegular_Item)
@@ -74,23 +75,26 @@ void WSPXPresetTreeItem::paintItem(Graphics& g, int width, int height)
 void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 {
 	if (level > kLevel_AddPreset && !isOpen()) setOpen(true);
-	//
 	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
-	bool redoInterface = false;
 	//
 	if (level == kLevel_AddPreset)
 	{
 		if (WConfirmBox("Add New Preset", "Are you sure?"))
 		{
 			processor.collection->presets.add(new WSPX_Collection_Preset);
-			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface);
-			return; // we exit quickly as this is about to go down //
+			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
+			//
+			getSubItem(getNumSubItems() - 1)->setOpen(true);
+			getSubItem(getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+			//
+			editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
+			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
 	}
-	if (level == kLevel_Presets)
+	else if (level == kLevel_Presets)
 	{
 		editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.indexOf(preset), (void*) preset);
-		redoInterface = true;
+		editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 	}
 	else if (level == kLevel_Sound_Groups)
 	{
@@ -103,6 +107,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 					preset->layers.indexOf(layer), getParentItem()->getIndexInParent(), 0, (void*) getParentItem());
 				return; // we exit quickly as this is about to go down //
 			}
+			else reselectParent();
 		}
 	}
 	else if (level == kLevel_Sound_Groups_Options)
@@ -113,6 +118,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 			{
 				return;
 			}
+			else reselectParent();
 		}
 	}
 	else if (level == kLevel_Preset_Layers)
@@ -121,9 +127,11 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		{
 			if (WConfirmBox("Remove Preset", "Are you sure?"))
 			{
-				//editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Remove_Preset, preset);
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Remove_Preset, 
+					processor.collection->presets.indexOf(preset), getParentItem()->getIndexInParent(), 0, 0, (void*)getParentItem());
 				return; // we exit quickly as this is about to go down //
 			}
+			else reselectParent();
 		}
 		else if (specialItem == kPreset_Duplicate)
 		{
@@ -138,44 +146,51 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				MemoryInputStream sendData(xData.getData(), xData.getSize(), false);
 				processor.collection->presets.getLast()->streamData((void *) &sendData, WS::kRead);
 				//
-				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Show_Collection);
-				return; // we exit quickly as this is about to go down //
+				getParentItem()->getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
+				//
+				getParentItem()->getParentItem()->getSubItem(getParentItem()->getParentItem()->getNumSubItems() - 1)->setOpen(true);
+				getParentItem()->getParentItem()->getSubItem(getParentItem()->getParentItem()->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+				//
+				editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
+			else reselectParent();
 		}
 		else if (specialItem == kPreset_Move_Up)
 		{
-			if (preset > 0)
+			if (processor.collection->presets.indexOf(preset) > 0)
 			{
-				//processor.collection->presets.move(preset, preset - 1);
+				processor.collection->presets.move(processor.collection->presets.indexOf(preset), processor.collection->presets.indexOf(preset) - 1);
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Show_Collection);
 				return; // we exit quickly as this is about to go down //
 			}
+			else reselectParent();
 		}
 		else if (specialItem == kPreset_Move_Down)
 		{
-			/*if (preset < (processor.collection->presets.size() - 1))
+			if (processor.collection->presets.indexOf(preset) < (processor.collection->presets.size() - 1))
 			{
-				//processor.collection->presets.move(preset, preset + 1);
+				processor.collection->presets.move(processor.collection->presets.indexOf(preset), processor.collection->presets.indexOf(preset) + 1);
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Show_Collection);
 				return; // we exit quickly as this is about to go down //
-			}*/
+			}
+			else reselectParent();
 		}
 		else if (specialItem == kPreset_Add_Layer)
 		{
-			//processor.collection->presets[preset]->layers.add(new WSPX_Collection_Preset_Layer);
-			//getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "", preset, kRegular_Item, processor.collection->presets[preset]->layers.size() - 1));
+			preset->layers.add(new WSPX_Collection_Preset_Layer);
+			getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "", preset, kRegular_Item, preset->layers.getLast()));
+			//
+			getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setOpen(true);
+			getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+			//
+			editor->editObject.set(WusikEditObject::kPresetLayer, 0, (void*) preset->layers.getLast());
+			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
 		else
 		{
-			//editor->editObject.set(WusikEditObject::kPresetLayer, layer, (void*)processor.collection->presets[preset]->layers[layer]);
-			redoInterface = true;
+			editor->editObject.set(WusikEditObject::kPresetLayer, preset->layers.indexOf(layer), (void*) layer);
+			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
-	}
-	//
-	if (redoInterface)
-	{
-		editor->redoTreeViewsOnResize = false;
-		editor->cleanInterface();
-		editor->updateInterface();
 	}
 }

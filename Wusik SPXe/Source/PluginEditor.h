@@ -85,8 +85,8 @@ public:
 		kTimerAction_Remove_Layer,
 		kTimerAction_Remove_SoundGroup,
 		kTimerAction_Update_Interface,
-		kTimerAction_Update_Interface_Show_Collection,
-		kTimerAction_Update_Preset_Layers
+		kTimerAction_Update_Interface_Not_TreeViews,
+		kTimerAction_Update_Interface_Show_Collection
 	};
 	//
 private:
