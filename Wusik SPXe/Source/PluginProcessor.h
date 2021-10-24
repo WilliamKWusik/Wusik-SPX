@@ -34,6 +34,17 @@ public:
 	void newCompilation();
 	bool loadCompilation(InputStream& stream);
 	void saveCompilation(OutputStream& stream);
+	void stopAllAudio()
+	{
+		suspendProcessing(true);
+		// Reset any Synth information Here //
+	}
+	//
+	void resumeAudio()
+	{
+		suspendProcessing(false);
+		// Restart the Synth engine //
+	}
 	//
 	ScopedPointer<WSPX_Collection> collection;
 	//

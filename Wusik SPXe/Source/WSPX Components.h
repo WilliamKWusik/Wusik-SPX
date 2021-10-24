@@ -39,8 +39,8 @@ public:
 		kCollection,
 		kPreset,
 		kPresetLayer,
-		kSoundGroup,
-		kSound
+		kSound,
+		kSoundFile
 	};
 };
 //
@@ -257,20 +257,13 @@ public:
 class WSPXTreeItem : public TreeViewItem
 {
 public:
-};
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
-class WSPXPresetTreeItem : public TreeViewItem
-{
-public:
-	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), WSPX_Collection_Preset* _preset = nullptr,
-		int _specialItem = 0, WSPX_Collection_Preset_Layer* _layer = nullptr, WSPX_Collection_Sound* _soundGroup = nullptr);
+	WSPXTreeItem(WusikSpxAudioProcessor& _processor, int _level, int _specialItem, double _ui_ratio, String _name)
+		: processor(_processor), level(_level), specialItem(_specialItem), ui_ratio(_ui_ratio), name(_name) { };
 	//
 	bool mightContainSubItems() override { return getNumSubItems() != 0; }
-	void paintItem(Graphics& g, int width, int height) override;
-	void itemClicked(const MouseEvent& e) override;
-	int getItemHeight() const override { return 24.0 * ui_ratio; }
 	void reselectParent() { getParentItem()->setSelected(true, true, NotificationType::dontSendNotification); }
+	int getItemHeight() const override { return 24.0 * ui_ratio; }
+	//
 	void openOnlyLast(TreeViewItem* item)
 	{
 		for (int ss = 0; ss < item->getNumSubItems(); ss++) { item->getSubItem(ss)->setOpen(false); }
@@ -284,13 +277,25 @@ public:
 	}
 	//
 	WusikSpxAudioProcessor& processor;
-	WSPX_Collection_Preset* preset = nullptr;
-	WSPX_Collection_Preset_Layer* layer = nullptr;
-	WSPX_Collection_Sound* soundGroup = nullptr;
 	int level = 0;
 	int specialItem = 0;
 	double ui_ratio = 1.0;
 	String name;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPXPresetTreeItem : public WSPXTreeItem
+{
+public:
+	WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), WSPX_Collection_Preset* _preset = nullptr,
+		int _specialItem = 0, WSPX_Collection_Preset_Layer* _layer = nullptr, WSPX_Collection_Sound* _soundLink = nullptr);
+	//
+	void paintItem(Graphics& g, int width, int height) override;
+	void itemClicked(const MouseEvent& e) override;
+	//
+	WSPX_Collection_Preset* preset = nullptr;
+	WSPX_Collection_Preset_Layer* layer = nullptr;
+	WSPX_Collection_Sound* soundLink = nullptr;
 	//
 	enum
 	{
@@ -314,61 +319,37 @@ public:
 		kPreset_Layer_Remove = 1,
 		kPreset_Layer_Add_Sound_Link,
 		//
-		kSound_Group_Remove = 1
+		kSound_Link_Remove = 1
 	};
-	//
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WSPXPresetTreeItem)
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPXSoundTreeItem : public TreeViewItem
+class WSPXSoundTreeItem : public WSPXTreeItem
 {
 public:
 	WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name = String(), 
-		int _specialItem = 0, WSPX_Collection_Sound* _soundGroup = nullptr, WSPX_Collection_Sound_File* _sound = nullptr);
+		int _specialItem = 0, WSPX_Collection_Sound* _sound = nullptr, WSPX_Collection_Sound_File* _soundFile = nullptr);
 	//
-	bool mightContainSubItems() override { return getNumSubItems() != 0; }
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
-	int getItemHeight() const override { return 24.0 * ui_ratio; }
-	void openOnlyLast(TreeViewItem* item)
-	{ 
-		for (int ss = 0; ss < item->getNumSubItems(); ss++) { item->getSubItem(ss)->setOpen(false); }
-		item->getSubItem(item->getNumSubItems() - 1)->setOpen(true);
-		item->getSubItem(item->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
-	}
-	void openOnly(TreeViewItem* item)
-	{
-		for (int ss = 0; ss < item->getParentItem()->getNumSubItems(); ss++) { item->getParentItem()->getSubItem(ss)->setOpen(false); }
-		setOpen(true);
-	}
 	//
-	WusikSpxAudioProcessor& processor;
-	WSPX_Collection_Sound* soundGroup = nullptr;
-	WSPX_Collection_Sound_File* sound = nullptr;
-	int level = 0;
-	int specialItem = 0;
-	double ui_ratio = 1.0;
-	String name;
+	WSPX_Collection_Sound* sound = nullptr;
+	WSPX_Collection_Sound_File* soundFile = nullptr;
 	//
 	enum
 	{
 		kLevel_Add_Sound = 0,
-		kLevel_Sound_Groups,
 		kLevel_Sounds,
-		kLevel_Sounds_Options,
+		kLevel_Sound_Files,
+		kLevel_Sound_File_Options,
 		//
 		kRegular_Item = 0,
 		//
-		kSound_Group_Remove = 1,
-		kSound_Group_Add_Sound,
+		kSound_Remove = 1,
+		kSound_File_Add,
 		//
-		kSound_Remove = 1
+		kSound_File_Remove = 1
 	};
-	//
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WSPXSoundTreeItem)
 };
 //
 // -------------------------------------------------------------------------------------------------------------------------------

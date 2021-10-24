@@ -11,9 +11,8 @@
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, double _ui_ratio, int _level, String _name, 
-	WSPX_Collection_Preset* _preset, int _specialItem, WSPX_Collection_Preset_Layer* _layer, WSPX_Collection_Sound* _soundGroup)
-	: processor(_processor), preset(_preset), level(_level), ui_ratio(_ui_ratio), soundGroup(_soundGroup), 
-	layer(_layer), specialItem(_specialItem), name(_name)
+	WSPX_Collection_Preset* _preset, int _specialItem, WSPX_Collection_Preset_Layer* _layer, WSPX_Collection_Sound* _soundLink)
+	: WSPXTreeItem(_processor, _level, _specialItem, _ui_ratio, _name), preset(_preset), soundLink(_soundLink), layer(_layer)
 {
 	if (level == kLevel_Add_Preset)
 	{
@@ -47,7 +46,7 @@ WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, doubl
 	}
 	else if (level == kLevel_Sound_Links && specialItem == kRegular_Item)
 	{
-		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links_Options, "Remove", preset, kSound_Group_Remove, layer, soundGroup));
+		addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links_Options, "Remove", preset, kSound_Link_Remove, layer, soundLink));
 	}
 }
 //
@@ -107,47 +106,51 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else if (specialItem == kPreset_Layer_Add_Sound_Link)
 		{
-			StringArray soundItems;
-			for (int gg = 0; gg < processor.collection->sounds.size(); gg++)
+			if (WConfirmBox("Add New Sound Link", "Are you sure?"))
 			{
-				soundItems.add("Sound " + String(gg + 1) + ": " + processor.collection->sounds[gg]->name);
-			}
-			//
-			AlertWindow w("Link Sound", "", AlertWindow::NoIcon);
-			w.addComboBox("Sound", soundItems);
-			w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-			w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-			w.setAlwaysOnTop(true);
-			//
-			int result = w.runModalLoop();
-			if (result == 1)
-			{
-				int selectedSound = w.getComboBoxComponent("Sound")->getSelectedItemIndex();
-				layer->soundLinks.add(processor.collection->sounds[selectedSound]);
-				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
-				openOnlyLast(getParentItem());
+				StringArray soundItems;
+				for (int gg = 0; gg < processor.collection->sounds.size(); gg++)
+				{
+					soundItems.add("Sound " + String(gg + 1) + ": " + processor.collection->sounds[gg]->name);
+				}
 				//
-				editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)layer->soundLinks.getLast());
-				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				AlertWindow w("Link Sound", "", AlertWindow::NoIcon);
+				w.addComboBox("Sound", soundItems);
+				w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+				w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+				w.setAlwaysOnTop(true);
+				//
+				int result = w.runModalLoop();
+				if (result == 1)
+				{
+					int selectedSound = w.getComboBoxComponent("Sound")->getSelectedItemIndex();
+					layer->soundLinks.add(processor.collection->sounds[selectedSound]);
+					getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
+					openOnlyLast(getParentItem());
+					//
+					editor->editObject.set(WusikEditObject::kSound, 0, (void*)layer->soundLinks.getLast());
+					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				}
+				else reselectParent();
 			}
 			else reselectParent();
 		}
 		else
 		{
 			openOnly(this);
-			editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)soundGroup);
+			editor->editObject.set(WusikEditObject::kSound, 0, (void*)soundLink);
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
 	}
 	else if (level == kLevel_Sound_Links_Options)
 	{
-		if (specialItem == kSound_Group_Remove)
+		if (specialItem == kSound_Link_Remove)
 		{
 			if (WConfirmBox("Remove Sound Link", "Are you sure?"))
 			{
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Remove_Sound_Link,
 					processor.collection->presets.indexOf(preset), preset->layers.indexOf(layer), 
-					layer->soundLinks.indexOf(soundGroup), getParentItem()->getIndexInParent(), (void*)getParentItem());
+					layer->soundLinks.indexOf(soundLink), getParentItem()->getIndexInParent(), (void*)getParentItem());
 				return; // we exit quickly as this is about to go down //
 			}
 			else reselectParent();
@@ -208,12 +211,16 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else if (specialItem == kPreset_Add_Layer)
 		{
-			preset->layers.add(new WSPX_Collection_Preset_Layer);
-			getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "", preset, kRegular_Item, preset->layers.getLast()));
-			openOnlyLast(getParentItem());
-			//
-			editor->editObject.set(WusikEditObject::kPresetLayer, 0, (void*) preset->layers.getLast());
-			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			if (WConfirmBox("Add New Layer", "Are you sure?"))
+			{
+				preset->layers.add(new WSPX_Collection_Preset_Layer);
+				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "", preset, kRegular_Item, preset->layers.getLast()));
+				openOnlyLast(getParentItem());
+				//
+				editor->editObject.set(WusikEditObject::kPresetLayer, 0, (void*)preset->layers.getLast());
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			}
+			else reselectParent();
 		}
 		else
 		{

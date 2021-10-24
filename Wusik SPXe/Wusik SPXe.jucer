@@ -7,6 +7,7 @@
               companyName="Wusik" companyCopyright="2021" companyWebsite="www.Wusik.com">
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
+      <FILE id="hNcW6x" name="WSPX Timer.cpp" compile="1" resource="0" file="Source/WSPX Timer.cpp"/>
       <GROUP id="{4E0B4FE7-CB62-8E58-1336-AFC179239A14}" name="Images">
         <FILE id="EJcHCy" name="SliderBack.png" compile="0" resource="1" file="../Interface/SliderBack.png"/>
         <FILE id="hdPSYA" name="SliderFilled.png" compile="0" resource="1"

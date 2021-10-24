@@ -56,16 +56,23 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kImage, "Image About", &processor.collection->imageAbout);
 		AddCompo2(kString, "Protection Key", &processor.collection->protectionKey, "", true, nullptr);
 	}
-	else if (editObject.type == WusikEditObject::kSoundGroup)
+	else if (editObject.type == WusikEditObject::kSound)
 	{
-		WSPX_Collection_Sound* soundGroup = (WSPX_Collection_Sound*)editObject.object;
+		WSPX_Collection_Sound* sound = (WSPX_Collection_Sound*)editObject.object;
 		//
 		editOptionsComponent = new Component;
 		AddCompoLabel("Sound Details");
-		AddCompo(kString, "Name", &soundGroup->name);
-		AddCompo(kString, "Tags", &soundGroup->tags);
-		AddCompo4(kSliderInteger, "Choke Group", &soundGroup->chokeGroup, "", 0, 128);
+		AddCompo(kString, "Name", &sound->name);
+		AddCompo(kString, "Tags", &sound->tags);
+		AddCompo4(kSliderInteger, "Choke Group", &sound->chokeGroup, "", 0, 128);
 
+	}
+	else if (editObject.type == WusikEditObject::kSoundFile)
+	{
+		WSPX_Collection_Sound_File* soundFile = (WSPX_Collection_Sound_File*)editObject.object;
+		//
+		editOptionsComponent = new Component;
+		AddCompoLabel("Sound File Details");
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
 	{
@@ -178,16 +185,9 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WusikEditOptionCallback_UpdateCollectionName::process(WusikSpxAudioProcessor* processor)
-{
-	((WusikSpxAudioProcessorEditor*)processor->getActiveEditor())->
-		collectionNameLabel->setText(processor->collection->name, NotificationType::dontSendNotification);
-}
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
-WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label, 
+WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* _editor, int _type, String _label,
 	void* _object, String _extraLabel, bool _showEditInstead, WusikEditOptionCallback* _callback, int _min, int _max, String _popupList)
-	: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel), 
+	: label(_label), object(_object), type(_type), showEditInstead(_showEditInstead), extraLabel(_extraLabel),
 	callback(_callback), processor(_processor), editor(_editor), min(_min), max(_max)
 {
 	if (type == kSlider || type == kSliderBipolar)
@@ -209,56 +209,8 @@ WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* 
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WusikSpxAudioProcessorEditor::timerCallback()
+void WusikEditOptionCallback_UpdateCollectionName::process(WusikSpxAudioProcessor* processor)
 {
-	stopTimer();
-	//
-	if (timerAction.get() == kTimerAction_Update_Interface || timerAction.get() == kTimerAction_Update_Interface_Show_Collection)
-	{
-		if (timerAction.get() == kTimerAction_Update_Interface_Show_Collection) editObject.set(WusikEditObject::kCollection, 0);
-		//
-		cleanInterface();
-		updateInterface();
-	}
-	else if (timerAction.get() == kTimerAction_Update_Interface_Not_TreeViews)
-	{
-		redoTreeViewsOnResize = false;
-		cleanInterface();
-		updateInterface();
-	}
-	else if (timerAction.get() == kTimerAction_Remove_Preset)
-	{
-		editObject.set(WusikEditObject::kCollection, 0);
-		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*)timerActionValueObject;
-		treeViewItem->getParentItem()->removeSubItem(timerActionValue2);
-		processor.collection->presets.remove(timerActionValue1);
-		//
-		redoTreeViewsOnResize = false;
-		cleanInterface();
-		updateInterface();
-	}
-	else if (timerAction.get() == kTimerAction_Remove_Layer)
-	{
-		editObject.set(WusikEditObject::kCollection, 0);
-		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*) timerActionValueObject;
-		treeViewItem->getParentItem()->removeSubItem(timerActionValue3);
-		processor.collection->presets[timerActionValue1]->layers.remove(timerActionValue2);
-		//
-		redoTreeViewsOnResize = false;
-		cleanInterface();
-		updateInterface();
-	}
-	else if (timerAction.get() == kTimerAction_Remove_Sound_Link)
-	{
-		editObject.set(WusikEditObject::kCollection, 0);
-		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*)timerActionValueObject;
-		treeViewItem->getParentItem()->removeSubItem(timerActionValue4);
-		processor.collection->presets[timerActionValue1]->layers[timerActionValue2]->soundLinks.remove(timerActionValue3);
-		//
-		redoTreeViewsOnResize = false;
-		cleanInterface();
-		updateInterface();
-	}
-	//
-	timerAction.set(kTimerAction_None);
+	((WusikSpxAudioProcessorEditor*)processor->getActiveEditor())->
+		collectionNameLabel->setText(processor->collection->name, NotificationType::dontSendNotification);
 }
