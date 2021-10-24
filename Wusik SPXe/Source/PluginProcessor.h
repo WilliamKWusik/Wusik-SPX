@@ -9,7 +9,7 @@
 #include "WSPX Definitions.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WusikSpxAudioProcessor  : public AudioProcessor
+class WusikSpxAudioProcessor : public AudioProcessor
 {
 public:
     WusikSpxAudioProcessor();
@@ -34,6 +34,7 @@ public:
 	void newCompilation();
 	bool loadCompilation(InputStream& stream);
 	void saveCompilation(OutputStream& stream);
+	void loadSoundFileDetails(WSPX_Collection_Sound_File* soundFile);
 	void stopAllAudio()
 	{
 		suspendProcessing(true);
@@ -47,6 +48,7 @@ public:
 	}
 	//
 	ScopedPointer<WSPX_Collection> collection;
+	AudioFormatManager audioFormatManager;
 	//
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WusikSpxAudioProcessor)

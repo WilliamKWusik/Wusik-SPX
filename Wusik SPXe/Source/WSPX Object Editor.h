@@ -93,7 +93,7 @@ public:
 			AskValue(label, extraLabel, String(((int64*)object)[0]), "", "OK", "Cancel", sValue);
 			if (sValue.isNotEmpty())
 			{
-				((int64*)object)[0] = sValue.getLargeIntValue();
+				((int64*)object)[0] = jlimit((int64) min, (int64) max, sValue.getLargeIntValue());
 				processor->collection->hasUnsavedChanges = true;
 			}
 		}

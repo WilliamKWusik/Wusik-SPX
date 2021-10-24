@@ -115,6 +115,10 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		else xFile = File(soundFile->soundFile).getFileName() + " ! MISSING FILE !";
 		//
 		AddCompoLabelSM(xFile);
+		AddCompoLabelSM("Channels " + String(soundFile->channels));
+		AddCompoLabelSM("Samples " + String(soundFile->totalSamples));
+		AddCompoLabelSM("SampleRate " + String(soundFile->sampleRate));
+		//
 		AddCompo(kSlider, "Volume", &soundFile->volume);
 		AddCompo(kSliderBipolar, "Pan", &soundFile->pan);
 		AddCompo(kSliderBipolar, "Pan", &soundFile->fineTune);
@@ -124,14 +128,15 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		AddCompoLabel("Loop");
 		AddCompo6(kPopupList, "Type", &soundFile->loopType, "", soundFile->loopTypes);
-		AddCompo(kStringInt64, "Start", &soundFile->loopStart);
-		AddCompo(kStringInt64, "End", &soundFile->loopEnd);
+		AddCompo4(kStringInt64, "Start", &soundFile->loopStart, "", 0, soundFile->totalSamples - 1);
+		AddCompo4(kStringInt64, "End", &soundFile->loopEnd, "", 0, soundFile->totalSamples - 1);
 		//
 		AddCompoLabel("Zones");
 		AddCompo4(kSliderInteger, "Key Zone Low", &soundFile->keyZoneLow, "", 0, 127);
 		AddCompo4(kSliderInteger, "Key Zone High", &soundFile->keyZoneHigh, "", 0, 127);
 		AddCompo4(kSliderInteger, "Vel Zone Low", &soundFile->velZoneLow, "", 0, 127);
 		AddCompo4(kSliderInteger, "Vel Zone High", &soundFile->velZoneHigh, "", 0, 127);
+		AddCompo4(kSliderInteger, "Key Root", &soundFile->keyRoot, "", 0, 127);
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
 	{

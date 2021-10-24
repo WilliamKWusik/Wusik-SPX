@@ -55,6 +55,18 @@ void WusikSpxAudioProcessorEditor::resized()
 		//
 		boundsSet(569, 107, 690, 807, editOptionsViewport, multRatio);
 		editOptionsComponent->setBounds(0, 0, editOptionsViewport->getWidth(), double(totalH) * multRatio);
+		//
+		if (editObject.type == WusikEditObject::kSoundFile)
+		{
+			if (soundFileWaveformThumb.getWidth() > 0)
+			{
+				editOptionsViewport->setBounds(
+					editOptionsViewport->getBounds().getX(),
+					editOptionsViewport->getBounds().getY() + soundFileWaveformThumb.getHeight(),
+					editOptionsViewport->getBounds().getWidth(),
+					editOptionsViewport->getBounds().getHeight() - soundFileWaveformThumb.getHeight());
+			}
+		}
 	}
 	// Sound Zones //
 	{

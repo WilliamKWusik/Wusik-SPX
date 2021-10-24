@@ -89,17 +89,21 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 		if (specialItem == kRegular_Item)
 		{
 			openOnly(this);
+			editor->createSoundFileWaveformThumb(soundFile);
 			editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
 		else if (specialItem == kSound_File_Add)
 		{
-			
-			FileChooser browseFile("Load New Sound File", processor.collection->file, "*.wav;*.flac;*.aiff;*.mp3;*.ogg");
+			FileChooser browseFile("Load New Sound File", processor.collection->file, processor.audioFormatManager.getWildcardForAllFormats());
 			//
 			if (browseFile.browseForFileToOpen())
 			{
 				sound->soundFiles.add(new WSPX_Collection_Sound_File);
+				sound->soundFiles.getLast()->soundFile = browseFile.getResult().getFullPathName();
+				processor.loadSoundFileDetails(sound->soundFiles.getLast());
+				editor->createSoundFileWaveformThumb(sound->soundFiles.getLast());
+				//
 				getParentItem()->addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "", kRegular_Item, sound, sound->soundFiles.getLast()));
 				openOnlyLast(getParentItem());
 				//
@@ -158,15 +162,87 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else
 		{
-			FileChooser browseFile("Load/Replace Sound File", processor.collection->file, "*.wav;*.flac;*.aiff;*.mp3;*.ogg");
+			FileChooser browseFile("Load/Replace Sound File", processor.collection->file, processor.audioFormatManager.getWildcardForAllFormats());
 			//
 			if (browseFile.browseForFileToOpen())
 			{
-				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)sound->soundFiles.getLast());
+				soundFile->soundFile = browseFile.getResult().getFullPathName();
+				soundFile->sampleDataMetaValuesRead = false;
+				processor.loadSoundFileDetails(soundFile);
+				editor->createSoundFileWaveformThumb(soundFile);
+				//
+				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
 			//
 			reselectParent();
 		}
+	}
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WusikSpxAudioProcessorEditor::createSoundFileWaveformThumb(WSPX_Collection_Sound_File* soundFile)
+{
+	soundFileWaveformThumb = Image();
+	if (soundFile->soundFile.isEmpty() || !File(soundFile->soundFile).existsAsFile()) return;
+	//
+	ScopedPointer<AudioFormatReader> audioReader = processor.audioFormatManager.createReaderFor(File(soundFile->soundFile));
+	//
+	if (audioReader != nullptr)
+	{
+		int channels = audioReader->numChannels;
+		int totalSamples = audioReader->lengthInSamples;
+		soundFileWaveformThumb = Image(Image::ARGB, double(getWidth()) * 0.88, double(getHeight()) * 0.22, true);
+		//
+		AudioSampleBuffer soundBuffer(channels, totalSamples);
+		audioReader->read(&soundBuffer, 0, totalSamples, 0, true, true);
+		//
+		if (totalSamples > soundFileWaveformThumb.getWidth())
+		{
+			Graphics gg(soundFileWaveformThumb);
+			gg.setColour(Colours::darkblue);
+			gg.drawRect(0, 0, soundFileWaveformThumb.getWidth(), soundFileWaveformThumb.getHeight(), 4);
+			gg.drawLine(0, soundFileWaveformThumb.getHeight() / 2, soundFileWaveformThumb.getWidth(), soundFileWaveformThumb.getHeight() / 2, 2);
+			//
+			double xPos = 0;
+			double rate = double(soundFileWaveformThumb.getWidth()) / double(totalSamples);
+			int xPosInt = 0;
+			float sample = 0.0f;
+			//
+			for (int ss = 0; ss < soundBuffer.getNumSamples(); ss++)
+			{
+				sample += soundBuffer.getReadPointer(0)[ss] * rate;
+				xPos += rate;
+				//
+				if (int(xPos) != xPosInt)
+				{
+					xPosInt = int(xPos);
+					//
+					if (sample > 0.0f)
+					{
+						gg.drawLine(xPosInt, soundFileWaveformThumb.getHeight() / 2, xPosInt, 
+							(soundFileWaveformThumb.getHeight() / 2) - ((double(soundFileWaveformThumb.getHeight() / 2) * sample)));
+					}
+					else
+					{
+						gg.drawLine(xPosInt, 
+							soundFileWaveformThumb.getHeight() / 2, 
+							xPosInt,
+							(soundFileWaveformThumb.getHeight() / 2) + 
+								((float(soundFileWaveformThumb.getHeight() / 2) * fabs(sample))));
+					}
+					//
+					sample = 0.0f;
+				}			
+			}
+		}
+		else
+		{
+
+		}
+	}
+	else
+	{
+		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Error Loading Sound File! Couldn't create a reader for it...", soundFile->soundFile);
 	}
 }

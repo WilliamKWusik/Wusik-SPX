@@ -159,6 +159,7 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 	WS::stream(stream, bits, type);
 	WS::stream(stream, format, type);
 	WS::stream(stream, channels, type);
+	WS::stream(stream, sampleDataMetaValuesRead, type);
 	WS::stream(stream, totalSamples, type);
 	//
 	int totalChannelsPan = channelPan.size();

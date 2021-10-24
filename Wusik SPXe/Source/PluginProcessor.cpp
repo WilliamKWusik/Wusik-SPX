@@ -18,6 +18,7 @@ extern String collectionFile = "";
 // ------------------------------------------------------------------------------------------------------------------------- //
 WusikSpxAudioProcessor::WusikSpxAudioProcessor()
 {
+	audioFormatManager.registerBasicFormats();
 	newCompilation();
 }
 //

@@ -60,7 +60,6 @@ public:
 	void streamData(void* stream, int type);
 	//
 	MemoryBlock soundData;
-	int64 totalSamples = 0;
 	float volume = 1.0f;
 	float pan = 0.5f;
 	float roundRobin = 0.0f;
@@ -77,14 +76,18 @@ public:
 	float fineTune = 0.5f;
 	float coarseTune = 0.5f;
 	//
+	Array<float> channelPan;
 	int keySwitchType = 0;
 	int64 loopStart = 0;
 	int64 loopEnd = 0;
 	int loopType = 0;
 	int bits = 24;
 	int format = 0;
+	//
+	bool sampleDataMetaValuesRead = false;
+	int64 totalSamples = 0;
 	int channels = 0;
-	Array<float> channelPan;
+	int sampleRate = 44100;
 	//
 	const String formats = "Binary\nFlac\nGZIP";
 	const String keySwitchTypes = "Normal\nMomentary\nLatch";

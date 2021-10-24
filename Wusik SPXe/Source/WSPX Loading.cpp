@@ -68,3 +68,36 @@ bool WusikSpxAudioProcessor::loadCompilation(InputStream& stream)
 		return false;
 	}
 }
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* soundFile)
+{
+	if (soundFile->soundFile.isNotEmpty())
+	{
+		ScopedPointer<AudioFormatReader> audioReader = audioFormatManager.createReaderFor(File(soundFile->soundFile));
+		//
+		if (audioReader != nullptr)
+		{
+			soundFile->channels = audioReader->numChannels;
+			soundFile->totalSamples = audioReader->lengthInSamples;
+			soundFile->sampleRate = audioReader->sampleRate;
+			//
+			if (!soundFile->sampleDataMetaValuesRead)
+			{
+				soundFile->loopStart = jlimit(0, (int) soundFile->totalSamples - 1, audioReader->metadataValues.getValue("Loop0Start", "0").getIntValue());
+				soundFile->loopEnd = jlimit(0, (int)soundFile->totalSamples - 1, audioReader->metadataValues.getValue("Loop0End", "0").getIntValue());
+				soundFile->keyRoot = jlimit(0, 127, audioReader->metadataValues.getValue("MidiUnityNote", "60").getIntValue());
+				//
+				soundFile->sampleDataMetaValuesRead = true;
+			}
+		}
+		else
+		{
+			AlertWindow::showMessageBox(AlertWindow::NoIcon, "Error Loading Sound File! Couldn't create a reader for it...", soundFile->soundFile);
+		}
+	}
+	else
+	{
+		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Error Loading Sound File!", "Sound File is Empty");
+	}
+}
