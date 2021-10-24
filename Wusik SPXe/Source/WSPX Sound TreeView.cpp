@@ -69,7 +69,7 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 	{
 		processor.collection->sounds.add(new WSPX_Collection_Sound);
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", kRegular_Item, processor.collection->sounds.getLast()));
-		openOnlyParentLast(this);
+		openOnlyLast(this);
 		//
 		editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)processor.collection->sounds.getLast());
 		editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
