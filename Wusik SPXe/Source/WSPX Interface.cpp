@@ -36,6 +36,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	editOptionsComponent = nullptr;
 
 	#define AddCompoLabel(label) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kLabel, label)))
+	#define AddCompoLabelSM(label) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kLabelSmall, label)))
 	#define AddCompoCallback(type, name, variable, label, callback) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, callback)))
 	#define AddCompo(type, name, variable) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable)))
 	#define AddCompo2(type, name, variable, label, showEditInsteead, callback) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, showEditInsteead, callback)))
@@ -65,6 +66,38 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kString, "Name", &sound->name);
 		AddCompo(kString, "Tags", &sound->tags);
 		AddCompo4(kSliderInteger, "Choke Group", &sound->chokeGroup, "", 0, 128);
+		//
+		AddCompoLabelSM("Total Of Sounds " + String(sound->soundFiles.size()));
+		//
+		int64 totalSize;
+		for (int ss = 0; ss < sound->soundFiles.size(); ss++)
+		{
+			String sFile = "File #" + String(ss + 1) + " ";
+			//
+			if (sound->soundFiles[ss]->soundFile.isEmpty())
+			{
+				sFile.append("No File", 9999);
+			}
+			else
+			{
+				sFile.append(File(sound->soundFiles[ss]->soundFile).getFileName(), 9999);
+				//
+				if (File(sound->soundFiles[ss]->soundFile).existsAsFile())
+				{
+					int64 xSize = File(sound->soundFiles[ss]->soundFile).getSize();
+					totalSize += xSize;
+					sFile.append(" " + String((xSize / 1024) / 1024) + " MB", 9999);
+				}
+				else
+				{
+					sFile.append(" ! MISSING FILE !", 9999);
+				}
+			}
+			//
+			AddCompoLabelSM(sFile);
+		}
+		//
+		AddCompoLabelSM("Total Size " + String(((totalSize / 1024) / 1024)) + " MB");
 
 	}
 	else if (editObject.type == WusikEditObject::kSoundFile)
@@ -73,6 +106,32 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		editOptionsComponent = new Component;
 		AddCompoLabel("Sound File Details");
+		//
+		String xFile;
+		//
+		if (soundFile->soundFile.isEmpty()) xFile = "No File";
+		else if (File(soundFile->soundFile).existsAsFile()) xFile = File(soundFile->soundFile).getFileName() + " " +
+			String((File(soundFile->soundFile).getSize() / 1024) / 1024) + " MB";
+		else xFile = File(soundFile->soundFile).getFileName() + " ! MISSING FILE !";
+		//
+		AddCompoLabelSM(xFile);
+		AddCompo(kSlider, "Volume", &soundFile->volume);
+		AddCompo(kSliderBipolar, "Pan", &soundFile->pan);
+		AddCompo(kSliderBipolar, "Pan", &soundFile->fineTune);
+		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &soundFile->coarseTune, "", -48, 48);
+		AddCompo(kOnOffButton, "Reverse", &soundFile->reverse);
+		AddCompo(kOnOffButton, "Release", &soundFile->isRelease);
+		//
+		AddCompoLabel("Loop");
+		AddCompo6(kPopupList, "Type", &soundFile->loopType, "", soundFile->loopTypes);
+		AddCompo(kStringInt64, "Start", &soundFile->loopStart);
+		AddCompo(kStringInt64, "End", &soundFile->loopEnd);
+		//
+		AddCompoLabel("Zones");
+		AddCompo4(kSliderInteger, "Key Zone Low", &soundFile->keyZoneLow, "", 0, 127);
+		AddCompo4(kSliderInteger, "Key Zone High", &soundFile->keyZoneHigh, "", 0, 127);
+		AddCompo4(kSliderInteger, "Vel Zone Low", &soundFile->velZoneLow, "", 0, 127);
+		AddCompo4(kSliderInteger, "Vel Zone High", &soundFile->velZoneHigh, "", 0, 127);
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
 	{

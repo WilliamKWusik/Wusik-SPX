@@ -7,7 +7,6 @@
               companyName="Wusik" companyCopyright="2021" companyWebsite="www.Wusik.com">
   <MAINGROUP id="xioTis" name="Wusik SPXe">
     <GROUP id="{3DB9CAD3-5214-5C37-6213-A2A220F1805F}" name="Source">
-      <FILE id="hNcW6x" name="WSPX Timer.cpp" compile="1" resource="0" file="Source/WSPX Timer.cpp"/>
       <GROUP id="{4E0B4FE7-CB62-8E58-1336-AFC179239A14}" name="Images">
         <FILE id="EJcHCy" name="SliderBack.png" compile="0" resource="1" file="../Interface/SliderBack.png"/>
         <FILE id="hdPSYA" name="SliderFilled.png" compile="0" resource="1"
@@ -18,6 +17,11 @@
         <FILE id="J2O08T" name="Interface.png" compile="0" resource="1" file="../Interface/Interface.png"/>
         <FILE id="eweZFQ" name="Logo.png" compile="0" resource="1" file="Source/Logo.png"/>
       </GROUP>
+      <FILE id="mkT0bz" name="WSPX Object Editor.h" compile="0" resource="0"
+            file="Source/WSPX Object Editor.h"/>
+      <FILE id="EICxAz" name="WSPX TreeViews.h" compile="0" resource="0"
+            file="Source/WSPX TreeViews.h"/>
+      <FILE id="hNcW6x" name="WSPX Timer.cpp" compile="1" resource="0" file="Source/WSPX Timer.cpp"/>
       <FILE id="NoqJdT" name="WSPX Knob.h" compile="0" resource="0" file="Source/WSPX Knob.h"/>
       <FILE id="XLD4ID" name="WSPX Look And Feel.h" compile="0" resource="0"
             file="Source/WSPX Look And Feel.h"/>

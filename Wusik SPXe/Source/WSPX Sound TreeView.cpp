@@ -24,7 +24,7 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 	else if (level == kLevel_Sounds)
 	{
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "Remove", kSound_Remove, sound));
-		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "Load File", kSound_File_Add, sound));
+		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "Load New", kSound_File_Add, sound));
 		//
 		for (int ss = 0; ss < sound->soundFiles.size(); ss++)
 		{
@@ -34,6 +34,7 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 	else if (level == kLevel_Sound_Files && name.isEmpty())
 	{
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Remove", kSound_File_Remove, sound, soundFile));
+		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Load", kSound_File_Load, sound, soundFile));
 	}
 }
 //
@@ -76,7 +77,6 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			editor->editObject.set(WusikEditObject::kSound, 0, (void*)processor.collection->sounds.getLast());
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
-		else reselectParent();
 	}
 	else if (level == kLevel_Sounds)
 	{
@@ -94,7 +94,10 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else if (specialItem == kSound_File_Add)
 		{
-			if (WConfirmBox("Add New Sound File", "Are you sure?"))
+			
+			FileChooser browseFile("Load New Sound File", processor.collection->file, "*.wav;*.flac;*.aiff;*.mp3;*.ogg");
+			//
+			if (browseFile.browseForFileToOpen())
 			{
 				sound->soundFiles.add(new WSPX_Collection_Sound_File);
 				getParentItem()->addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "", kRegular_Item, sound, sound->soundFiles.getLast()));
@@ -152,6 +155,18 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				return; // we exit quickly as this is about to go down //
 			}
 			else reselectParent();
+		}
+		else
+		{
+			FileChooser browseFile("Load/Replace Sound File", processor.collection->file, "*.wav;*.flac;*.aiff;*.mp3;*.ogg");
+			//
+			if (browseFile.browseForFileToOpen())
+			{
+				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)sound->soundFiles.getLast());
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			}
+			//
+			reselectParent();
 		}
 	}
 }

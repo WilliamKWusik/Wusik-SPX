@@ -8,6 +8,8 @@
 // ------------------------------------------------------------------------------------------------------------------------- //
 #pragma once
 #include "WSPX Components.h"
+#include "WSPX TreeViews.h"
+#include "WSPX Object Editor.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WusikSpxAudioProcessorEditor  : public AudioProcessorEditor, public Button::Listener, public Timer
