@@ -63,5 +63,22 @@ void WSPXSoundTreeItem::paintItem(Graphics& g, int width, int height)
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 {
-	if (level > kLevel_Add_Sound) setOpen(!isOpen());
+	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
+	//
+	if (level == kLevel_Add_Sound)
+	{
+		processor.collection->sounds.add(new WSPX_Collection_Sound);
+		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Groups, "", kRegular_Item, processor.collection->sounds.getLast()));
+		openOnlyParentLast(this);
+		//
+		editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)processor.collection->sounds.getLast());
+		editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+	}
+	else if (level == kLevel_Sound_Groups)
+	{
+		openOnly(this);
+		editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)soundGroup);
+		editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+	}
+
 }

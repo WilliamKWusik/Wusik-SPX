@@ -265,6 +265,16 @@ public:
 	void itemClicked(const MouseEvent& e) override;
 	int getItemHeight() const override { return 24.0 * ui_ratio; }
 	void reselectParent() { getParentItem()->setSelected(true, true, NotificationType::dontSendNotification); }
+	void openOnlyParentLast(TreeViewItem* item)
+	{
+		((WSPXPresetTreeItem*)item->getSubItem(item->getNumSubItems() - 1))->openOnly(item);
+		item->getSubItem(item->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+	};
+	void openOnly(TreeViewItem* item)
+	{
+		for (int ss = 0; ss < item->getParentItem()->getNumSubItems(); ss++) { item->getParentItem()->getSubItem(ss)->setOpen(false); }
+		setOpen(true);
+	}
 	//
 	WusikSpxAudioProcessor& processor;
 	WSPX_Collection_Preset* preset = nullptr;
@@ -315,6 +325,16 @@ public:
 	void paintItem(Graphics& g, int width, int height) override;
 	void itemClicked(const MouseEvent& e) override;
 	int getItemHeight() const override { return 24.0 * ui_ratio; }
+	void openOnlyParentLast(TreeViewItem* item)
+	{ 
+		((WSPXPresetTreeItem*)item->getSubItem(item->getNumSubItems() - 1))->openOnly(item);
+		item->getSubItem(item->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+	};
+	void openOnly(TreeViewItem* item)
+	{
+		for (int ss = 0; ss < item->getParentItem()->getNumSubItems(); ss++) { item->getParentItem()->getSubItem(ss)->setOpen(false); }
+		setOpen(true);
+	}
 	//
 	WusikSpxAudioProcessor& processor;
 	WSPX_Collection_Sound* soundGroup = nullptr;

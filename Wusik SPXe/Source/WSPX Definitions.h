@@ -132,7 +132,8 @@ public:
 	//
 	OwnedArray<WSPX_Collection_Sound_File> soundFiles;
 	float chokeGroup = 0.0f;
-	String name, tags;
+	String name = "Init Sound";
+	String tags;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

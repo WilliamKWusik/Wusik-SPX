@@ -72,7 +72,7 @@ void WSPXPresetTreeItem::paintItem(Graphics& g, int width, int height)
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 {
-	if (level > kLevel_Add_Preset && !isOpen()) setOpen(true);
+	//if (level > kLevel_Add_Preset && !isOpen()) setOpen(true);
 	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
 	//
 	if (level == kLevel_Add_Preset)
@@ -81,9 +81,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		{
 			processor.collection->presets.add(new WSPX_Collection_Preset);
 			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
-			//
-			getSubItem(getNumSubItems() - 1)->setOpen(true);
-			getSubItem(getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+			openOnlyParentLast(this);
 			//
 			editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
@@ -91,6 +89,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 	}
 	else if (level == kLevel_Presets)
 	{
+		openOnly(this);
 		editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.indexOf(preset), (void*) preset);
 		editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 	}
@@ -128,8 +127,9 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				layer->soundLinks.add(processor.collection->sounds[selectedSound]);
 				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
 				//
-				getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setOpen(true);
-				getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+				//getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setOpen(true);
+				//getParentItem()->getSubItem(getParentItem()->getNumSubItems() - 1)->setSelected(true, true, NotificationType::dontSendNotification);
+				openOnlyParentLast(getParentItem());
 				//
 				editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)layer->soundLinks.getLast());
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
@@ -138,6 +138,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else
 		{
+			openOnly(this);
 			editor->editObject.set(WusikEditObject::kSoundGroup, 0, (void*)soundGroup);
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
@@ -224,6 +225,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else
 		{
+			openOnly(this);
 			editor->editObject.set(WusikEditObject::kPresetLayer, preset->layers.indexOf(layer), (void*) layer);
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
