@@ -12,6 +12,23 @@
 #include "WSPX Object Editor.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WSPXSoundFileThumbView
+{
+public:
+	void reset()
+	{
+		ready.set(0);
+		waveform = Image();
+		loopStart = loopEnd = 0;
+	}
+	//
+	Atomic<int> ready = 0;
+	Image waveform;
+	int loopStart = 0;
+	int loopEnd = 0;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WusikSpxAudioProcessorEditor  : public AudioProcessorEditor, public Button::Listener, public Timer
 {
 public:
@@ -68,8 +85,7 @@ public:
 	bool prevHasUnsavedChanges = false;
 	double multRatio = 1.0;
 	bool redoTreeViewsOnResize = true;
-	Image soundFileWaveformThumb;
-	ScopedPointer<WSPXSoundFileThumb> soundFileThumb;
+	WSPXSoundFileThumbView soundFileThumbView;
 	//
 	Atomic<int> timerAction = 0;
 	int timerActionValue1 = 0;

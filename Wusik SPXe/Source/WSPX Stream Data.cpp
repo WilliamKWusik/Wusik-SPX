@@ -30,15 +30,15 @@ void WSPX_Collection::streamData(void* stream, int type)
 	imageAbout.streamData(stream, type);
 	imageIcon.streamData(stream, type);
 	//
-	WS::stream(stream, totalPresets, type);
 	WS::stream(stream, totalsounds, type);
+	WS::stream(stream, totalPresets, type);
 	//
 	if (isWSPXEditor)
 	{
 		for (int pp = 0; pp < totalPresets; pp++)
 		{
 			if (type == WS::kRead) presets.add(new WSPX_Collection_Preset);
-			presets[pp]->streamData(stream, type);
+			presets[pp]->streamData(stream, type, sounds);
 		}
 		//
 		for (int ss = 0; ss < totalsounds; ss++)
@@ -50,7 +50,7 @@ void WSPX_Collection::streamData(void* stream, int type)
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WSPX_Collection_Preset::streamData(void* stream, int type)
+void WSPX_Collection_Preset::streamData(void* stream, int type, OwnedArray<WSPX_Collection_Sound>& soundsList)
 {
 	int totalLayers = layers.size();
 	//
@@ -73,13 +73,14 @@ void WSPX_Collection_Preset::streamData(void* stream, int type)
 	for (int ll = 0; ll < totalLayers; ll++)
 	{	
 		if (type == WS::kRead) layers.add(new WSPX_Collection_Preset_Layer);
-		layers[ll]->streamData(stream, type);
+		layers[ll]->streamData(stream, type, soundsList);
 	}
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WSPX_Collection_Preset_Layer::streamData(void* stream, int type)
+void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray<WSPX_Collection_Sound>& soundsList)
 {
+	WS::stream(stream, name, type);
 	WS::stream(stream, volume, type);
 	WS::stream(stream, pan, type);
 	WS::stream(stream, fineTune, type);
@@ -109,13 +110,25 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type)
 		channels[ch]->streamData(stream, type);
 	}
 	//
-	/*int totalsounds = sounds.size();
+	int totalsounds = soundLinks.size();
 	WS::stream(stream, totalsounds, type);
 	for (int ss = 0; ss < totalsounds; ss++)
 	{
-		if (type == WS::kRead) sounds.add(0);
-		WS::stream(stream, sounds.getRawDataPointer()[ss], type);
-	}*/
+		if (isWSPXEditor)
+		{
+			if (type == WS::kRead)
+			{
+				int soundID = 0;
+				WS::stream(stream, soundID, type);
+				soundLinks.add(soundsList[soundID]);
+			}
+			else
+			{
+				int soundID = soundsList.indexOf(soundLinks[ss]);
+				WS::stream(stream, soundID, type);
+			}
+		}
+	}
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -174,6 +187,12 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 		WS::stream(stream, exportBits, type);
 		WS::stream(stream, exportFormat, type);
 		WS::streamRelativePath(stream, soundFile, type);
+		//
+		if (WSPXeBundle)
+		{
+			if (type == WS::kWrite) File(soundFile).loadFileAsData(soundData);
+			WS::stream(stream, soundData, type);
+		}
 	}
 	else
 	{

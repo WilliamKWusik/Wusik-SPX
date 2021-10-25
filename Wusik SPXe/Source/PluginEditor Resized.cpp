@@ -58,7 +58,7 @@ void WusikSpxAudioProcessorEditor::resized()
 		//
 		if (editObject.type == WusikEditObject::kSoundFile)
 		{
-			if (soundFileWaveformThumb.getWidth() > 0)
+			if (soundFileThumbView.ready.get() == 1 && soundFileThumbView.waveform.getWidth() > 0)
 			{
 				editOptionsViewport->setBounds(
 					editOptionsViewport->getBounds().getX(),

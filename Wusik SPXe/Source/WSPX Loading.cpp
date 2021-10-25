@@ -56,9 +56,16 @@ bool WusikSpxAudioProcessor::loadCompilation(InputStream& stream)
 	collection = new WSPX_Collection;
 	//
 	String header = stream.readString();
+	WSPXeBundle = false;
 	//
 	if (header.containsIgnoreCase("WSPXe"))
 	{
+		if (header.containsIgnoreCase("WSPXeBundle"))
+		{
+			collection->isWSPXeBundle = true;
+			WSPXeBundle = true;
+		}
+		//
 		collection->streamData((void*)&stream, WS::kRead);
 		return true;
 	}

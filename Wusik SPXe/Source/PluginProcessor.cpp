@@ -9,6 +9,7 @@
 #include "PluginEditor.h"
 //
 extern String collectionFile = "";
+extern bool WSPXeBundle = false;
 #if WSPXEDITOR
 	extern bool isWSPXEditor = true;
 #else

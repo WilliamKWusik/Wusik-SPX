@@ -160,6 +160,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		editOptionsComponent = new Component;
 		AddCompoLabel("Layer Details");
+		AddCompo(kString, "Name", &layer->name);
 		AddCompo(kSlider, "Volume", &layer->volume);
 		AddCompo(kSliderBipolar, "Pan", &layer->pan);
 		AddCompo(kSliderBipolar, "Fine Tune", &layer->fineTune);

@@ -64,8 +64,8 @@ void WSPXPresetTreeItem::paintItem(Graphics& g, int width, int height)
 		g.drawText(name, 0, 0, width, height, Justification::left);
 	}
 	else if (level == kLevel_Presets) g.drawFittedText(preset->name, 0, 0, width, height, Justification::left, 1);
-	else if (level == kLevel_Sound_Links) g.drawFittedText("Snd Link", 0, 0, width, height, Justification::left, 1);
-	else if (level == kLevel_Preset_Layers) g.drawFittedText("Layer", 0, 0, width, height, Justification::left, 1);
+	else if (level == kLevel_Sound_Links) g.drawFittedText((soundLink != nullptr && soundLink->name.isNotEmpty() ? soundLink->name : "SND Link"), 0, 0, width, height, Justification::left, 1);
+	else if (level == kLevel_Preset_Layers) g.drawFittedText(layer->name, 0, 0, width, height, Justification::left, 1);
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -107,33 +107,29 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else if (specialItem == kPreset_Layer_Add_Sound_Link)
 		{
-			if (WConfirmBox("Add New Sound Link", "Are you sure?"))
+			StringArray soundItems;
+			for (int gg = 0; gg < processor.collection->sounds.size(); gg++)
 			{
-				StringArray soundItems;
-				for (int gg = 0; gg < processor.collection->sounds.size(); gg++)
-				{
-					soundItems.add("Sound " + String(gg + 1) + ": " + processor.collection->sounds[gg]->name);
-				}
+				soundItems.add("Sound " + String(gg + 1) + ": " + processor.collection->sounds[gg]->name);
+			}
+			//
+			AlertWindow w("Link Sound", "", AlertWindow::NoIcon);
+			w.addComboBox("Sound", soundItems);
+			w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+			w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+			w.setAlwaysOnTop(true);
+			//
+			int result = w.runModalLoop();
+			if (result == 1)
+			{
+				int selectedSound = w.getComboBoxComponent("Sound")->getSelectedItemIndex();
+				layer->soundLinks.add(processor.collection->sounds[selectedSound]);
+				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
+				openOnlyLast(getParentItem());
 				//
-				AlertWindow w("Link Sound", "", AlertWindow::NoIcon);
-				w.addComboBox("Sound", soundItems);
-				w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-				w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-				w.setAlwaysOnTop(true);
-				//
-				int result = w.runModalLoop();
-				if (result == 1)
-				{
-					int selectedSound = w.getComboBoxComponent("Sound")->getSelectedItemIndex();
-					layer->soundLinks.add(processor.collection->sounds[selectedSound]);
-					getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
-					openOnlyLast(getParentItem());
-					//
-					editor->presetChanged();
-					editor->editObject.set(WusikEditObject::kSound, 0, (void*)layer->soundLinks.getLast());
-					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
-				}
-				else reselectParent();
+				editor->presetChanged();
+				editor->editObject.set(WusikEditObject::kSound, 0, (void*)layer->soundLinks.getLast());
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
 			else reselectParent();
 		}
@@ -176,12 +172,12 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 			{
 				MemoryBlock xData;
 				MemoryOutputStream streamOut(xData, false);
-				preset->streamData((void *) &streamOut, WS::kWrite);
+				preset->streamData((void *) &streamOut, WS::kWrite, processor.collection->sounds);
 				//
 				processor.collection->presets.add(new WSPX_Collection_Preset);
 				//
 				MemoryInputStream sendData(xData.getData(), xData.getSize(), false);
-				processor.collection->presets.getLast()->streamData((void *) &sendData, WS::kRead);
+				processor.collection->presets.getLast()->streamData((void *) &sendData, WS::kRead, processor.collection->sounds);
 				//
 				getParentItem()->getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
 				openOnlyLast(getParentItem()->getParentItem());

@@ -22,6 +22,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 	else if (buttonThatWasClicked == saveButton)
 	{
 		bool saveFile = true;
+		WSPXeBundle = false;
 		//
 		if (!processor.collection->file.existsAsFile())
 		{
@@ -56,6 +57,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 		mm.addSeparator();
 		mm.addItem(4, "Save");
 		mm.addItem(6, "Save As");
+		mm.addItem(12, "Save Bundle");
 		mm.addSeparator();
 		mm.addItem(8, "Export");
 		mm.setLookAndFeel(newLookAndFeel);
@@ -77,7 +79,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			{
 				if (!processor.collection->hasUnsavedChanges || AlertWindow::showOkCancelBox(AlertWindow::NoIcon, "There are unsaved changes!", "Are you sure you want to continue?"))
 				{
-					FileChooser browseFile("Load WSPXe Collection File", processor.collection->file, "*.WSPXe");
+					FileChooser browseFile("Load WSPXe Collection File", processor.collection->file, "*.WSPXe;*.WSPXeBundle");
 					//
 					if (browseFile.browseForFileToOpen())
 					{
@@ -88,10 +90,29 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			}
 			else if (result == 4)
 			{
+				WSPXeBundle = false;
 				buttonClicked(saveButton);
+			}
+			else if (result == 12)
+			{
+				WSPXeBundle = true;
+				FileChooser browseFile("Save WSPXe Bundle Collection File (includes all samples - this is not the final WSPX file format)", processor.collection->file, "*.WSPXeBundle");
+				//
+				if (browseFile.browseForFileToSave(true))
+				{
+					processor.collection->file = browseFile.getResult();
+					processor.collection->file.deleteFile();
+					//
+					FileOutputStream stream(processor.collection->file);
+					processor.saveCompilation(stream);
+					//
+					statusBar->setText(processor.collection->file.getFullPathName(), NotificationType::dontSendNotification);
+					repaint();
+				}
 			}
 			else if (result == 6)
 			{
+				WSPXeBundle = false;
 				FileChooser browseFile("Save WSPXe Collection File (this is not the final WSPX file format)", processor.collection->file, "*.WSPXe");
 				//
 				if (browseFile.browseForFileToSave(true))

@@ -35,6 +35,13 @@ public:
 	bool loadCompilation(InputStream& stream);
 	void saveCompilation(OutputStream& stream);
 	void loadSoundFileDetails(WSPX_Collection_Sound_File* soundFile);
+	//
+	String getLastSoundFilePath(String inputFile = String())
+	{
+		if (inputFile.isNotEmpty() && File(inputFile).existsAsFile()) lastSoundFilePath = File(inputFile).getParentDirectory().getFullPathName();
+		return lastSoundFilePath;
+	}
+	//
 	void stopAllAudio()
 	{
 		suspendProcessing(true);
@@ -49,6 +56,7 @@ public:
 	//
 	ScopedPointer<WSPX_Collection> collection;
 	AudioFormatManager audioFormatManager;
+	String lastSoundFilePath;
 	//
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WusikSpxAudioProcessor)

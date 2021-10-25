@@ -25,10 +25,10 @@
 	if (w.runModalLoop() == 1) FinalValue = w.getTextEditorContents("Value"); else FinalValue = String();
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPXSoundFileThumb : public ThreadWithProgressWindow
+class WSPXSoundFileThumbThreadCreation : public ThreadWithProgressWindow
 {
 public:
-	WSPXSoundFileThumb(void* _editor, File _fileToProcess, File _thumbFile) :
+	WSPXSoundFileThumbThreadCreation(void* _editor, File _fileToProcess, File _thumbFile) :
 		ThreadWithProgressWindow("Sound Thumb Processing", true, false, 0, String(), (Component*) _editor), 
 		fileToProcess(_fileToProcess), editor(_editor), thumbFile(_thumbFile) { }
 	//

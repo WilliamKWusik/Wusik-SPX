@@ -32,12 +32,12 @@ public:
 	//
 	void mouseEnter(const MouseEvent& e) override
 	{
-		getParentComponent()->repaint();
+		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 	}
 	//
 	void mouseExit(const MouseEvent& e) override
 	{
-		getParentComponent()->repaint();
+		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 	}
 	//
 	void mouseUp(const MouseEvent& e) override
@@ -65,7 +65,7 @@ public:
 			repaint();
 		}
 		//
-		getParentComponent()->repaint();
+		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 	}
 	//
 	void mouseDown(const MouseEvent& e) override
@@ -75,7 +75,7 @@ public:
 		if (e.mods.isCtrlDown()) value = 0.5f;
 		if (e.mods.isMiddleButtonDown()) value = 0.5f;
 		repaint();
-		getParentComponent()->repaint();
+		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 	}
 	//
 	void mouseDrag(const MouseEvent& e) override
@@ -87,14 +87,14 @@ public:
 		//
 		value = jlimit(0.0f, 1.0f, startDragValue + (float(e.getDistanceFromDragStartX()) * 0.006f * xMultiply));
 		repaint();
-		getParentComponent()->repaint();
+		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 	}
 	//
 	void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override
 	{
 		value = jlimit(0.0f, 1.0f, value + (float(wheel.deltaY) * 0.1f));
 		repaint();
-		getParentComponent()->repaint();
+		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 	}
 	//
 	void paint(Graphics& g) override

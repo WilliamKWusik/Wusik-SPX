@@ -10,6 +10,7 @@
 #define WIGNORE_SET_STATE 0
 #define WVERSION "1.0.0 BETA 00"
 extern bool isWSPXEditor;
+extern bool WSPXeBundle;
 extern String collectionFile;
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -388,7 +389,7 @@ public:
 class WSPX_Collection_Preset_Layer
 {
 public:
-	void streamData(void* stream, int type);
+	void streamData(void* stream, int type, OwnedArray<WSPX_Collection_Sound>& soundsList);
 	//
 	WSPX_Sequencer sequencer;
 	OwnedArray<WSPX_Channel> channels;
@@ -396,6 +397,7 @@ public:
 	WSPX_Collection_LFO lfos[2];
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
+	String name = "Layer";
 	float reverse = 0.0f;
 	float keyZoneLow = 0.0f;
 	float keyZoneHigh = 1.0f;
@@ -416,7 +418,7 @@ public:
 class WSPX_Collection_Preset
 {
 public:
-	void streamData(void* stream, int type);
+	void streamData(void* stream, int type, OwnedArray<WSPX_Collection_Sound>& soundsList);
 	//
 	OwnedArray<WSPX_Collection_Preset_Layer> layers;
 	WSPX_Collection_Effect effects[4]; // Up to 4 Sends with up to 4 internal effects //
@@ -456,6 +458,7 @@ public:
 		OwnedArray<WSPX_Collection_Sound> sounds;
 		bool hasUnsavedChanges = false;
 		File exportedFile;
+		bool isWSPXeBundle = false;
 	#else
 		ScopedPointer<WSPX_Collection_Preset> preset;
 		//
