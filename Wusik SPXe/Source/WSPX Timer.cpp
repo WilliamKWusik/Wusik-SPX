@@ -34,6 +34,7 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue2);
 		processor.collection->presets.remove(timerActionValue1);
 		//
+		presetChanged();
 		redoTreeViewsOnResize = false;
 		cleanInterface();
 		updateInterface();
@@ -45,6 +46,7 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue3);
 		processor.collection->presets[timerActionValue1]->layers.remove(timerActionValue2);
 		//
+		presetChanged();
 		redoTreeViewsOnResize = false;
 		cleanInterface();
 		updateInterface();
@@ -56,6 +58,7 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue4);
 		processor.collection->presets[timerActionValue1]->layers[timerActionValue2]->soundLinks.remove(timerActionValue3);
 		//
+		presetChanged();
 		redoTreeViewsOnResize = false;
 		cleanInterface();
 		updateInterface();
@@ -67,6 +70,7 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue2);
 		processor.collection->sounds.remove(timerActionValue1);
 		//
+		presetChanged();
 		redoTreeViewsOnResize = false;
 		cleanInterface();
 		updateInterface();
@@ -80,6 +84,7 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue3);
 		processor.collection->sounds[timerActionValue1]->soundFiles.remove(timerActionValue2);
 		//
+		presetChanged();
 		redoTreeViewsOnResize = false;
 		cleanInterface();
 		updateInterface();

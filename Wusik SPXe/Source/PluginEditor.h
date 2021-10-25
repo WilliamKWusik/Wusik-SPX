@@ -21,6 +21,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 	void loadSoundFileThumb(WSPX_Collection_Sound_File* soundFile);
+	void presetChanged() { processor.collection->hasUnsavedChanges = true; }
 	void showAbout()
 	{
 		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Wusik WSPX Editor", "Created by William Kalfelz @ Wusik.com (c) 2021\n\nVersion " + String(WVERSION));
@@ -68,6 +69,7 @@ public:
 	double multRatio = 1.0;
 	bool redoTreeViewsOnResize = true;
 	Image soundFileWaveformThumb;
+	ScopedPointer<WSPXSoundFileThumb> soundFileThumb;
 	//
 	Atomic<int> timerAction = 0;
 	int timerActionValue1 = 0;

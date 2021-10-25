@@ -144,7 +144,7 @@ public:
 		else if (bipolar) xText = String((value * 2.0f) - 1.0f, 3);
 		else xText = String(value, 3);
 		//
-		g.setColour(Colours::blue.withAlpha(0.06f));
+		g.setColour(Colours::black.withAlpha(0.06f));
 		g.fillRect(Rectangle<int>(0, 0, double(getWidth()) * 0.3, getHeight()));
 		//
 		g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.4));

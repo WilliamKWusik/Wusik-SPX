@@ -145,21 +145,26 @@ public:
 	{
 		if (type == kLabel)
 		{
-			g.fillAll(Colours::darkblue.withAlpha(0.22f));
+			g.fillAll(Colours::black.withAlpha(0.22f));
 			g.setColour(Colours::white.withAlpha(0.94f));
 			g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.52f));
-			g.drawFittedText(label, 0, 4, getWidth(), getHeight(), Justification::centred, 1);
+			g.drawFittedText(label, 8, 4, getWidth() - 16, getHeight(), Justification::centred, 1);
 		}
 		else if (type == kLabelSmall)
 		{
-			g.fillAll(Colours::darkblue.withAlpha(0.12f));
+			g.fillAll(Colours::black.withAlpha(0.22f));
+			g.fillAll(Colours::white.withAlpha(0.06f));
+			g.setColour(Colours::black.withAlpha(0.32f));
+			g.drawRect(0, 0, getWidth(), getHeight(), 2);
+			//
 			g.setColour(Colours::white.withAlpha(0.88f));
 			g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.32f));
-			g.drawFittedText(label, 0, 4, getWidth(), getHeight(), Justification::centred, 1);
+			g.drawFittedText(label, 8, 4, getWidth() - 16, getHeight(), Justification::centred, 1);
 		}
 		else
 		{
-			if (isMouseOver(true)) g.fillAll(Colours::darkblue.withAlpha(0.42f)); else g.fillAll(Colours::darkblue.withAlpha(0.12f));
+			g.fillAll(Colours::black.withAlpha(0.12f));
+			if (isMouseOver(true)) g.fillAll(Colours::red.withAlpha(0.12f));
 			//
 			g.setColour(Colours::white.withAlpha(0.26f));
 			g.drawRect(0, 0, getWidth(), getHeight(), 1);

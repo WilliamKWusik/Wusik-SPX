@@ -80,7 +80,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			}
 			else
 			{
-				sFile.append(File(sound->soundFiles[ss]->soundFile).getFileName(), 9999);
+				sFile.append("\"" + File(sound->soundFiles[ss]->soundFile).getFileName() + "\"", 9999);
 				//
 				if (File(sound->soundFiles[ss]->soundFile).existsAsFile())
 				{
@@ -110,15 +110,14 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		String xFile;
 		//
 		if (soundFile->soundFile.isEmpty()) xFile = "No File";
-		else if (File(soundFile->soundFile).existsAsFile()) xFile = File(soundFile->soundFile).getFileName() + " " +
-			WS::getSize(File(soundFile->soundFile).getSize());
+		else if (File(soundFile->soundFile).existsAsFile()) xFile = "\"" + soundFile->soundFile + "\"";
 		else xFile = File(soundFile->soundFile).getFileName() + " ! MISSING FILE !";
 		//
 		AddCompoLabelSM(xFile);
-		AddCompoLabelSM("Channels " + String(soundFile->channels));
-		AddCompoLabelSM("Samples " + String(soundFile->totalSamples));
-		AddCompoLabelSM("Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds");
-		AddCompoLabelSM("SampleRate " + String(soundFile->sampleRate));
+		AddCompoLabelSM("Channels " + String(soundFile->channels) + " - Samples " + String(soundFile->totalSamples) + " - SampleRate " + String(soundFile->sampleRate));
+		//
+		xFile = "Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds - Size " + WS::getSize(File(soundFile->soundFile).getSize());
+		AddCompoLabelSM(xFile);
 		//
 		AddCompo(kSlider, "Volume", &soundFile->volume);
 		AddCompo(kSliderBipolar, "Pan", &soundFile->pan);
@@ -241,8 +240,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		addAndMakeVisible(editOptionsViewport = new Viewport);
 		editOptionsViewport->setViewedComponent(editOptionsComponent);
 		editOptionsViewport->setScrollBarsShown(true, false);
-		editOptionsViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colours::darkblue);
-		editOptionsViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::trackColourId, Colours::darkblue);
+		editOptionsViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colours::grey);
+		editOptionsViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::trackColourId, Colours::grey);
 	}
 	//
 	resized();

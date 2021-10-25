@@ -81,6 +81,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
 			openOnlyLast(this);
 			//
+			editor->presetChanged();
 			editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
@@ -128,6 +129,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 					getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
 					openOnlyLast(getParentItem());
 					//
+					editor->presetChanged();
 					editor->editObject.set(WusikEditObject::kSound, 0, (void*)layer->soundLinks.getLast());
 					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 				}
@@ -184,6 +186,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				getParentItem()->getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
 				openOnlyLast(getParentItem()->getParentItem());
 				//
+				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
@@ -193,6 +196,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		{
 			if (processor.collection->presets.indexOf(preset) > 0)
 			{
+				editor->presetChanged();
 				processor.collection->presets.move(processor.collection->presets.indexOf(preset), processor.collection->presets.indexOf(preset) - 1);
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Show_Collection);
 				return; // we exit quickly as this is about to go down //
@@ -203,6 +207,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		{
 			if (processor.collection->presets.indexOf(preset) < (processor.collection->presets.size() - 1))
 			{
+				editor->presetChanged();
 				processor.collection->presets.move(processor.collection->presets.indexOf(preset), processor.collection->presets.indexOf(preset) + 1);
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Show_Collection);
 				return; // we exit quickly as this is about to go down //
@@ -217,6 +222,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "", preset, kRegular_Item, preset->layers.getLast()));
 				openOnlyLast(getParentItem());
 				//
+				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kPresetLayer, 0, (void*)preset->layers.getLast());
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
