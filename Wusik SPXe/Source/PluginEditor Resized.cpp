@@ -62,9 +62,9 @@ void WusikSpxAudioProcessorEditor::resized()
 			{
 				editOptionsViewport->setBounds(
 					editOptionsViewport->getBounds().getX(),
-					editOptionsViewport->getBounds().getY() + soundFileWaveformThumb.getHeight(),
+					editOptionsViewport->getBounds().getY() + (270 * multRatio) + (24.0 * multRatio),
 					editOptionsViewport->getBounds().getWidth(),
-					editOptionsViewport->getBounds().getHeight() - soundFileWaveformThumb.getHeight());
+					editOptionsViewport->getBounds().getHeight() - (270 * multRatio) - (24.0 * multRatio));
 			}
 		}
 	}

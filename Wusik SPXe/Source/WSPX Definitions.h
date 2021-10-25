@@ -7,7 +7,7 @@
 //
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
-#define WIGNORE_SET_STATE 1
+#define WIGNORE_SET_STATE 0
 #define WVERSION "1.0.0 BETA 00"
 extern bool isWSPXEditor;
 extern String collectionFile;
@@ -47,6 +47,14 @@ extern String collectionFile;
 		{ 
 			if (_type == kWrite) ((OutputStream*)_stream)->writeString(pathRelativeToCollection(_value));
 			else _value = pathFromCollectionLocation(((InputStream*)_stream)->readString());
+		}
+		//
+		static String getSize(int64 size)
+		{
+			if (size < 1024) return String(size) + " Bytes";
+			else if (size < (1024 * 1024)) return String(double(size) / 1024.0, 2) + " KB";
+			else if (size < (1024 * 1024 * 1024)) return String(double(size) / 1024.0 / 1024, 2) + " MB";
+			else return String(double(size) / 1024.0 / 1024.0 / 1024, 2) + " GB";
 		}
 		//
 		enum { kRead, kWrite };

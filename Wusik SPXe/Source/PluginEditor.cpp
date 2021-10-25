@@ -127,9 +127,15 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 	{
 		if (soundFileWaveformThumb.getWidth() > 0)
 		{
-			g.drawImageAt(soundFileWaveformThumb, 
-				(getWidth() / 2) - (soundFileWaveformThumb.getWidth() / 2), 
-				editOptionsViewport->getBounds().getY() - soundFileWaveformThumb.getHeight());
+			g.drawImage(soundFileWaveformThumb,
+				editOptionsViewport->getBounds().getX() + (editOptionsViewport->getWidth() / 2) - ((1280.0 * 0.5 * multRatio)),
+				editOptionsViewport->getBounds().getY() - (24.0 * multRatio) - (270.0 * multRatio),
+				1280.0 * multRatio,
+				270.0 * multRatio,
+				0,
+				0,
+				soundFileWaveformThumb.getWidth(),
+				soundFileWaveformThumb.getHeight());
 		}
 	}
 }

@@ -20,7 +20,7 @@ public:
 	void buttonClicked(Button* buttonThatWasClicked);
     void paint (Graphics&) override;
     void resized() override;
-	void createSoundFileWaveformThumb(WSPX_Collection_Sound_File* soundFile);
+	void loadSoundFileThumb(WSPX_Collection_Sound_File* soundFile);
 	void showAbout()
 	{
 		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Wusik WSPX Editor", "Created by William Kalfelz @ Wusik.com (c) 2021\n\nVersion " + String(WVERSION));

@@ -89,7 +89,7 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 		if (specialItem == kRegular_Item)
 		{
 			openOnly(this);
-			editor->createSoundFileWaveformThumb(soundFile);
+			editor->loadSoundFileThumb(soundFile);
 			editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
@@ -102,7 +102,7 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				sound->soundFiles.add(new WSPX_Collection_Sound_File);
 				sound->soundFiles.getLast()->soundFile = browseFile.getResult().getFullPathName();
 				processor.loadSoundFileDetails(sound->soundFiles.getLast());
-				editor->createSoundFileWaveformThumb(sound->soundFiles.getLast());
+				editor->loadSoundFileThumb(sound->soundFiles.getLast());
 				//
 				getParentItem()->addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "", kRegular_Item, sound, sound->soundFiles.getLast()));
 				openOnlyLast(getParentItem());
@@ -169,7 +169,7 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				soundFile->soundFile = browseFile.getResult().getFullPathName();
 				soundFile->sampleDataMetaValuesRead = false;
 				processor.loadSoundFileDetails(soundFile);
-				editor->createSoundFileWaveformThumb(soundFile);
+				editor->loadSoundFileThumb(soundFile);
 				//
 				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
@@ -181,10 +181,33 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WusikSpxAudioProcessorEditor::createSoundFileWaveformThumb(WSPX_Collection_Sound_File* soundFile)
+void WusikSpxAudioProcessorEditor::loadSoundFileThumb(WSPX_Collection_Sound_File* soundFile)
 {
 	soundFileWaveformThumb = Image();
 	if (soundFile->soundFile.isEmpty() || !File(soundFile->soundFile).existsAsFile()) return;
+	//
+	// Check for a thumb file first //
+	//
+	File thumbFile = File::addTrailingSeparator(File(soundFile->soundFile).getParentDirectory().getFullPathName()) +
+		File(soundFile->soundFile).getFileNameWithoutExtension() + ".WSPXeThumb";
+	//
+	if (thumbFile.existsAsFile())
+	{
+		// Check for the file dates first //
+		//
+		ScopedPointer<FileInputStream> stream = thumbFile.createInputStream();
+		//
+		String header = stream->readString();
+		char version = stream->readByte();
+		String time = stream->readString();
+		//
+		if (File(soundFile->soundFile).getLastModificationTime().toString(true, true).compare(time) == 0)
+		{
+			PNGImageFormat pngReader;
+			soundFileWaveformThumb = pngReader.loadFrom(*stream);
+			return;
+		}
+	}
 	//
 	ScopedPointer<AudioFormatReader> audioReader = processor.audioFormatManager.createReaderFor(File(soundFile->soundFile));
 	//
@@ -192,54 +215,117 @@ void WusikSpxAudioProcessorEditor::createSoundFileWaveformThumb(WSPX_Collection_
 	{
 		int channels = audioReader->numChannels;
 		int totalSamples = audioReader->lengthInSamples;
-		soundFileWaveformThumb = Image(Image::ARGB, double(getWidth()) * 0.88, double(getHeight()) * 0.22, true);
+		soundFileWaveformThumb = Image(Image::ARGB, 1280 * 2, 270 * 2, true);
 		//
 		AudioSampleBuffer soundBuffer(channels, totalSamples);
 		audioReader->read(&soundBuffer, 0, totalSamples, 0, true, true);
 		//
+		// Normalize First //
+		float maxValue = soundBuffer.getMagnitude(0, soundBuffer.getNumSamples());
+		if (maxValue < 1.0f) soundBuffer.applyGain(1.0f / maxValue);
+		//
+		Graphics gg(soundFileWaveformThumb);
+		gg.setColour(Colours::black.withAlpha(0.76f));
+		gg.drawRect(0, 0, soundFileWaveformThumb.getWidth(), soundFileWaveformThumb.getHeight(), 4);
+		gg.drawLine(0, soundFileWaveformThumb.getHeight() / 2, soundFileWaveformThumb.getWidth(), soundFileWaveformThumb.getHeight() / 2, 2);
+		//
 		if (totalSamples > soundFileWaveformThumb.getWidth())
 		{
-			Graphics gg(soundFileWaveformThumb);
-			gg.setColour(Colours::darkblue);
-			gg.drawRect(0, 0, soundFileWaveformThumb.getWidth(), soundFileWaveformThumb.getHeight(), 4);
-			gg.drawLine(0, soundFileWaveformThumb.getHeight() / 2, soundFileWaveformThumb.getWidth(), soundFileWaveformThumb.getHeight() / 2, 2);
-			//
 			double xPos = 0;
 			double rate = double(soundFileWaveformThumb.getWidth()) / double(totalSamples);
 			int xPosInt = 0;
-			float sample = 0.0f;
+			float sample[2] = { 0.0f, 0.0f };
+			//
+			// Create a normalize version of the buffer x area size //
+			//
+			AudioSampleBuffer soundBuffer2(channels, soundFileWaveformThumb.getWidth() + 100);
 			//
 			for (int ss = 0; ss < soundBuffer.getNumSamples(); ss++)
 			{
-				sample += soundBuffer.getReadPointer(0)[ss] * rate;
+				sample[0] += soundBuffer.getReadPointer(0)[ss];
+				if (channels > 1) sample[1] += soundBuffer.getReadPointer(1)[ss];
 				xPos += rate;
 				//
 				if (int(xPos) != xPosInt)
 				{
-					xPosInt = int(xPos);
+					sample[0] *= rate;
+					sample[1] *= rate;
 					//
-					if (sample > 0.0f)
+					xPosInt = int(xPos);
+					soundBuffer2.setSample(0, xPosInt, sample[0]);
+					if (channels > 1) soundBuffer2.setSample(1, xPosInt, sample[1]);
+					sample[0] = sample[1] = 0.0f;
+				}
+			}
+			// Normalize Again //
+			float maxValue = soundBuffer2.getMagnitude(0, soundBuffer2.getNumSamples());
+			if (maxValue < 1.0f) soundBuffer2.applyGain(1.0f / maxValue);
+			//
+			for (int ss = 0; ss < soundFileWaveformThumb.getWidth(); ss++)
+			{
+				for (int cc = 0; cc < channels; cc++)
+				{
+					sample[0] = soundBuffer2.getReadPointer(cc)[ss];
+					//
+					if (cc == 0) gg.setColour(Colours::white.withAlpha(0.90f));
+						else gg.setColour(Colours::white.withAlpha(0.78f));
+					//
+					if (sample[0] > 0.0f)
 					{
-						gg.drawLine(xPosInt, soundFileWaveformThumb.getHeight() / 2, xPosInt, 
-							(soundFileWaveformThumb.getHeight() / 2) - ((double(soundFileWaveformThumb.getHeight() / 2) * sample)));
+						gg.drawLine(ss, soundFileWaveformThumb.getHeight() / 2, ss,
+							(soundFileWaveformThumb.getHeight() / 2) - ((double(soundFileWaveformThumb.getHeight() / 2) * sample[0])));
 					}
 					else
 					{
-						gg.drawLine(xPosInt, 
-							soundFileWaveformThumb.getHeight() / 2, 
-							xPosInt,
-							(soundFileWaveformThumb.getHeight() / 2) + 
-								((float(soundFileWaveformThumb.getHeight() / 2) * fabs(sample))));
+						gg.drawLine(ss,
+							soundFileWaveformThumb.getHeight() / 2,
+							ss,
+							(soundFileWaveformThumb.getHeight() / 2) +
+							((float(soundFileWaveformThumb.getHeight() / 2) * fabs(sample[0]))));
 					}
-					//
-					sample = 0.0f;
-				}			
+				}
 			}
 		}
 		else
 		{
-
+			for (int ss = 0; ss < soundBuffer.getNumSamples(); ss++)
+			{
+				for (int cc = 0; cc < channels; cc++)
+				{
+					float sample = soundBuffer.getReadPointer(cc)[ss];
+					//
+					if (cc == 0) gg.setColour(Colours::white.withAlpha(0.90f));
+					else gg.setColour(Colours::white.withAlpha(0.78f));
+					//
+					if (sample > 0.0f)
+					{
+						gg.drawLine(ss, soundFileWaveformThumb.getHeight() / 2, ss,
+							(soundFileWaveformThumb.getHeight() / 2) - ((double(soundFileWaveformThumb.getHeight() / 2) * sample)));
+					}
+					else
+					{
+						gg.drawLine(ss,
+							soundFileWaveformThumb.getHeight() / 2,
+							ss,
+							(soundFileWaveformThumb.getHeight() / 2) +
+							((float(soundFileWaveformThumb.getHeight() / 2) * fabs(sample))));
+					}
+				}
+			}
 		}
+		//
+		// Create thumb file //
+		//
+		if (thumbFile.existsAsFile()) thumbFile.deleteFile();
+		ScopedPointer<FileOutputStream> stream = thumbFile.createOutputStream();
+		//
+		stream->writeString("WSPXeThumb");
+		stream->writeByte(1); // Version //
+		stream->writeString(File(soundFile->soundFile).getLastModificationTime().toString(true, true));
+		//
+		PNGImageFormat pngWriter;
+		pngWriter.writeImageToStream(soundFileWaveformThumb, *stream);
+		stream->flush();
 	}
 	else
 	{

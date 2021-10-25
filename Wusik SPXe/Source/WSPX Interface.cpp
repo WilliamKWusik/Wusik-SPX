@@ -86,7 +86,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 				{
 					int64 xSize = File(sound->soundFiles[ss]->soundFile).getSize();
 					totalSize += xSize;
-					sFile.append(" " + String((xSize / 1024) / 1024) + " MB", 9999);
+					sFile.append(" " + WS::getSize(xSize), 9999);
 				}
 				else
 				{
@@ -97,7 +97,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			AddCompoLabelSM(sFile);
 		}
 		//
-		AddCompoLabelSM("Total Size " + String(((totalSize / 1024) / 1024)) + " MB");
+		AddCompoLabelSM("Total Size " + WS::getSize(totalSize));
 
 	}
 	else if (editObject.type == WusikEditObject::kSoundFile)
@@ -111,12 +111,13 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		if (soundFile->soundFile.isEmpty()) xFile = "No File";
 		else if (File(soundFile->soundFile).existsAsFile()) xFile = File(soundFile->soundFile).getFileName() + " " +
-			String((File(soundFile->soundFile).getSize() / 1024) / 1024) + " MB";
+			WS::getSize(File(soundFile->soundFile).getSize());
 		else xFile = File(soundFile->soundFile).getFileName() + " ! MISSING FILE !";
 		//
 		AddCompoLabelSM(xFile);
 		AddCompoLabelSM("Channels " + String(soundFile->channels));
 		AddCompoLabelSM("Samples " + String(soundFile->totalSamples));
+		AddCompoLabelSM("Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds");
 		AddCompoLabelSM("SampleRate " + String(soundFile->sampleRate));
 		//
 		AddCompo(kSlider, "Volume", &soundFile->volume);
