@@ -21,20 +21,15 @@ void WusikSpxAudioProcessorEditor::cleanInterface()
 	editOptionsViewport = nullptr;
 	editOptionsComponent = nullptr;
 	//
-	soundZones.clear();
+	keyVelZones.clear();
 	editOptions.clear();
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::updateInterface()
 {
-	/*for (int ss = 0; ss < processor.collection->sounds[processor.collection->editingSound]->sounds.size(); ss++)
-	{
-		addAndMakeVisible(soundZones.add(new WSPXSoundZone(processor.collection->sounds[processor.collection->editingSound]->sounds[ss])));
-	}*/
-
 	editOptionsComponent = nullptr;
-
+	//
 	#define AddCompoLabel(label) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kLabel, label)))
 	#define AddCompoLabelSM(label) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kLabelSmall, label)))
 	#define AddCompoCallback(type, name, variable, label, callback) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, callback)))
@@ -43,11 +38,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	#define AddCompo4(type, name, variable, label, min, max) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, min, max)))
 	#define AddCompo6(type, name, variable, label, PopupList) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, 0, 1, PopupList)))
 	//
-	if (editObject.type == WusikEditObject::kSoundZones)
-	{
-
-	}
-	else if (editObject.type == WusikEditObject::kCollection)
+	if (editObject.type == WusikEditObject::kCollection)
 	{
 		editOptionsComponent = new Component;
 		AddCompoLabel("Collection Details");
@@ -246,6 +237,15 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kOnOffButton, "Sync to BPM", &layer->sequencer.sync);
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
+	}
+	else if (editObject.type == WusikEditObject::kSoundZones)
+	{
+		WSPX_Collection_Sound* sound = (WSPX_Collection_Sound*)editObject.object;
+		//
+		for (int ss = 0; ss < sound->soundFiles.size(); ss++)
+		{
+			addAndMakeVisible(keyVelZones.add(new WSPXKeyVelZone(sound->soundFiles[ss], midiKeyboard)));
+		}
 	}
 	//
 	if (editOptionsComponent != nullptr)

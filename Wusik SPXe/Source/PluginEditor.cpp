@@ -44,6 +44,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	addAndMakeVisible(previewButton = new WTransparentButton(this));
 	//
 	resizerConstrainer.setFixedAspectRatio(uiRatio);
+	resizerConstrainer.setSizeLimits(int(400 * uiRatio), 400, 99999, 99999);
 	addAndMakeVisible(resizer = new ResizableCornerComponent(this, &resizerConstrainer));
 	//
 	updateInterface();

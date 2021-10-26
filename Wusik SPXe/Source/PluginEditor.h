@@ -76,7 +76,7 @@ public:
 	Label* collectionNameLabel;
 	ScopedPointer<WusikTreeHolder> presetsTreeView;
 	ScopedPointer<WusikTreeHolder> soundsTreeView;
-	OwnedArray<WSPXSoundZone> soundZones;
+	OwnedArray<WSPXKeyVelZone> keyVelZones;
 	WusikEditObject editObject;
 	OwnedArray<WusikEditOption> editOptions;
 	Component* editOptionsComponent;

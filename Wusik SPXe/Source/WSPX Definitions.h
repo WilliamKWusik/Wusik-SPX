@@ -79,11 +79,11 @@ public:
 	float randomProbability = 1.0f;
 	float fineTune = 0.5f;
 	float coarseTune = 0.5f;
-	int keyZoneLow = 0;
-	int keyZoneHigh = 127;
-	int velZoneLow = 0;
-	int velZoneHigh = 127;
-	int keyRoot = 60;
+	float keyZoneLow = 0;
+	float keyZoneHigh = 1.0f;
+	float velZoneLow = 0;
+	float velZoneHigh = 1.0f;
+	float keyRoot = (1.0f / 127.0f) * 60.0f;
 	//
 	Array<float> channelPan;
 	int keySwitchType = 0;
@@ -407,10 +407,10 @@ public:
 	float output = 0.0f; // Main Out //
 	float glide = 0.0f;
 	float autoGlide = 1.0f;
-	int keyZoneLow = 0;
-	int keyZoneHigh = 127;
-	int velZoneLow = 0;
-	int velZoneHigh = 127;
+	float keyZoneLow = 0;
+	float keyZoneHigh = 1.0f;
+	float velZoneLow = 0;
+	float velZoneHigh = 1.0f;
 	MemoryBlock scripting;
 };
 //

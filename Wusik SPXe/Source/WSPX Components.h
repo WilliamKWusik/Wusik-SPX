@@ -38,21 +38,83 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPXSoundZone : public Component
+class WSPXKeyVelZone : public Component
 {
 public:
-	WSPXSoundZone(WSPX_Collection_Sound_File* _sound) : sound(_sound) { }
+	WSPXKeyVelZone(WSPX_Collection_Sound_File* _sound, MidiKeyboardComponent& _midiKeyboard) : sound(_sound), midiKeyboard(_midiKeyboard) { }
 	//
 	void paint(Graphics& g) override
 	{
-		g.fillAll(Colours::yellow.withAlpha(0.22f));
-		g.setColour(Colours::white.withAlpha(0.66f));
+		g.fillAll(Colour::fromString("BB94B7C4").darker(0.6f));
+		//
+		if (isMouseOverOrDragging())
+		{
+			g.fillAll(Colours::red.withAlpha(0.12f));
+			g.setColour(Colours::red.withAlpha(0.66f));
+		}
+		else g.setColour(Colours::white.withAlpha(0.66f));
+		//
 		g.drawRect(0, 0, getWidth(), getHeight(), 2);
 	}
 	//
+	void mouseExit(const MouseEvent& event) override
+	{
+		setMouseCursor(MouseCursor::NormalCursor);
+		repaint();
+	}
+	//
+	void mouseEnter(const MouseEvent& event) override
+	{
+		repaint();
+	}
+	//
+	void mouseMove(const MouseEvent& event) override
+	{
+		if (event.getPosition().x < 20)
+		{
+			setMouseCursor(MouseCursor::LeftEdgeResizeCursor);
+		}
+		else if (event.getPosition().y < 20)
+		{
+			setMouseCursor(MouseCursor::TopEdgeResizeCursor);
+		}
+		else if (event.getPosition().x > (getWidth() - 20))
+		{
+			setMouseCursor(MouseCursor::RightEdgeResizeCursor);
+		}
+		else if (event.getPosition().y > (getHeight() - 20))
+		{
+			setMouseCursor(MouseCursor::BottomEdgeResizeCursor);
+		}
+		else
+		{
+			setMouseCursor(MouseCursor::UpDownLeftRightResizeCursor);
+		}
+		//
+		repaint();
+	}
+	//
+	void setPositionOnUI()
+	{
+		double keyLow = double(int(sound->keyZoneLow * 127.0f)) / 127.0;
+		double keyHigh = double(int(sound->keyZoneHigh * 127.0f)) / 127.0;
+		double velLow = double(int(sound->velZoneLow * 127.0f)) / 127.0;
+		double velHigh = double(int(sound->velZoneHigh * 127.0f)) / 127.0;
+		//
+		double xPos = keyLow * double(positionOnUI.getWidth());
+		double yPos = (double(positionOnUI.getHeight()) - (velHigh * double(positionOnUI.getHeight())));
+		double ww = (keyHigh * double(positionOnUI.getWidth())) - xPos;
+		double hh = (double(positionOnUI.getHeight()) - (velLow * double(positionOnUI.getHeight()))) - yPos;
+		//
+		setBounds(positionOnUI.getX() + xPos, positionOnUI.getY() + yPos, ww, hh);
+	}
+	//
 	WSPX_Collection_Sound_File* sound;
+	MidiKeyboardComponent& midiKeyboard;
+	Rectangle<int> positionOnUI;
 };
 //
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WTransparentButton : public TextButton
 {
 public:
