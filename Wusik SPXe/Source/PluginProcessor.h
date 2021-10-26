@@ -57,6 +57,7 @@ public:
 	ScopedPointer<WSPX_Collection> collection;
 	AudioFormatManager audioFormatManager;
 	String lastSoundFilePath;
+	MidiKeyboardState midiKeyboardState;
 	//
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WusikSpxAudioProcessor)

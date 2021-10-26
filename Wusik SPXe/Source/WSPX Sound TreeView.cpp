@@ -23,8 +23,9 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 	}
 	else if (level == kLevel_Sounds)
 	{
+		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "Zones", kSound_Zones, sound));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "Remove", kSound_Remove, sound));
-		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "Load New", kSound_File_Add, sound));
+		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "Load New", kSound_Add, sound));
 		//
 		for (int ss = 0; ss < sound->soundFiles.size(); ss++)
 		{
@@ -94,7 +95,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
-		else if (specialItem == kSound_File_Add)
+		else if (specialItem == kSound_Zones)
+		{
+			editor->editObject.set(WusikEditObject::kSoundZones, 0, (void*)sound);
+			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+		}
+		else if (specialItem == kSound_Add)
 		{
 			FileChooser browseFile("Load New Sound File", processor.getLastSoundFilePath(), processor.audioFormatManager.getWildcardForAllFormats());
 			//
@@ -114,7 +120,7 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			}
 			else reselectParent();
 		}
-		else if (specialItem == kSound_File_Remove)
+		else if (specialItem == kSound_Remove)
 		{
 			StringArray presetsUsingThisSound;
 			//

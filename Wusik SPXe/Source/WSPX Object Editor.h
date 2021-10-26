@@ -25,7 +25,9 @@ public:
 		kPreset,
 		kPresetLayer,
 		kSound,
-		kSoundFile
+		kSoundFile,
+		kSoundLink,
+		kSoundZones
 	};
 };
 //

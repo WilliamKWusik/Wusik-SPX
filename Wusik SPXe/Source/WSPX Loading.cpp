@@ -25,15 +25,8 @@ void WusikSpxAudioProcessor::newCompilation()
 	{
 		collection->sounds.add(new WSPX_Collection_Sound);
 		collection->sounds.getFirst()->soundFiles.add(new WSPX_Collection_Sound_File);
-		collection->sounds.getFirst()->soundFiles.getLast()->keyZoneHigh = 59;
-		collection->sounds.getFirst()->soundFiles.getLast()->keyRoot = 42;
 		collection->sounds.getFirst()->soundFiles.add(new WSPX_Collection_Sound_File);
-		collection->sounds.getFirst()->soundFiles.getLast()->keyZoneLow = 60;
-		collection->sounds.getFirst()->soundFiles.getLast()->keyZoneHigh = 88;
-		collection->sounds.getFirst()->soundFiles.getLast()->keyRoot = 78;
 		collection->sounds.getFirst()->soundFiles.add(new WSPX_Collection_Sound_File);
-		collection->sounds.getFirst()->soundFiles.getLast()->keyZoneLow = 89;
-		collection->sounds.getFirst()->soundFiles.getLast()->keyRoot = 102;
 		collection->sounds.getFirst()->name = "Test Sound 1";
 		//
 		collection->sounds.add(new WSPX_Collection_Sound);

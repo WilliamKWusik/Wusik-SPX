@@ -18,8 +18,8 @@ public:
 	void reset()
 	{
 		ready.set(0);
-		waveform = Image();
 		loopStart = loopEnd = 0;
+		waveform = Image();
 	}
 	//
 	Atomic<int> ready = 0;
@@ -74,7 +74,6 @@ public:
 	ComponentBoundsConstrainer resizerConstrainer;
 	ScopedPointer<LookAndFeelEx> newLookAndFeel;
 	Label* collectionNameLabel;
-	Label* statusBar;
 	ScopedPointer<WusikTreeHolder> presetsTreeView;
 	ScopedPointer<WusikTreeHolder> soundsTreeView;
 	OwnedArray<WSPXSoundZone> soundZones;
@@ -86,6 +85,7 @@ public:
 	double multRatio = 1.0;
 	bool redoTreeViewsOnResize = true;
 	WSPXSoundFileThumbView soundFileThumbView;
+	MidiKeyboardComponent midiKeyboard;
 	//
 	Atomic<int> timerAction = 0;
 	int timerActionValue1 = 0;

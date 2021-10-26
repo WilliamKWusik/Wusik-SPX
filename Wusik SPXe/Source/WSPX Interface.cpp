@@ -43,7 +43,11 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	#define AddCompo4(type, name, variable, label, min, max) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, min, max)))
 	#define AddCompo6(type, name, variable, label, PopupList) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, 0, 1, PopupList)))
 	//
-	if (editObject.type == WusikEditObject::kCollection)
+	if (editObject.type == WusikEditObject::kSoundZones)
+	{
+
+	}
+	else if (editObject.type == WusikEditObject::kCollection)
 	{
 		editOptionsComponent = new Component;
 		AddCompoLabel("Collection Details");
@@ -57,15 +61,23 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kImage, "Image About", &processor.collection->imageAbout);
 		AddCompo2(kString, "Protection Key", &processor.collection->protectionKey, "", true, nullptr);
 	}
-	else if (editObject.type == WusikEditObject::kSound)
+	else if (editObject.type == WusikEditObject::kSound || editObject.type == WusikEditObject::kSoundLink)
 	{
 		WSPX_Collection_Sound* sound = (WSPX_Collection_Sound*)editObject.object;
-		//
 		editOptionsComponent = new Component;
-		AddCompoLabel("Sound Details");
-		AddCompo(kString, "Name", &sound->name);
-		AddCompo(kString, "Tags", &sound->tags);
-		AddCompo4(kSliderInteger, "Choke Group", &sound->chokeGroup, "", 0, 128);
+		//
+		if (editObject.type == WusikEditObject::kSound)
+		{
+			AddCompoLabel("Sound Details");
+			AddCompo(kString, "Name", &sound->name);
+			AddCompo(kString, "Tags", &sound->tags);
+			AddCompo4(kSliderInteger, "Choke Group", &sound->chokeGroup, "", 0, 128);
+		}
+		else
+		{
+			AddCompoLabel("Sound Link Details");
+			AddCompoLabelSM("Name: " + sound->name);
+		}
 		//
 		AddCompoLabelSM("Total Of Sounds " + String(sound->soundFiles.size()));
 		//

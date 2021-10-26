@@ -128,7 +128,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				openOnlyLast(getParentItem());
 				//
 				editor->presetChanged();
-				editor->editObject.set(WusikEditObject::kSound, 0, (void*)layer->soundLinks.getLast());
+				editor->editObject.set(WusikEditObject::kSoundLink, 0, (void*)layer->soundLinks.getLast());
 				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
 			else reselectParent();
@@ -136,7 +136,7 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		else
 		{
 			openOnly(this);
-			editor->editObject.set(WusikEditObject::kSound, 0, (void*)soundLink);
+			editor->editObject.set(WusikEditObject::kSoundLink, 0, (void*)soundLink);
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
 	}

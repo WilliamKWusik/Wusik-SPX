@@ -9,7 +9,8 @@
 #include "PluginEditor.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcessor& p) : AudioProcessorEditor (&p), processor (p)
+WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcessor& p) : 
+	AudioProcessorEditor (&p), processor (p), midiKeyboard(p.midiKeyboardState, MidiKeyboardComponent::Orientation::horizontalKeyboard)
 {
 	backgroundImage = ImageCache::getFromMemory(BinaryData::Interface_png, BinaryData::Interface_pngSize);
 	redSaveImage = ImageCache::getFromMemory(BinaryData::Interface3_png, BinaryData::Interface3_pngSize);
@@ -34,15 +35,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	collectionNameLabel->setText(processor.collection->name, NotificationType::dontSendNotification);
 	collectionNameLabel->setJustificationType(Justification::centred);
 	//
-	addAndMakeVisible(statusBar = new Label());
-	statusBar->setColour(Label::ColourIds::textColourId, Colours::white.withAlpha(0.66f));
-	//
-	if (processor.collection->file.existsAsFile())
-		statusBar->setText(processor.collection->file.getFullPathName(), NotificationType::dontSendNotification);
-	else
-		statusBar->setText("Unsaved Collection", NotificationType::dontSendNotification);
-	//
-	statusBar->setJustificationType(Justification::centred);
+	addAndMakeVisible(midiKeyboard);
 	//
 	addAndMakeVisible(logoButton = new WTransparentButton(this));
 	addAndMakeVisible(fileButton = new WTransparentButton(this));
@@ -125,7 +118,7 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 	//
 	if (editObject.type == WusikEditObject::kSoundFile)
 	{
-		if (soundFileThumbView.ready.get() == 1 && soundFileThumbView.waveform.getWidth() > 0)
+		if (soundFileThumbView.ready.get() == 1 && editOptionsViewport != nullptr && soundFileThumbView.waveform.getWidth() > 0)
 		{
 			g.drawImage(soundFileThumbView.waveform,
 				editOptionsViewport->getBounds().getX() + (editOptionsViewport->getWidth() / 2) - ((1280.0 * 0.5 * multRatio)),
@@ -136,7 +129,6 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 				0,
 				soundFileThumbView.waveform.getWidth(),
 				soundFileThumbView.waveform.getHeight());
-			//
 		}
 	}
 }

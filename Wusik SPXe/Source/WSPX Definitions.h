@@ -77,13 +77,13 @@ public:
 	float reverse = 0.0f;
 	float keySwitch = 0.0f;
 	float randomProbability = 1.0f;
-	float keyZoneLow = 0.0f;
-	float keyZoneHigh = 1.0f;
-	float velZoneLow = 0.0f;
-	float velZoneHigh = 1.0f;
-	float keyRoot = (1.0f / 127.0f) * 60.0f;
 	float fineTune = 0.5f;
 	float coarseTune = 0.5f;
+	int keyZoneLow = 0;
+	int keyZoneHigh = 127;
+	int velZoneLow = 0;
+	int velZoneHigh = 127;
+	int keyRoot = 60;
 	//
 	Array<float> channelPan;
 	int keySwitchType = 0;
@@ -399,10 +399,6 @@ public:
 	WSPX_Collection_Filter filter;
 	String name = "Layer";
 	float reverse = 0.0f;
-	float keyZoneLow = 0.0f;
-	float keyZoneHigh = 1.0f;
-	float velZoneLow = 0.0f;
-	float velZoneHigh = 1.0f;
 	float volume = 1.0f;
 	float pan = 0.5f;
 	float fineTune = 0.5f;
@@ -411,6 +407,10 @@ public:
 	float output = 0.0f; // Main Out //
 	float glide = 0.0f;
 	float autoGlide = 1.0f;
+	int keyZoneLow = 0;
+	int keyZoneHigh = 127;
+	int velZoneLow = 0;
+	int velZoneHigh = 127;
 	MemoryBlock scripting;
 };
 //

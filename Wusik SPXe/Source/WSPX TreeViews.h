@@ -101,8 +101,9 @@ public:
 		//
 		kRegular_Item = 0,
 		//
-		kSound_Remove = 1,
-		kSound_File_Add,
+		kSound_Zones = 1,
+		kSound_Remove,
+		kSound_Add,
 		//
 		kSound_File_Remove = 1,
 		kSound_File_Load

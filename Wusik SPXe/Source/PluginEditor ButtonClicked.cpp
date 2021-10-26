@@ -45,7 +45,6 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			FileOutputStream stream(processor.collection->file);
 			processor.saveCompilation(stream);
 			//
-			statusBar->setText(processor.collection->file.getFullPathName(), NotificationType::dontSendNotification);
 			repaint();
 		}
 	}
@@ -72,7 +71,6 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			if (result == 2)
 			{
 				processor.newCompilation();
-				statusBar->setText("Unsaved Collection", NotificationType::dontSendNotification);
 				repaint();
 			}
 			else if (result == 1)
@@ -106,7 +104,6 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 					FileOutputStream stream(processor.collection->file);
 					processor.saveCompilation(stream);
 					//
-					statusBar->setText(processor.collection->file.getFullPathName(), NotificationType::dontSendNotification);
 					repaint();
 				}
 			}
@@ -123,7 +120,6 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 					FileOutputStream stream(processor.collection->file);
 					processor.saveCompilation(stream);
 					//
-					statusBar->setText(processor.collection->file.getFullPathName(), NotificationType::dontSendNotification);
 					repaint();
 				}
 			}

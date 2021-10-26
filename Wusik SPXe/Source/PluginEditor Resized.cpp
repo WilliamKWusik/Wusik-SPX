@@ -14,10 +14,6 @@ void WusikSpxAudioProcessorEditor::resized()
 	multRatio = double(getHeight()) / double(backgroundImage.getHeight());
 	newLookAndFeel->ratioValue = multRatio;
 	//
-	// Status Bar //
-	boundsSet(0, 958, 1624, 38, statusBar, multRatio);
-	statusBar->setFont(LookAndFeelEx::getCustomFont().withHeight(double(statusBar->getHeight()) * 0.48));
-	//
 	// Collection Name //
 	boundsSet(682, 12, 452, 51, collectionNameLabel, multRatio);
 	collectionNameLabel->setFont(LookAndFeelEx::getCustomFont().withHeight(double(collectionNameLabel->getHeight()) * 0.52));
@@ -43,7 +39,7 @@ void WusikSpxAudioProcessorEditor::resized()
 	redoTreeViewsOnResize = true;
 	//
 	// Show Edit Objects //
-	if (editObject.type != WusikEditObject::kNone)
+	if (editObject.type != WusikEditObject::kNone && editOptionsComponent != nullptr)
 	{
 		int totalH = 0;
 		//
@@ -53,7 +49,7 @@ void WusikSpxAudioProcessorEditor::resized()
 			totalH += 56;
 		}
 		//
-		boundsSet(569, 107, 690, 807, editOptionsViewport, multRatio);
+		boundsSet(569, 90, 690, 794, editOptionsViewport, multRatio);
 		editOptionsComponent->setBounds(0, 0, editOptionsViewport->getWidth(), double(totalH) * multRatio);
 		//
 		if (editObject.type == WusikEditObject::kSoundFile)
@@ -72,14 +68,17 @@ void WusikSpxAudioProcessorEditor::resized()
 	{
 		for (int zz = 0; zz < soundZones.size(); zz++)
 		{
-			int xPos = int(double(soundZones[zz]->sound->keyZoneLow) * ((1589.0 * multRatio) / 127.0));
+			/*int xPos = int(double(soundZones[zz]->sound->keyZoneLow) * ((1589.0 * multRatio) / 127.0));
 			int yPos = 0;
 			int ww = int((double(soundZones[zz]->sound->keyZoneHigh + 1) * ((1589.0 * multRatio) / 127.0)) - xPos);
 			int hh = int(856.0 * multRatio);
 			//
-			soundZones[zz]->setBounds(xPos + int(13.0 * multRatio), yPos + int(84.0 * multRatio), ww, hh);
+			soundZones[zz]->setBounds(xPos + int(13.0 * multRatio), yPos + int(84.0 * multRatio), ww, hh);*/
 		}
 	}
+	//
+	midiKeyboard.setKeyWidth(26.0 * multRatio);
+	boundsSet(0, 905, 1622, 93, &midiKeyboard, multRatio);
 	//
 	resizer->setBounds(getWidth() - 32, getHeight() - 32, 32, 32);
 	resizer->toFront(false);
