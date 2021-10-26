@@ -58,6 +58,7 @@ public:
 	AudioFormatManager audioFormatManager;
 	String lastSoundFilePath;
 	MidiKeyboardState midiKeyboardState;
+	MidiKeyboardState midiKeyboardStateBottom;
 	//
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WusikSpxAudioProcessor)

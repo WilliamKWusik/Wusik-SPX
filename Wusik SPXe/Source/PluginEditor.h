@@ -86,6 +86,8 @@ public:
 	bool redoTreeViewsOnResize = true;
 	WSPXSoundFileThumbView soundFileThumbView;
 	MidiKeyboardComponent midiKeyboard;
+	MidiKeyboardComponent midiKeyboardBottom;
+	WSPXKeyVelZoneStatusBar* keyVelZoneStatusBar;
 	//
 	Atomic<int> timerAction = 0;
 	int timerActionValue1 = 0;

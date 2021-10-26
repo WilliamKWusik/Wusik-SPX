@@ -67,28 +67,18 @@ void WusikSpxAudioProcessorEditor::resized()
 	// Sound Zones //
 	if (keyVelZones.size() > 0)
 	{
-		Rectangle<int> positionOnUI(int(24.0 * multRatio), int(88.0 * multRatio), int(1582.0 * multRatio), int(798.0 * multRatio));
+		boundsSet(20, 905, 1592, 93, &midiKeyboard, multRatio);
+		boundsSet(20, 905, 1592, 93, &midiKeyboardBottom, multRatio);
+		midiKeyboard.setKeyWidth(double(midiKeyboard.getWidth()) / 76.0);
+		midiKeyboardBottom.setKeyWidth(double(midiKeyboardBottom.getWidth()) / 76.0);
+		//
+		Rectangle<int> positionOnUI(midiKeyboard.getBounds().getX(), int(88.0 * multRatio), midiKeyboard.getWidth(), int(798.0 * multRatio));
 		//
 		for (int zz = 0; zz < keyVelZones.size(); zz++)
 		{
-			/*double keyLow = double(int(keyVelZones[zz]->sound->keyZoneLow * 127.0f)) / 127.0;
-			double keyHigh = double(int(keyVelZones[zz]->sound->keyZoneHigh * 127.0f)) / 127.0;
-			double velLow = double(int(keyVelZones[zz]->sound->velZoneLow * 127.0f)) / 127.0;
-			double velHigh = double(int(keyVelZones[zz]->sound->velZoneHigh * 127.0f)) / 127.0;
-			//
-			double xPos = keyLow * 1582.0;
-			double yPos = (798.0 - (velHigh * 798.0));
-			double ww = (keyHigh * 1582.0) - xPos;
-			double hh = (798.0 - (velLow * 798.0)) - yPos;
-			//
-			boundsSet(24.0 + xPos - 5, 88.0 + yPos, ww + 10, hh, keyVelZones[zz], multRatio);*/
-			//
 			keyVelZones[zz]->positionOnUI = positionOnUI;
 			keyVelZones[zz]->setPositionOnUI();
 		}
-		//
-		boundsSet(24 - 5, 905, 1582 + 10, 93, &midiKeyboard, multRatio);
-		midiKeyboard.setKeyWidth(double(midiKeyboard.getWidth()) / 76.0);
 	}
 	else
 	{
