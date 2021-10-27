@@ -23,12 +23,15 @@ void WusikSpxAudioProcessorEditor::cleanInterface()
 	//
 	keyVelZones.clear();
 	editOptions.clear();
+	//
+	statusLabel->setVisible(false);
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessorEditor::updateInterface()
 {
 	editOptionsComponent = nullptr;
+	midiKeyboard.selectedHigh = midiKeyboard.selectedLow = midiKeyboard.rootKey = -1;
 	//
 	#define AddCompoLabel(label) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kLabel, label)))
 	#define AddCompoLabelSM(label) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kLabelSmall, label)))
@@ -140,6 +143,11 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderInteger, "Vel Zone Low", &soundFile->velZoneLow, "", 0, 127);
 		AddCompo4(kSliderInteger, "Vel Zone High", &soundFile->velZoneHigh, "", 0, 127);
 		AddCompo4(kSliderInteger, "Key Root", &soundFile->keyRoot, "", 0, 127);
+		//
+		midiKeyboard.selectedHigh = soundFile->keyZoneHigh * 127.0f;
+		midiKeyboard.selectedLow = soundFile->keyZoneLow * 127.0f;
+		midiKeyboard.rootKey = soundFile->keyRoot * 127.0f;
+		midiKeyboard.repaint();
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
 	{
@@ -237,6 +245,11 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kOnOffButton, "Sync to BPM", &layer->sequencer.sync);
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
+		//
+		//
+		midiKeyboard.selectedHigh = layer->keyZoneHigh * 127.0f;
+		midiKeyboard.selectedLow = layer->keyZoneLow * 127.0f;
+		midiKeyboard.repaint();
 	}
 	else if (editObject.type == WusikEditObject::kSoundZones)
 	{
@@ -244,7 +257,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		for (int ss = 0; ss < sound->soundFiles.size(); ss++)
 		{
-			addAndMakeVisible(keyVelZones.add(new WSPXKeyVelZone(sound->soundFiles[ss], midiKeyboard, *statusLabel)));
+			addAndMakeVisible(keyVelZones.add(new WSPXKeyVelZone(this, sound->soundFiles[ss])));
 		}
 	}
 	//

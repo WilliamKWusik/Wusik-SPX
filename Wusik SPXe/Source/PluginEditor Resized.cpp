@@ -65,31 +65,20 @@ void WusikSpxAudioProcessorEditor::resized()
 		}
 	}
 	// Sound Zones //
+	boundsSet(20, 905, 1592, 93, &midiKeyboard, multRatio);
+	midiKeyboard.setAvailableRange(0, 127);
+	midiKeyboard.setKeyWidth(double(midiKeyboard.getWidth()) / 76.0);
+	statusLabel->setVisible(false);
+	//
 	if (keyVelZones.size() > 0)
 	{
-		boundsSet(20, 905, 1592, 93, &midiKeyboard, multRatio);
-		midiKeyboard.setAvailableRange(0, 127);
-		midiKeyboard.setKeyWidth(double(midiKeyboard.getWidth()) / 76.0);
-		midiKeyboard.selectedHigh = midiKeyboard.selectedLow = midiKeyboard.rootKey = -1;
-		//
-		Rectangle<int> positionOnUI(
-			midiKeyboard.getBounds().getX() + int(8.0 * multRatio),
-			int(88.0 * multRatio), 
-			midiKeyboard.getWidth() - int(32.0 * multRatio),
-			int(798.0 * multRatio));
+		Rectangle<int> positionOnUI(midiKeyboard.getBounds().getX() + int(8.0 * multRatio), int(88.0 * multRatio), midiKeyboard.getWidth() - int(32.0 * multRatio),int(798.0 * multRatio));
 		//
 		for (int zz = 0; zz < keyVelZones.size(); zz++)
 		{
 			keyVelZones[zz]->positionOnUI = positionOnUI;
 			keyVelZones[zz]->setPositionOnUI();
 		}
-	}
-	else
-	{
-		midiKeyboard.setKeyWidth(26.0 * multRatio);
-		midiKeyboard.selectedHigh = midiKeyboard.selectedLow = midiKeyboard.rootKey = -1;
-		midiKeyboard.setAvailableRange(0, 127);
-		boundsSet(0, 905, 1622, 93, &midiKeyboard, multRatio);
 	}
 	//
 	resizer->setBounds(getWidth() - 32, getHeight() - 32, 32, 32);

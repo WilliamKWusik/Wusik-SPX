@@ -373,3 +373,83 @@ void WSPXSoundFileThumbThreadCreation::run()
 	setProgress(1.0);
 	sleep(100);
 }
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WSPXKeyVelZone::updateKeysAndLabel(bool mouseAway)
+{
+	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)theEditor;
+	//
+	if (mouseAway)
+	{
+		editor->midiKeyboard.selectedHigh = editor->midiKeyboard.selectedLow = editor->midiKeyboard.rootKey = -1;
+		editor->midiKeyboard.repaint();
+		editor->statusLabel->setVisible(false);
+	}
+	else
+	{
+		editor->midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
+		editor->midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
+		editor->midiKeyboard.rootKey = sound->keyRoot * 127.0f;
+		editor->midiKeyboard.repaint();
+		//
+		((WSPXStatusLabel*)editor->statusLabel)->text = File(sound->soundFile).getFileName();
+		editor->statusLabel->setBounds(getBounds().getX() + 8, getBounds().getY() + 8, 320, 42);
+		editor->statusLabel->setAlwaysOnTop(true);
+		editor->statusLabel->setVisible(true);
+	}
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WSPXKeyVelZone::mouseUp(const MouseEvent& event)
+{
+	if (!hasMoved)
+	{
+		PopupMenu mm;
+		mm.addItem(1, "Load");
+		mm.addItem(2, "Open");
+		mm.addItem(4, "Edit");
+		mm.addItem(6, "Remove");
+		//
+		int result = mm.show();
+		if (result > 0)
+		{
+			WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)theEditor;
+			editor->statusLabel->setVisible(false);
+			//
+			if (result == 2)
+			{
+				if (File(sound->soundFile).existsAsFile()) File(sound->soundFile).startAsProcess();
+			}
+			else if (result == 6)
+			{
+				if (WConfirmBox("Remove Sound File", "Are you sure?"))
+				{
+					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Remove_Sound_File_From_Zones, 0, 0, 0, 0, (void*)sound);
+					return; // we exit quickly as this is about to go down //
+				}
+			}
+			else if (result == 1)
+			{
+				WusikSpxAudioProcessor* processor = ((WusikSpxAudioProcessor*)editor->getAudioProcessor());
+				FileChooser browseFile("Load/Replace Sound File", processor->getLastSoundFilePath(sound->soundFile), processor->audioFormatManager.getWildcardForAllFormats());
+				//
+				if (browseFile.browseForFileToOpen())
+				{
+					sound->soundFile = browseFile.getResult().getFullPathName();
+					sound->sampleDataMetaValuesRead = false;
+					processor->loadSoundFileDetails(sound);
+					editor->loadSoundFileThumb(sound);
+					editor->presetChanged();
+					editor->repaint();
+				}
+			}
+			else if (result == 4)
+			{
+				editor->editObject.type = WusikEditObject::kSoundFile;
+				editor->editObject.object = (void*) sound;
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				return; // we exit quickly as this is about to go down //
+			}
+		}
+	}
+}

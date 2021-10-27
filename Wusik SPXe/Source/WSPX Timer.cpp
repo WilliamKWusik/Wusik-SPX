@@ -92,5 +92,26 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		processor.resumeAudio();
 	}
 	//
+	else if (timerAction.get() == kTimerAction_Remove_Sound_File_From_Zones)
+	{
+		processor.stopAllAudio(); // We are about to mess with the audio data //
+		//
+		for (int ss = 0; ss < processor.collection->sounds.size(); ss++)
+		{
+			if (processor.collection->sounds[ss]->soundFiles.contains((WSPX_Collection_Sound_File*)timerActionValueObject))
+			{
+				processor.collection->sounds[ss]->soundFiles.remove(
+					processor.collection->sounds[ss]->soundFiles.indexOf(
+					(WSPX_Collection_Sound_File*)timerActionValueObject));
+			}
+		}
+		//
+		presetChanged();
+		cleanInterface();
+		updateInterface();
+		//
+		processor.resumeAudio();
+	}
+	//
 	timerAction.set(kTimerAction_None);
 }

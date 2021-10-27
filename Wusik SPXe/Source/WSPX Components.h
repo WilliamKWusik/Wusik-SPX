@@ -128,12 +128,15 @@ public:
 	String text;
 };
 //
+//
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPXKeyVelZone : public Component
 {
 public:
-	WSPXKeyVelZone(WSPX_Collection_Sound_File* _sound, WMidiKeyboardComponent& _midiKeyboard, Component& _statusLabel) 
-		: sound(_sound), midiKeyboard(_midiKeyboard), statusLabel(_statusLabel) { }
+	WSPXKeyVelZone(void* _theEditor, WSPX_Collection_Sound_File* _sound) : sound(_sound), theEditor(_theEditor) { }
+	//
+	void updateKeysAndLabel(bool mouseAway = false);
+	void mouseUp(const MouseEvent& event) override;
 	//
 	void paint(Graphics& g) override
 	{
@@ -151,6 +154,7 @@ public:
 	//
 	void mouseDrag(const MouseEvent& event) override
 	{
+		hasMoved = true;
 		float multiply = 1.0f;
 		if (event.mods.isShiftDown() || event.mods.isRightButtonDown()) multiply = 0.1f;
 		//
@@ -186,15 +190,13 @@ public:
 		}
 		//
 		setPositionOnUI();
-		midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
-		midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
-		midiKeyboard.rootKey = sound->keyRoot * 127.0f;
-		midiKeyboard.repaint();
+		updateKeysAndLabel();
 		repaint();
 	}
 	//
 	void mouseDown(const MouseEvent& event) override
 	{
+		hasMoved = false;
 		keyZoneLow = sound->keyZoneLow;
 		keyZoneHigh = sound->keyZoneHigh;
 		velZoneLow = sound->velZoneLow;
@@ -210,24 +212,13 @@ public:
 	void mouseExit(const MouseEvent& event) override
 	{
 		setMouseCursor(MouseCursor::NormalCursor);
-		statusLabel.setVisible(false);
-		midiKeyboard.selectedHigh = midiKeyboard.selectedLow = midiKeyboard.rootKey = -1;
-		midiKeyboard.repaint();
+		updateKeysAndLabel(true);
 		repaint();
 	}
 	//
 	void mouseEnter(const MouseEvent& event) override
 	{
-		midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
-		midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
-		midiKeyboard.rootKey = sound->keyRoot * 127.0f;
-		midiKeyboard.repaint();
-		//
-		((WSPXStatusLabel&)statusLabel).text = File(sound->soundFile).getFileName();
-		statusLabel.setBounds(getBounds().getX() + 8, getBounds().getY() + 8, 320, 42);
-		statusLabel.setAlwaysOnTop(true);
-		statusLabel.setVisible(true);
-		//
+		updateKeysAndLabel();
 		repaint();
 	}
 	//
@@ -239,10 +230,7 @@ public:
 		else if (event.getPosition().y > (getHeight() - 20)) setMouseCursor(MouseCursor::BottomEdgeResizeCursor);
 		else setMouseCursor(MouseCursor::UpDownLeftRightResizeCursor);
 		//
-		midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
-		midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
-		midiKeyboard.rootKey = sound->keyRoot * 127.0f;
-		midiKeyboard.repaint();
+		updateKeysAndLabel();
 		repaint();
 	}
 	//
@@ -264,16 +252,16 @@ public:
 		setBounds(positionOnUI.getX() + xPos - xExtraX, positionOnUI.getY() + yPos - xExtraY, ww + (xExtraX * 2), hh + (xExtraY * 2));
 	}
 	//
+	void* theEditor;
 	WSPX_Collection_Sound_File* sound;
-	WMidiKeyboardComponent& midiKeyboard;
 	Rectangle<int> positionOnUI;
-	Component& statusLabel;
 	//
 	float keyZoneLow = 0.0;
 	float keyZoneHigh = 0.0f;
 	float velZoneLow = 0.0;
 	float velZoneHigh = 0.0f;
 	int type = kMove;
+	bool hasMoved = false;
 	//
 	enum
 	{
