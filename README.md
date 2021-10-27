@@ -25,3 +25,5 @@ Here you will find the definition of the format plus a full free open-source edi
 - Round Robin, Random Probability and Key Switching
 - Visual Scripting (from the editor)
 - Reverse, Ping Pong and Regular playbacks
+
+![Screenshot](/Screenshots/2021-10-26%2022_06_51-Window.png)
