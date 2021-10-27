@@ -147,6 +147,15 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderInteger, "Vel Zone High", &soundFile->velZoneHigh, "", 0, 127);
 		AddCompo4(kSliderInteger, "Key Root", &soundFile->keyRoot, "", 0, 127); AddMIDIKey(rootKey);
 		//
+		if (soundFile->channelInformation.size() > 0) AddCompoLabel("Channel Information");
+		for (int cc = 0; cc < soundFile->channelInformation.size(); cc++)
+		{
+			AddCompoLabelSM("Channel #" + String(cc + 1));
+			AddCompo(kString, "Name", &soundFile->channelInformation[cc]->name);
+			AddCompo(kSlider, "Volume", &soundFile->channelInformation[cc]->volume);
+			AddCompo4(kSliderBipolar, "Pan", &soundFile->channelInformation[cc]->pan, "", -1.0f, 1.0f);
+		}
+		//
 		midiKeyboard.selectedHigh = soundFile->keyZoneHigh;
 		midiKeyboard.selectedLow = soundFile->keyZoneLow;
 		midiKeyboard.rootKey = soundFile->keyRoot;
@@ -226,9 +235,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		{
 			AddCompoLabel("LFO " + String(ll + 1));
 			AddCompo6(kPopupList, "Waveform", &layer->lfos[ll].waveform, "", layer->lfos[ll].waveforms);
-			AddCompo(kSlider, "Speed 1", &layer->lfos[ll].speed1);
-			AddCompo(kSlider, "Speed 2", &layer->lfos[ll].speed2);
-			AddCompo(kOnOffButton, "Sync to BPM", &layer->lfos[ll].sync);
+			AddCompo(kTime, "Time", &layer->lfos[ll].time);
 			AddCompo(kSlider, "Phase", &layer->lfos[ll].phase);
 			AddCompo(kSlider, "Smooth", &layer->lfos[ll].smooth);
 			AddCompo4(kSliderBipolar, "To Filter Frequency", &layer->lfos[ll].toFilterFreq, "", -1, 1);
@@ -243,9 +250,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		}
 		//
 		AddCompoLabel("Sequencer");
-		AddCompo(kSlider, "Speed 1", &layer->sequencer.speed1);
-		AddCompo(kSlider, "Speed 1", &layer->sequencer.speed2);
-		AddCompo(kOnOffButton, "Sync to BPM", &layer->sequencer.sync);
+		AddCompo(kTime, "Time", &layer->sequencer.time);
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
 		//

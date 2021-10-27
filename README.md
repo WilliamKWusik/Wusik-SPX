@@ -13,15 +13,16 @@ Here you will find the definition of the format plus a full free open-source edi
 - Round Robin, Random Probability and Key Switching
 - Tag Database For Sounds and Presets
 - 16, 24 and 32 bits support
-- Collection, Preset and About PNG files.
+- Collection, Preset and About PNG files
+- Skin data for the Player
 
 .WSPX Engine Support
-- Multi layer presets. Each layer has a link to a Sound that has its own set of sub-sounds, or Sound Files.
+- Multi layer presets. Each layer has a link to a Sound that has its own set of sub-sounds, or Sound Files
 - ADSR AMP and Filter Envelope
 - 2 LFOs
 - Sequencer with any number of steps
 - Multi type Filter
-- Multi Effects. 4 sends with 4 effects each. Serial and Parallel modes.
+- Multi Effects. 4 sends with 4 effects each. Serial and Parallel modes
 - Round Robin, Random Probability and Key Switching
 - Visual Scripting (from the editor)
 - Reverse, Ping Pong and Regular playbacks

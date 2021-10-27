@@ -256,9 +256,6 @@ void WSPXSoundFileThumbThreadCreation::run()
 		setProgress(0.1);
 		//
 		Graphics gg(theEditor->soundFileThumbView.waveform);
-		gg.setColour(Colours::black.withAlpha(0.76f));
-		gg.drawRect(0, 0, theEditor->soundFileThumbView.waveform.getWidth(), theEditor->soundFileThumbView.waveform.getHeight(), 4);
-		gg.drawLine(0, theEditor->soundFileThumbView.waveform.getHeight() / 2, theEditor->soundFileThumbView.waveform.getWidth(), theEditor->soundFileThumbView.waveform.getHeight() / 2, 2);
 		//
 		setProgress(0.2);
 		//
@@ -350,6 +347,10 @@ void WSPXSoundFileThumbThreadCreation::run()
 				}
 			}
 		}
+		//
+		gg.setColour(Colours::black.withAlpha(0.76f));
+		gg.drawRect(0, 0, theEditor->soundFileThumbView.waveform.getWidth(), theEditor->soundFileThumbView.waveform.getHeight(), 4);
+		gg.drawLine(0, theEditor->soundFileThumbView.waveform.getHeight() / 2, theEditor->soundFileThumbView.waveform.getWidth(), theEditor->soundFileThumbView.waveform.getHeight() / 2, 2);
 		//
 		// Create thumb file //
 		//

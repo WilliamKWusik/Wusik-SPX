@@ -104,14 +104,6 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 	lfos[0].streamData(stream, type);
 	lfos[1].streamData(stream, type);
 	//
-	int totalChannels = channels.size();
-	WS::stream(stream, totalChannels, type);
-	for (int ch = 0; ch < totalChannels; ch++)
-	{
-		if (type == WS::kRead) channels.add(new WSPX_Channel);
-		channels[ch]->streamData(stream, type);
-	}
-	//
 	int totalsounds = soundLinks.size();
 	WS::stream(stream, totalsounds, type);
 	for (int ss = 0; ss < totalsounds; ss++)
@@ -136,10 +128,8 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPX_Sequencer::streamData(void* stream, int type)
 {
+	time.streamData(stream, type);
 	int totalSteps = steps.size();
-	WS::stream(stream, sync, type);
-	WS::stream(stream, speed1, type);
-	WS::stream(stream, speed2, type);
 	WS::stream(stream, loopStart, type);
 	WS::stream(stream, smoothOutput, type);
 	WS::stream(stream, mode, type);
@@ -177,11 +167,12 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 	WS::stream(stream, sampleDataMetaValuesRead, type);
 	WS::stream(stream, totalSamples, type);
 	//
-	int totalChannelsPan = channelPan.size();
-	for (int cc = 0; cc < totalChannelsPan; cc++)
+	int totalChannelsInfo = channelInformation.size();
+	WS::stream(stream, totalChannelsInfo, type);
+	for (int cc = 0; cc < totalChannelsInfo; cc++)
 	{
-		if (type == WS::kRead) channelPan.add(0.0f);
-		WS::stream(stream, channelPan.getRawDataPointer()[cc], type);
+		if (type == WS::kRead) channelInformation.add(new WSPX_Channel_Info);
+		channelInformation[cc]->streamData(stream, type);
 	}
 	//
 	if (isWSPXEditor)

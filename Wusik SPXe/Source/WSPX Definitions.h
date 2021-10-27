@@ -64,6 +64,22 @@ extern String collectionFile;
 #endif
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Channel_Info
+{
+public:
+	void streamData(void* stream, int type)
+	{
+		WS::stream(stream, volume, type);
+		WS::stream(stream, pan, type);
+		WS::stream(stream, name, type);
+	}
+	//
+	float volume = 1.0f;
+	float pan = 0.0f;
+	String name;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Sound_File
 {
 public:
@@ -86,7 +102,7 @@ public:
 	int velZoneHigh = 127;
 	int keyRoot = 60;
 	//
-	Array<float> channelPan;
+	OwnedArray<WSPX_Channel_Info> channelInformation;
 	int keySwitchType = 0;
 	int64 loopStart = 0;
 	int64 loopEnd = 0;
@@ -200,17 +216,22 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Time
+{
+public:
+	void streamData(void* stream, int _type) { WS::stream(stream, speed, _type); }
+	String speed = "1/4";
+};
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_LFO
 {
 public:
 	void streamData(void* stream, int _type)
 	{
+		time.streamData(stream, _type);
 		WS::stream(stream, waveform, _type);
-		WS::stream(stream, sync, _type);
 		WS::stream(stream, inverted, _type);
 		WS::stream(stream, noteOnReset, _type);
-		WS::stream(stream, speed1, _type);
-		WS::stream(stream, speed2, _type);
 		WS::stream(stream, phase, _type);
 		WS::stream(stream, smooth, _type);
 		WS::stream(stream, toVolume, _type);
@@ -223,12 +244,10 @@ public:
 	}
 	//
 	const String waveforms = "Sine\nSawtooth\nPulse\nRandom\nNoise\nTriangle";
+	WSPX_Time time;
 	int waveform = 0;
-	bool sync = true;
 	bool inverted = false;
 	bool noteOnReset = false;
-	float speed1 = 0.1f;
-	float speed2 = 0.1f;
 	float phase = 0.0f;
 	float smooth = 0.0f;
 	float toVolume = 0.0f;
@@ -356,9 +375,7 @@ public:
 	//
 	const String modes = "Forward\nBackwards\nPingPong\nRandom";
 	OwnedArray<WSPX_Sequencer_Step> steps;
-	bool sync = false;
-	float speed1 = 0.1f;
-	float speed2 = 0.1f;
+	WSPX_Time time;
 	int loopStart = 0;
 	float smoothOutput = 0.0f;
 	int mode = 0;
@@ -373,27 +390,12 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Channel
-{
-public:
-	void streamData(void* stream, int type)
-	{
-		WS::stream(stream, volume, type);
-		WS::stream(stream, name, type);
-	}
-	//
-	float volume = 1.0f;
-	String name;
-};
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Preset_Layer
 {
 public:
 	void streamData(void* stream, int type, OwnedArray<WSPX_Collection_Sound>& soundsList);
 	//
 	WSPX_Sequencer sequencer;
-	OwnedArray<WSPX_Channel> channels;
 	Array<WSPX_Collection_Sound*> soundLinks;
 	WSPX_Collection_LFO lfos[2];
 	WSPX_Collection_Envelope ampEnvelope;

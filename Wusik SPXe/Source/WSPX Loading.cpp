@@ -90,6 +90,23 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 				//
 				soundFile->sampleDataMetaValuesRead = true;
 			}
+			//
+			soundFile->channelInformation.clear();
+			//
+			for (int cc = 0; cc < soundFile->channels; cc++)
+			{
+				soundFile->channelInformation.add(new WSPX_Channel_Info);
+				soundFile->channelInformation.getLast()->name = "Channel #" + String(cc + 1);
+			}
+			//
+			if (soundFile->channels == 1) soundFile->channelInformation.getFirst()->name = "Mono";
+			else if (soundFile->channels == 2)
+			{
+				soundFile->channelInformation.getFirst()->name = "Left";
+				soundFile->channelInformation.getFirst()->pan = -1.0f;
+				soundFile->channelInformation.getLast()->name = "Right";
+				soundFile->channelInformation.getLast()->pan = 1.0f;
+			}
 		}
 		else
 		{

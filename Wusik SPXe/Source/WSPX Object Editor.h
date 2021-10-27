@@ -95,6 +95,18 @@ public:
 				processor->collection->hasUnsavedChanges = true;
 			}
 		}
+		else if (type == kTime)
+		{
+			WSPX_Time* time = (WSPX_Time*) object;
+			String sValue = time->speed;
+			//
+			AskValue(label, "Enter time in 1/1 format for host sync or 10hz for free run (0.0001hz up to 99999hz)", sValue, "", "OK", "Cancel", sValue);
+			if (sValue.isNotEmpty())
+			{
+				time->speed = sValue;
+				processor->collection->hasUnsavedChanges = true;
+			}
+		}
 		else if (type == kStringInt64)
 		{
 			String sValue;
@@ -185,6 +197,14 @@ public:
 				String xText = popupList[jlimit(0, popupList.size() - 1, ((int*)object)[0])];
 				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
+			if (type == kTime)
+			{
+				WSPX_Time* time = (WSPX_Time*)object;
+				String xText = time->speed;
+				if (time->speed.containsIgnoreCase("/")) xText.append(" (host sync)", 9999); else xText.append(" (free run)", 9999);
+				//
+				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
+			}
 			else if (type == kSkinFolder)
 			{
 				g.drawFittedText("EDIT", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
@@ -254,6 +274,7 @@ public:
 		kLabel,
 		kLabelSmall,
 		kPopupList,
+		kTime,
 		kSlider,
 		kSliderBipolar,
 		kSliderInteger,
