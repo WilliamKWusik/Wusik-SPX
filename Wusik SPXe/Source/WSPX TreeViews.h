@@ -106,6 +106,7 @@ public:
 		kSound_Add,
 		//
 		kSound_File_Remove = 1,
+		kSound_File_Open,
 		kSound_File_Load
 	};
 };

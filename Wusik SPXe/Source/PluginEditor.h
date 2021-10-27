@@ -85,9 +85,8 @@ public:
 	double multRatio = 1.0;
 	bool redoTreeViewsOnResize = true;
 	WSPXSoundFileThumbView soundFileThumbView;
-	MidiKeyboardComponent midiKeyboard;
-	MidiKeyboardComponent midiKeyboardBottom;
-	WSPXKeyVelZoneStatusBar* keyVelZoneStatusBar;
+	WMidiKeyboardComponent midiKeyboard;
+	WSPXStatusLabel* statusLabel;
 	//
 	Atomic<int> timerAction = 0;
 	int timerActionValue1 = 0;

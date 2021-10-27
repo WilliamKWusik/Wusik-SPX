@@ -10,8 +10,7 @@
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcessor& p) : 
-	AudioProcessorEditor (&p), processor (p), midiKeyboard(p.midiKeyboardState, MidiKeyboardComponent::Orientation::horizontalKeyboard),
-	midiKeyboardBottom(p.midiKeyboardStateBottom, MidiKeyboardComponent::Orientation::horizontalKeyboard)
+	AudioProcessorEditor (&p), processor (p), midiKeyboard(p.midiKeyboardState)
 {
 	backgroundImage = ImageCache::getFromMemory(BinaryData::Interface_png, BinaryData::Interface_pngSize);
 	redSaveImage = ImageCache::getFromMemory(BinaryData::Interface3_png, BinaryData::Interface3_pngSize);
@@ -36,8 +35,6 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	collectionNameLabel->setText(processor.collection->name, NotificationType::dontSendNotification);
 	collectionNameLabel->setJustificationType(Justification::centred);
 	//
-	midiKeyboardBottom.setInterceptsMouseClicks(false, false);
-	addAndMakeVisible(midiKeyboardBottom);
 	addAndMakeVisible(midiKeyboard);
 	//
 	addAndMakeVisible(logoButton = new WTransparentButton(this));
@@ -46,7 +43,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	addAndMakeVisible(collectionButton = new WTransparentButton(this));
 	addAndMakeVisible(previewButton = new WTransparentButton(this));
 	//
-	addChildComponent(keyVelZoneStatusBar = new WSPXKeyVelZoneStatusBar);
+	addChildComponent(statusLabel = new WSPXStatusLabel);
 	//
 	resizerConstrainer.setFixedAspectRatio(uiRatio);
 	resizerConstrainer.setSizeLimits(int(400 * uiRatio), 400, 99999, 99999);

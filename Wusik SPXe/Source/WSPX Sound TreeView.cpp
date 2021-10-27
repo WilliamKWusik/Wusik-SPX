@@ -35,6 +35,7 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 	else if (level == kLevel_Sound_Files && name.isEmpty())
 	{
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Remove", kSound_File_Remove, sound, soundFile));
+		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Open", kSound_File_Open, sound, soundFile));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Load", kSound_File_Load, sound, soundFile));
 	}
 }
@@ -155,7 +156,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 	}
 	else if (level == kLevel_Sound_File_Options)
 	{
-		if (specialItem == kSound_File_Remove)
+		if (specialItem == kSound_File_Open)
+		{
+			if (File(soundFile->soundFile).existsAsFile()) File(soundFile->soundFile).startAsProcess();
+			reselectParent();
+		}
+		else if (specialItem == kSound_File_Remove)
 		{
 			if (WConfirmBox("Remove Sound File", "Are you sure?"))
 			{

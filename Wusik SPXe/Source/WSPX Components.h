@@ -38,24 +38,102 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPXKeyVelZoneStatusBar : public Component
+static const uint8 whiteNotes[] = { 0, 2, 4, 5, 7, 9, 11 };
+static const uint8 blackNotes[] = { 1, 3, 6, 8, 10 };
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WMidiKeyboardComponent : public MidiKeyboardComponent
+{
+public:
+	WMidiKeyboardComponent(MidiKeyboardState& mstate) 
+		: MidiKeyboardComponent(mstate, MidiKeyboardComponent::Orientation::horizontalKeyboard) { }
+	//
+	void drawWhiteNote(int midiNoteNumber, Graphics& g, Rectangle<float> area, bool isDown, bool isOver, Colour lineColour, Colour textColour) override
+	{
+		auto c = Colours::transparentWhite;
+		if (isDown)  c = findColour(keyDownOverlayColourId);
+		if (isOver)  c = c.overlaidWith(findColour(mouseOverKeyOverlayColourId));
+		if (midiNoteNumber >= selectedLow && midiNoteNumber <= selectedHigh) c = Colours::red.withAlpha(0.48f);
+		if (midiNoteNumber == rootKey) c = Colours::yellow.withAlpha(0.48f);
+		//
+		g.setColour(c);
+		g.fillRect(area);
+		//
+		auto text = getWhiteNoteText(midiNoteNumber);
+		//
+		if (text.isNotEmpty())
+		{
+			auto fontHeight = jmin(12.0f, keyWidth * 0.9f);
+			g.setColour(textColour);
+			g.setFont(LookAndFeelEx::getCustomFont().withHeight(fontHeight).withHorizontalScale(0.8f));
+			g.drawText(text, area.withTrimmedLeft(1.0f).withTrimmedBottom(2.0f), Justification::centredBottom, false);
+		}
+		//
+		if (!lineColour.isTransparent())
+		{
+			g.setColour(lineColour);
+			g.fillRect(area.withWidth(1.0f));
+			if (midiNoteNumber == rangeEnd) g.fillRect(area.expanded(1.0f, 0).removeFromRight(1.0f));
+		}
+	}
+	//
+	void drawBlackNote(int midiNoteNumber, Graphics& g, Rectangle<float> area, bool isDown, bool isOver, Colour noteFillColour) override
+	{
+		auto c = noteFillColour;
+		if (isDown)  c = c.overlaidWith(findColour(keyDownOverlayColourId));
+		if (isOver)  c = c.overlaidWith(findColour(mouseOverKeyOverlayColourId));
+		if (midiNoteNumber >= selectedLow && midiNoteNumber <= selectedHigh) c = Colours::red.darker(0.8f);
+		if (midiNoteNumber == rootKey) c = Colours::yellow.darker(0.72f);
+		//
+		g.setColour(c);
+		g.fillRect(area);
+		//
+		if (isDown)
+		{
+			g.setColour(noteFillColour);
+			g.drawRect(area);
+		}
+		else
+		{
+			g.setColour(c.brighter());
+			auto sideIndent = 1.0f / 8.0f;
+			auto topIndent = 7.0f / 8.0f;
+			auto w = area.getWidth();
+			auto h = area.getHeight();
+			g.fillRect(area.reduced(w * sideIndent, 0).removeFromTop(h * topIndent));
+		}
+	}
+	//
+	int selectedLow = -1;
+	int selectedHigh = -1;
+	int rootKey = -1;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPXStatusLabel : public Component
 {
 public:
 	void paint(Graphics& g) override
 	{
-
+		g.setColour(Colours::black.withAlpha(0.66f));
+		g.fillRoundedRectangle(0, 0, getWidth(), getHeight(), 4.0f);
+		g.setColour(Colours::white.withAlpha(0.66f));
+		g.drawRoundedRectangle(0, 0, getWidth(), getHeight(), 4.0f, 2.0f);
+		//
+		g.setColour(Colours::white.withAlpha(0.92f));
+		g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.42f));
+		g.drawFittedText(text, 6, 6, getWidth() - 12, getHeight() - 12, Justification::centred, 99);
 	}
 	//
-	String topText;
-	String bottomText;
+	String text;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPXKeyVelZone : public Component
 {
 public:
-	WSPXKeyVelZone(WSPX_Collection_Sound_File* _sound, MidiKeyboardComponent& _midiKeyboard, Component& _statusBar) 
-		: sound(_sound), midiKeyboard(_midiKeyboard), statusBar(_statusBar) { }
+	WSPXKeyVelZone(WSPX_Collection_Sound_File* _sound, WMidiKeyboardComponent& _midiKeyboard, Component& _statusLabel) 
+		: sound(_sound), midiKeyboard(_midiKeyboard), statusLabel(_statusLabel) { }
 	//
 	void paint(Graphics& g) override
 	{
@@ -108,8 +186,10 @@ public:
 		}
 		//
 		setPositionOnUI();
-		midiKeyboard.setAvailableRange(int(sound->keyZoneLow * 127.0f), int(sound->keyZoneHigh * 127.0f));
-		midiKeyboard.setBounds(getBounds().getX(), midiKeyboard.getBounds().getY(), getWidth(), midiKeyboard.getHeight());
+		midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
+		midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
+		midiKeyboard.rootKey = sound->keyRoot * 127.0f;
+		midiKeyboard.repaint();
 		repaint();
 	}
 	//
@@ -130,15 +210,24 @@ public:
 	void mouseExit(const MouseEvent& event) override
 	{
 		setMouseCursor(MouseCursor::NormalCursor);
-		statusBar.setVisible(false);
-		midiKeyboard.setAvailableRange(0, 127);
-		midiKeyboard.setBounds(positionOnUI.getX(), midiKeyboard.getBounds().getY(), positionOnUI.getWidth(), midiKeyboard.getHeight());
+		statusLabel.setVisible(false);
+		midiKeyboard.selectedHigh = midiKeyboard.selectedLow = midiKeyboard.rootKey = -1;
+		midiKeyboard.repaint();
 		repaint();
 	}
 	//
 	void mouseEnter(const MouseEvent& event) override
 	{
-		statusBar.setVisible(true);
+		midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
+		midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
+		midiKeyboard.rootKey = sound->keyRoot * 127.0f;
+		midiKeyboard.repaint();
+		//
+		((WSPXStatusLabel&)statusLabel).text = File(sound->soundFile).getFileName();
+		statusLabel.setBounds(getBounds().getX() + 8, getBounds().getY() + 8, 320, 42);
+		statusLabel.setAlwaysOnTop(true);
+		statusLabel.setVisible(true);
+		//
 		repaint();
 	}
 	//
@@ -150,8 +239,10 @@ public:
 		else if (event.getPosition().y > (getHeight() - 20)) setMouseCursor(MouseCursor::BottomEdgeResizeCursor);
 		else setMouseCursor(MouseCursor::UpDownLeftRightResizeCursor);
 		//
-		midiKeyboard.setAvailableRange(int(sound->keyZoneLow * 127.0f), int(sound->keyZoneHigh * 127.0f));
-		midiKeyboard.setBounds(getBounds().getX(), midiKeyboard.getBounds().getY(), getWidth(), midiKeyboard.getHeight());
+		midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
+		midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
+		midiKeyboard.rootKey = sound->keyRoot * 127.0f;
+		midiKeyboard.repaint();
 		repaint();
 	}
 	//
@@ -170,18 +261,13 @@ public:
 		double ww = (keyHigh * double(positionOnUI.getWidth())) - xPos;
 		double hh = (double(positionOnUI.getHeight()) - (velLow * double(positionOnUI.getHeight()))) - yPos;
 		//
-		setBounds(	positionOnUI.getX() + xPos - xExtraX, 
-					positionOnUI.getY() + yPos - xExtraY,
-					ww + (xExtraX * 2), 
-					hh + (xExtraY * 2));
-		//
-		statusBar.setBounds(getBounds().getX(), getBounds().getY(), 200, 200);
+		setBounds(positionOnUI.getX() + xPos - xExtraX, positionOnUI.getY() + yPos - xExtraY, ww + (xExtraX * 2), hh + (xExtraY * 2));
 	}
 	//
 	WSPX_Collection_Sound_File* sound;
-	MidiKeyboardComponent& midiKeyboard;
+	WMidiKeyboardComponent& midiKeyboard;
 	Rectangle<int> positionOnUI;
-	Component& statusBar;
+	Component& statusLabel;
 	//
 	float keyZoneLow = 0.0;
 	float keyZoneHigh = 0.0f;

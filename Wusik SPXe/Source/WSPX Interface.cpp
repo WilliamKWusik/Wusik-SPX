@@ -244,7 +244,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		for (int ss = 0; ss < sound->soundFiles.size(); ss++)
 		{
-			addAndMakeVisible(keyVelZones.add(new WSPXKeyVelZone(sound->soundFiles[ss], midiKeyboard, *keyVelZoneStatusBar)));
+			addAndMakeVisible(keyVelZones.add(new WSPXKeyVelZone(sound->soundFiles[ss], midiKeyboard, *statusLabel)));
 		}
 	}
 	//
