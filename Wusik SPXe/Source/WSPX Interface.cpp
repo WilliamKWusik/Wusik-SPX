@@ -139,10 +139,18 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		AddCompoLabel("Zones");
 		AddCompo4(kSliderInteger, "Key Zone Low", &soundFile->keyZoneLow, "", 0, 127);
+		editOptions.getLast()->slider->midiKeyboard = &midiKeyboard;
+		editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.selectedLow;
+		//
 		AddCompo4(kSliderInteger, "Key Zone High", &soundFile->keyZoneHigh, "", 0, 127);
+		editOptions.getLast()->slider->midiKeyboard = &midiKeyboard;
+		editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.selectedHigh;
+		//
 		AddCompo4(kSliderInteger, "Vel Zone Low", &soundFile->velZoneLow, "", 0, 127);
 		AddCompo4(kSliderInteger, "Vel Zone High", &soundFile->velZoneHigh, "", 0, 127);
 		AddCompo4(kSliderInteger, "Key Root", &soundFile->keyRoot, "", 0, 127);
+		editOptions.getLast()->slider->midiKeyboard = &midiKeyboard;
+		editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.rootKey;
 		//
 		midiKeyboard.selectedHigh = soundFile->keyZoneHigh * 127.0f;
 		midiKeyboard.selectedLow = soundFile->keyZoneLow * 127.0f;
@@ -245,7 +253,6 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kOnOffButton, "Sync to BPM", &layer->sequencer.sync);
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
-		//
 		//
 		midiKeyboard.selectedHigh = layer->keyZoneHigh * 127.0f;
 		midiKeyboard.selectedLow = layer->keyZoneLow * 127.0f;

@@ -18,6 +18,78 @@
 	if (w.runModalLoop() == 1) FinalValue = w.getTextEditorContents("Value"); else FinalValue = String();
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+static const uint8 whiteNotes[] = { 0, 2, 4, 5, 7, 9, 11 };
+static const uint8 blackNotes[] = { 1, 3, 6, 8, 10 };
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WMidiKeyboardComponent : public MidiKeyboardComponent
+{
+public:
+	WMidiKeyboardComponent(MidiKeyboardState& mstate)
+		: MidiKeyboardComponent(mstate, MidiKeyboardComponent::Orientation::horizontalKeyboard) { }
+	//
+	void drawWhiteNote(int midiNoteNumber, Graphics& g, Rectangle<float> area, bool isDown, bool isOver, Colour lineColour, Colour textColour) override
+	{
+		auto c = Colours::transparentWhite;
+		if (isDown)  c = findColour(keyDownOverlayColourId);
+		if (isOver)  c = c.overlaidWith(findColour(mouseOverKeyOverlayColourId));
+		if (midiNoteNumber >= selectedLow && midiNoteNumber <= selectedHigh) c = Colours::red.withAlpha(0.48f);
+		if (midiNoteNumber == rootKey) c = Colours::yellow.withAlpha(0.48f);
+		//
+		g.setColour(c);
+		g.fillRect(area);
+		//
+		auto text = getWhiteNoteText(midiNoteNumber);
+		//
+		if (text.isNotEmpty())
+		{
+			auto fontHeight = jmin(12.0f, keyWidth * 0.9f);
+			g.setColour(textColour);
+			g.setFont(LookAndFeelEx::getCustomFont().withHeight(fontHeight).withHorizontalScale(0.8f));
+			g.drawText(text, area.withTrimmedLeft(1.0f).withTrimmedBottom(2.0f), Justification::centredBottom, false);
+		}
+		//
+		if (!lineColour.isTransparent())
+		{
+			g.setColour(lineColour);
+			g.fillRect(area.withWidth(1.0f));
+			if (midiNoteNumber == rangeEnd) g.fillRect(area.expanded(1.0f, 0).removeFromRight(1.0f));
+		}
+	}
+	//
+	void drawBlackNote(int midiNoteNumber, Graphics& g, Rectangle<float> area, bool isDown, bool isOver, Colour noteFillColour) override
+	{
+		auto c = noteFillColour;
+		if (isDown)  c = c.overlaidWith(findColour(keyDownOverlayColourId));
+		if (isOver)  c = c.overlaidWith(findColour(mouseOverKeyOverlayColourId));
+		if (midiNoteNumber >= selectedLow && midiNoteNumber <= selectedHigh) c = Colours::red.darker(0.8f);
+		if (midiNoteNumber == rootKey) c = Colours::yellow.darker(0.72f);
+		//
+		g.setColour(c);
+		g.fillRect(area);
+		//
+		if (isDown)
+		{
+			g.setColour(noteFillColour);
+			g.drawRect(area);
+		}
+		else
+		{
+			g.setColour(c.brighter());
+			auto sideIndent = 1.0f / 8.0f;
+			auto topIndent = 7.0f / 8.0f;
+			auto w = area.getWidth();
+			auto h = area.getHeight();
+			g.fillRect(area.reduced(w * sideIndent, 0).removeFromTop(h * topIndent));
+		}
+	}
+	//
+	int selectedLow = -1;
+	int selectedHigh = -1;
+	int rootKey = -1;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSlider : public Component
 {
 public:
@@ -38,6 +110,12 @@ public:
 	void mouseExit(const MouseEvent& e) override
 	{
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
+		//
+		if (midiKeyboard != nullptr)
+		{
+			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboard->repaint();
+		}
 	}
 	//
 	void mouseUp(const MouseEvent& e) override
@@ -66,6 +144,12 @@ public:
 		}
 		//
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
+		//
+		if (midiKeyboard != nullptr)
+		{
+			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboard->repaint();
+		}
 	}
 	//
 	void mouseDown(const MouseEvent& e) override
@@ -88,6 +172,12 @@ public:
 		value = jlimit(0.0f, 1.0f, startDragValue + (float(e.getDistanceFromDragStartX()) * 0.006f * xMultiply));
 		repaint();
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
+		//
+		if (midiKeyboard != nullptr)
+		{
+			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboard->repaint();
+		}
 	}
 	//
 	void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override
@@ -95,6 +185,12 @@ public:
 		value = jlimit(0.0f, 1.0f, value + (float(wheel.deltaY) * 0.1f));
 		repaint();
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
+		//
+		if (midiKeyboard != nullptr)
+		{
+			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboard->repaint();
+		}
 	}
 	//
 	void paint(Graphics& g) override
@@ -152,6 +248,8 @@ public:
 		g.drawFittedText(xText, Rectangle<int>(0, 0, double(getWidth()) * 0.3, getHeight()), Justification::centred, 1);
 	}
 	//
+	WMidiKeyboardComponent* midiKeyboard = nullptr;
+	int* midiKeyboardValue = nullptr;
 	Image originalSizeImage;
 	Image tempFill;
 	Image& background;
