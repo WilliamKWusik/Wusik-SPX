@@ -15,6 +15,8 @@ void WSPX_Collection::streamData(void* stream, int type)
 	int totalPresets = presets.size();
 	int totalsounds = sounds.size();
 	//
+	if (isWSPXEditor) WS::stream(stream, playerSkinFolder, type); else WS::stream(stream, playerSkin, type);
+	//
 	WS::stream(stream, xVersion, type);
 	WS::stream(stream, name, type);
 	WS::stream(stream, author, type);

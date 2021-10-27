@@ -76,6 +76,15 @@ public:
 		{
 			if (((bool*)object)[0]) ((bool*)object)[0] = false; else ((bool*)object)[0] = true;
 		}
+		else if (type == kSkinFolder)
+		{
+			FileChooser browseFolder("Set Player Skin Folder (where the skin files are located at)", ((File*)object)[0], "*.*");
+			//
+			if (browseFolder.browseForDirectory())
+			{
+				((File*)object)[0] = browseFolder.getResult();
+			}
+		}
 		else if (type == kString)
 		{
 			String sValue;
@@ -176,6 +185,10 @@ public:
 				String xText = popupList[jlimit(0, popupList.size() - 1, ((int*)object)[0])];
 				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
+			else if (type == kSkinFolder)
+			{
+				g.drawFittedText("EDIT", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
+			}
 			else if (type == kOnOffButton)
 			{
 				if (((bool*)object)[0])
@@ -237,6 +250,7 @@ public:
 		kString,
 		kStringInt64,
 		kImage,
+		kSkinFolder,
 		kLabel,
 		kLabelSmall,
 		kPopupList,

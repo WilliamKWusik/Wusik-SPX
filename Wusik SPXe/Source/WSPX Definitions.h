@@ -7,8 +7,9 @@
 //
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
-#define WIGNORE_SET_STATE 1
+#define WIGNORE_SET_STATE 0
 #define WVERSION "1.0.0 BETA 00"
+#define XRGKEY "HKEY_CURRENT_USER\\Software\\Wusik\\Wusik SPXe\\"
 extern bool isWSPXEditor;
 extern bool WSPXeBundle;
 extern String collectionFile;
@@ -273,7 +274,7 @@ public:
 	float sustain = 1.0f;
 	float release = 0.28f;
 	float velocity = 1.0f;
-	float maxSeconds = 0.2f;
+	int maxSeconds = 4;
 	float keyTrack = 0.0f;
 	float velTrack = 0.0f;
 	//
@@ -446,6 +447,7 @@ class WSPX_Collection
 public:
 	void streamData(void* stream, int type);
 	//
+	MemoryBlock playerSkin;
 	WSPX_Image imageAbout;
 	WSPX_Image imageIcon;
 	String name = "Init Collection";
@@ -459,6 +461,7 @@ public:
 		bool hasUnsavedChanges = false;
 		File exportedFile;
 		bool isWSPXeBundle = false;
+		File playerSkinFolder;
 	#else
 		ScopedPointer<WSPX_Collection_Preset> preset;
 		//

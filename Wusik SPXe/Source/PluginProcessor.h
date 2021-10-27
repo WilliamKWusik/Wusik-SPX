@@ -54,6 +54,29 @@ public:
 		// Restart the Synth engine //
 	}
 	//
+	String readGlobalSettings(String key, String defaultVal)
+	{
+		String sKey(XRGKEY + key);
+		if (WindowsRegistry::keyExists(sKey) &&
+			WindowsRegistry::getValue(XRGKEY + key).isNotEmpty())
+		{
+			return WindowsRegistry::getValue(XRGKEY + key);
+		}
+		//
+		return defaultVal;
+	}
+	//
+	void saveGlobalSettings(String key, String value)
+	{
+		WindowsRegistry::setValue(XRGKEY + key, value);
+	}
+	//
+	void deleteGlobalSettings(String key)
+	{
+		saveGlobalSettings(key, "");
+		if (WindowsRegistry::keyExists(XRGKEY + key)) WindowsRegistry::deleteKey(XRGKEY + key);
+	}
+	//
 	ScopedPointer<WSPX_Collection> collection;
 	AudioFormatManager audioFormatManager;
 	String lastSoundFilePath;

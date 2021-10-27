@@ -392,7 +392,10 @@ void WSPXKeyVelZone::updateKeysAndLabel(bool mouseAway)
 		editor->midiKeyboard.rootKey = sound->keyRoot;
 		editor->midiKeyboard.repaint();
 		//
-		((WSPXStatusLabel*)editor->statusLabel)->text = File(sound->soundFile).getFileName();
+		if (sound->soundFile.isEmpty()) ((WSPXStatusLabel*)editor->statusLabel)->text = "No File";
+		else if (File(sound->soundFile).existsAsFile()) ((WSPXStatusLabel*)editor->statusLabel)->text = File(sound->soundFile).getFileName();
+		else ((WSPXStatusLabel*)editor->statusLabel)->text = "Missing File";
+		//
 		editor->statusLabel->setBounds(getBounds().getX() + 8, getBounds().getY() + 8, 320, 42);
 		editor->statusLabel->setAlwaysOnTop(true);
 		editor->statusLabel->setVisible(true);

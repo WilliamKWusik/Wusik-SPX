@@ -86,13 +86,13 @@ public:
 		float multiply = 1.0f;
 		if (event.mods.isShiftDown() || event.mods.isRightButtonDown()) multiply = 0.1f;
 		//
-		float moveX = event.getDistanceFromDragStartX() * 0.8f * multiply;
-		float moveY = event.getDistanceFromDragStartY() * 0.8f * multiply;
+		float moveX = event.getDistanceFromDragStartX() * 0.1f * multiply;
+		float moveY = event.getDistanceFromDragStartY() * 0.1f * multiply;
 		//
 		if (type == kMove)
 		{
 			sound->keyZoneLow = jlimit(0, 127, int(keyZoneLow + moveX));
-			sound->keyZoneHigh = jlimit(0, 127, int(keyZoneLow + moveX));
+			sound->keyZoneHigh = jlimit(0, 127, int(keyZoneHigh + moveX));
 			//
 			if (!event.mods.isMiddleButtonDown())
 			{
@@ -106,7 +106,7 @@ public:
 		}
 		else if (type == kRight)
 		{
-			sound->keyZoneHigh = jlimit(0, 127, int(keyZoneLow + moveX));
+			sound->keyZoneHigh = jlimit(0, 127, int(keyZoneHigh + moveX));
 		}
 		else if (type == kTop)
 		{
@@ -167,10 +167,10 @@ public:
 		int xExtraX = int((double(positionOnUI.getWidth()) / 127.0) / 2.0);
 		int xExtraY = int((double(positionOnUI.getHeight()) / 127.0) / 2.0);
 		//
-		double keyLow = double(sound->keyZoneLow);
-		double keyHigh = double(sound->keyZoneHigh);
-		double velLow = double(sound->velZoneLow);
-		double velHigh = double(sound->velZoneHigh);
+		double keyLow = double(sound->keyZoneLow) / 127.0;
+		double keyHigh = double(sound->keyZoneHigh) / 127.0;
+		double velLow = double(sound->velZoneLow) / 127.0;
+		double velHigh = double(sound->velZoneHigh) / 127.0;
 		//
 		double xPos = keyLow * double(positionOnUI.getWidth());
 		double yPos = (double(positionOnUI.getHeight()) - (velHigh * double(positionOnUI.getHeight())));

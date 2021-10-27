@@ -51,7 +51,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	//
 	updateInterface();
 	//
-	double defaultH = 900.0;
+	double defaultH = processor.readGlobalSettings("UIHeight", "900").getDoubleValue();
     setSize (int(defaultH * uiRatio), int(defaultH));
 }
 //
@@ -62,6 +62,7 @@ WusikSpxAudioProcessorEditor::~WusikSpxAudioProcessorEditor()
 	cleanInterface();
 	setLookAndFeel(nullptr);
 	LookAndFeel::setDefaultLookAndFeel(nullptr);
+	processor.saveGlobalSettings("UIHeight", String(getHeight()));
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

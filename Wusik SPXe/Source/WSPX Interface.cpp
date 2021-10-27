@@ -55,6 +55,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo2(kString, "Description", &processor.collection->description, "", true, nullptr);
 		AddCompo(kImage, "Image Icon", &processor.collection->imageIcon);
 		AddCompo(kImage, "Image About", &processor.collection->imageAbout);
+		AddCompo(kSkinFolder, "Player Skin Folder", &processor.collection->playerSkinFolder);
 		AddCompo2(kString, "Protection Key", &processor.collection->protectionKey, "", true, nullptr);
 	}
 	else if (editObject.type == WusikEditObject::kSound || editObject.type == WusikEditObject::kSoundLink)
@@ -194,7 +195,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Decay", &layer->ampEnvelope.decay);
 		AddCompo(kSlider, "Sustain", &layer->ampEnvelope.sustain);
 		AddCompo(kSlider, "Release", &layer->ampEnvelope.release);
-		AddCompo(kSlider, "Max Seconds", &layer->ampEnvelope.maxSeconds);
+		AddCompo4(kSliderInteger, "Max Seconds", &layer->ampEnvelope.maxSeconds, "", 1, 99);
 		AddCompo(kSlider, "Velocity %", &layer->ampEnvelope.velocity);
 		AddCompo4(kSliderBipolar, "Key Track", &layer->ampEnvelope.keyTrack, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Velocity Track", &layer->ampEnvelope.velTrack, "", -1, 1);
@@ -208,14 +209,14 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Feedback", &layer->filter.feedback);
 		AddCompo(kSlider, "Feedback Delay", &layer->filter.delay);
 		AddCompo(kSlider, "Sample and Hold", &layer->filter.sampleAndHold);
-		AddCompo(kSliderBipolar, "To Envelope", &layer->filter.toEnvelope);
+		AddCompo4(kSliderBipolar, "To Envelope", &layer->filter.toEnvelope, "", -1, 1);
 		//
 		AddCompoLabel("Filter Envelope");
 		AddCompo(kSlider, "Attack", &layer->filter.envelope.attack);
 		AddCompo(kSlider, "Decay", &layer->filter.envelope.decay);
 		AddCompo(kSlider, "Sustain", &layer->filter.envelope.sustain);
 		AddCompo(kSlider, "Release", &layer->filter.envelope.release);
-		AddCompo(kSlider, "Max Seconds", &layer->filter.envelope.maxSeconds);
+		AddCompo4(kSliderInteger, "Max Seconds", &layer->filter.envelope.maxSeconds, "", 1, 99);
 		AddCompo(kSlider, "Velocity %", &layer->filter.envelope.velocity);
 		AddCompo4(kSliderBipolar, "Key Track", &layer->filter.envelope.keyTrack, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Velocity Track", &layer->filter.envelope.velTrack, "", -1, 1);
@@ -230,13 +231,13 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			AddCompo(kOnOffButton, "Sync to BPM", &layer->lfos[ll].sync);
 			AddCompo(kSlider, "Phase", &layer->lfos[ll].phase);
 			AddCompo(kSlider, "Smooth", &layer->lfos[ll].smooth);
-			AddCompo(kSlider, "To Filter Frequency", &layer->lfos[ll].toFilterFreq);
-			AddCompo(kSlider, "To Volume", &layer->lfos[ll].toVolume);
-			AddCompo(kSlider, "To Pan", &layer->lfos[ll].toPan);
-			AddCompo(kSlider, "To Effect Send 1", &layer->lfos[ll].toEffect1);
-			AddCompo(kSlider, "To Effect Send 2", &layer->lfos[ll].toEffect2);
-			AddCompo(kSlider, "To Effect Send 3", &layer->lfos[ll].toEffect3);
-			AddCompo(kSlider, "To Effect Send 4", &layer->lfos[ll].toEffect4);
+			AddCompo4(kSliderBipolar, "To Filter Frequency", &layer->lfos[ll].toFilterFreq, "", -1, 1);
+			AddCompo4(kSliderBipolar, "To Volume", &layer->lfos[ll].toVolume, "", -1, 1);
+			AddCompo4(kSliderBipolar, "To Pan", &layer->lfos[ll].toPan, "", -1, 1);
+			AddCompo4(kSliderBipolar, "To Effect Send 1", &layer->lfos[ll].toEffect1, "", -1, 1);
+			AddCompo4(kSliderBipolar, "To Effect Send 2", &layer->lfos[ll].toEffect2, "", -1, 1);
+			AddCompo4(kSliderBipolar, "To Effect Send 3", &layer->lfos[ll].toEffect3, "", -1, 1);
+			AddCompo4(kSliderBipolar, "To Effect Send 4", &layer->lfos[ll].toEffect4, "", -1, 1);
 			AddCompo(kOnOffButton, "Note On Reset", &layer->lfos[ll].noteOnReset);
 			AddCompo(kOnOffButton, "Inverted", &layer->lfos[ll].inverted);
 		}
