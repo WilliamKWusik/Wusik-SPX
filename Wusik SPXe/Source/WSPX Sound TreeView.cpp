@@ -387,9 +387,9 @@ void WSPXKeyVelZone::updateKeysAndLabel(bool mouseAway)
 	}
 	else
 	{
-		editor->midiKeyboard.selectedHigh = sound->keyZoneHigh * 127.0f;
-		editor->midiKeyboard.selectedLow = sound->keyZoneLow * 127.0f;
-		editor->midiKeyboard.rootKey = sound->keyRoot * 127.0f;
+		editor->midiKeyboard.selectedHigh = sound->keyZoneHigh;
+		editor->midiKeyboard.selectedLow = sound->keyZoneLow;
+		editor->midiKeyboard.rootKey = sound->keyRoot;
 		editor->midiKeyboard.repaint();
 		//
 		((WSPXStatusLabel*)editor->statusLabel)->text = File(sound->soundFile).getFileName();

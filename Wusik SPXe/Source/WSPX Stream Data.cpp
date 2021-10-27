@@ -154,7 +154,7 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 {
 	WS::stream(stream, roundRobin, type);
 	WS::stream(stream, random, type);
-	WS::stream(stream, isRelease, type);
+	WS::stream(stream, release, type);
 	WS::stream(stream, reverse, type);
 	WS::stream(stream, keySwitch, type);
 	WS::stream(stream, keySwitchType, type);

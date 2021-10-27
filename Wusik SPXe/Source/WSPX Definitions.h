@@ -7,7 +7,7 @@
 //
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
-#define WIGNORE_SET_STATE 0
+#define WIGNORE_SET_STATE 1
 #define WVERSION "1.0.0 BETA 00"
 extern bool isWSPXEditor;
 extern bool WSPXeBundle;
@@ -70,20 +70,20 @@ public:
 	//
 	MemoryBlock soundData;
 	float volume = 1.0f;
-	float pan = 0.5f;
-	float roundRobin = 0.0f;
-	float random = 0.0f;
-	float isRelease = 0.0f;
-	float reverse = 0.0f;
-	float keySwitch = 0.0f;
+	float pan = 0.0f;
+	bool roundRobin = false;
+	bool random = false;
+	bool release = false;
+	bool reverse = false;
+	int keySwitch = 0;
 	float randomProbability = 1.0f;
-	float fineTune = 0.5f;
-	float coarseTune = 0.5f;
-	float keyZoneLow = 0;
-	float keyZoneHigh = 1.0f;
-	float velZoneLow = 0;
-	float velZoneHigh = 1.0f;
-	float keyRoot = (1.0f / 127.0f) * 60.0f;
+	float fineTune = 0.0f;
+	int coarseTune = 0;
+	int keyZoneLow = 0;
+	int keyZoneHigh = 127;
+	int velZoneLow = 0;
+	int velZoneHigh = 127;
+	int keyRoot = 60;
 	//
 	Array<float> channelPan;
 	int keySwitchType = 0;
@@ -223,9 +223,9 @@ public:
 	//
 	const String waveforms = "Sine\nSawtooth\nPulse\nRandom\nNoise\nTriangle";
 	int waveform = 0;
-	float sync = 1.0f;
-	float inverted = 0.0f;
-	float noteOnReset = 0.0f;
+	bool sync = true;
+	bool inverted = false;
+	bool noteOnReset = false;
 	float speed1 = 0.1f;
 	float speed2 = 0.1f;
 	float phase = 0.0f;
@@ -274,8 +274,8 @@ public:
 	float release = 0.28f;
 	float velocity = 1.0f;
 	float maxSeconds = 0.2f;
-	float keyTrack = 0.5f;
-	float velTrack = 0.5f;
+	float keyTrack = 0.0f;
+	float velTrack = 0.0f;
 	//
 	enum
 	{
@@ -314,7 +314,7 @@ public:
 	float sampleAndHold = 0.0f;
 	float feedback = 0.0f;
 	float delay = 0.0f;
-	float toEnvelope = 0.5f;
+	float toEnvelope = 0.0f;
 	//
 	enum
 	{
@@ -340,11 +340,11 @@ public:
 	}
 	//
 	float volume = 1.0f;
-	float pan = 0.5f;
-	float fine = 0.5f;
-	float tune = 0.0f;
+	float pan = 0.0f;
+	float fine = 0.0f;
+	int tune = 0;
 	float filterFreq = 0.0f;
-	float time = 0.0f;
+	int time = 0;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -355,10 +355,10 @@ public:
 	//
 	const String modes = "Forward\nBackwards\nPingPong\nRandom";
 	OwnedArray<WSPX_Sequencer_Step> steps;
-	float sync = 1.0f;
+	bool sync = false;
 	float speed1 = 0.1f;
 	float speed2 = 0.1f;
-	float loopStart = 0.0f;
+	int loopStart = 0;
 	float smoothOutput = 0.0f;
 	int mode = 0;
 	//
@@ -398,19 +398,19 @@ public:
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
 	String name = "Layer";
-	float reverse = 0.0f;
+	bool reverse = false;
 	float volume = 1.0f;
-	float pan = 0.5f;
-	float fineTune = 0.5f;
-	float coarseTune = 0.5f;
-	float voices = (1.0f / 128.0f) * 16.0f;
-	float output = 0.0f; // Main Out //
+	float pan = 0.0f;
+	float fineTune = 0.0f;
+	int coarseTune = 0;
+	int voices = 16;
+	int output = 0; // Main Out //
 	float glide = 0.0f;
-	float autoGlide = 1.0f;
-	float keyZoneLow = 0;
-	float keyZoneHigh = 1.0f;
-	float velZoneLow = 0;
-	float velZoneHigh = 1.0f;
+	bool autoGlide = true;
+	int keyZoneLow = 0;
+	int keyZoneHigh = 127;
+	int velZoneLow = 0;
+	int velZoneHigh = 127;
 	MemoryBlock scripting;
 };
 //
@@ -427,9 +427,9 @@ public:
 	String tags, author, description;
 	//
 	float volume = 1.0f;
-	float pan = 0.5f;
-	float fineTune = 0.5f;
-	float coarseTune = 0.5f;
+	float pan = 0.0f;
+	float fineTune = 0.0f;
+	int coarseTune = 0;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

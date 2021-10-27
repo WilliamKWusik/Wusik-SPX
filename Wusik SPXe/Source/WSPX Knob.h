@@ -93,13 +93,30 @@ public:
 class WSlider : public Component
 {
 public:
-	WSlider(Image& _background, Image& _filled, Image& _thumb, float& _value, bool _bipolar,
-		bool _integer = false, int _min = 0, int _max = 1)
-		: background(_background), filled(_filled), thumb(_thumb), value(_value), bipolar(_bipolar), integer(_integer), min(_min), max(_max)
+	WSlider(Image& _background, Image& _filled, Image& _thumb, void* _value, bool _bipolar, int _min = 0, int _max = 1, int _valueType = kFloat)
+		: background(_background), filled(_filled), thumb(_thumb), value(_value), bipolar(_bipolar), min(_min), max(_max), valueType(_valueType)
 	{ 
 		originalSizeImage = Image(Image::ARGB, background.getWidth(), background.getHeight(), true);
 		tempFill = Image(Image::ARGB, filled.getWidth(), filled.getHeight(), true);
-		if (integer) totalInt = max - min;
+		totalInt = max - min;
+	}
+	//
+	float getValue()
+	{
+		if (valueType == kFloat) return ((float*)value)[0];
+		return float(((int*)value)[0]);
+	}
+	//
+	void setValue(float _value)
+	{
+		if (valueType == kFloat)
+		{
+			((float*)value)[0] = jlimit(float(min), float(max), _value);
+		}
+		else
+		{
+			((int*)value)[0] = jlimit(min, max, int(_value));
+		}
 	}
 	//
 	void mouseEnter(const MouseEvent& e) override
@@ -113,7 +130,7 @@ public:
 		//
 		if (midiKeyboard != nullptr)
 		{
-			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboardValue[0] = getValue();
 			midiKeyboard->repaint();
 		}
 	}
@@ -125,21 +142,15 @@ public:
 			String xVal;
 			String xLabel;
 			//
-			if (integer)
+			if (valueType == kInt)
 			{
 				if (min > 1 || max < 0) xLabel = "Min: " + String(min) + " - Max: " + String(max);
-				xVal = String(int(value * totalInt) + min);
+				xVal = String(int(getValue()));
 			}
-			else if (bipolar) xVal = String((value * 2.0f) - 1.0f, 6);
-			else xVal = String(value, 6);
+			else xVal = String(getValue(), 6);
 			//
 			WAskValue("Edit Value", xLabel, xVal, "", "OK", "Cancel", xVal);
-			if (xVal.isNotEmpty())
-			{
-				if (integer) value = jlimit(0.0f, 1.0f, (float(xVal.getFloatValue() - min) / totalInt));
-				else if (bipolar) value = jlimit(0.0f, 1.0f, (xVal.getFloatValue() + 1.0f) * 0.5f);
-				else value = jlimit(0.0f, 1.0f, xVal.getFloatValue());
-			}
+			if (xVal.isNotEmpty()) setValue(xVal.getFloatValue());
 			repaint();
 		}
 		//
@@ -147,7 +158,7 @@ public:
 		//
 		if (midiKeyboard != nullptr)
 		{
-			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboardValue[0] = getValue();
 			midiKeyboard->repaint();
 		}
 	}
@@ -155,9 +166,9 @@ public:
 	void mouseDown(const MouseEvent& e) override
 	{
 		wasOntopOfValue = e.getPosition().x <= int(double(getWidth()) * 0.28);
-		startDragValue = value;
-		if (e.mods.isCtrlDown()) value = 0.5f;
-		if (e.mods.isMiddleButtonDown()) value = 0.5f;
+		startDragValue = getValue();
+		if (e.mods.isCtrlDown()) setValue(0.0f);
+		if (e.mods.isMiddleButtonDown()) setValue(0.0f);
 		repaint();
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 	}
@@ -169,26 +180,28 @@ public:
 		float xMultiply = 1.0f;
 		if (e.mods.isShiftDown() || e.mods.isRightButtonDown()) xMultiply = 0.1f;
 		//
-		value = jlimit(0.0f, 1.0f, startDragValue + (float(e.getDistanceFromDragStartX()) * 0.006f * xMultiply));
+		if (valueType == kFloat) setValue(startDragValue + (float(e.getDistanceFromDragStartX()) * 0.006f * xMultiply));
+			else setValue(startDragValue + (float(e.getDistanceFromDragStartX()) * 0.8f * xMultiply));
+		//
 		repaint();
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 		//
 		if (midiKeyboard != nullptr)
 		{
-			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboardValue[0] = getValue();
 			midiKeyboard->repaint();
 		}
 	}
 	//
 	void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override
 	{
-		value = jlimit(0.0f, 1.0f, value + (float(wheel.deltaY) * 0.1f));
+		setValue(getValue() + (float(wheel.deltaY) * 0.1f));
 		repaint();
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
 		//
 		if (midiKeyboard != nullptr)
 		{
-			midiKeyboardValue[0] = value * 127.0f;
+			midiKeyboardValue[0] = getValue();
 			midiKeyboard->repaint();
 		}
 	}
@@ -199,9 +212,7 @@ public:
 		Graphics gg(originalSizeImage);
 		gg.drawImageAt(background, 0, 0);
 		//
-		int thumbPos; 
-		if (integer) thumbPos = (double(background.getWidth() - thumb.getWidth()) * (int(value * totalInt) / totalInt));
-			else thumbPos = (double(background.getWidth() - thumb.getWidth()) * value);
+		int thumbPos = (double(background.getWidth() - thumb.getWidth()) * (getValue() / float(max)));
 		//
 		tempFill.clear(Rectangle<int>(0, 0, tempFill.getWidth(), tempFill.getHeight()), Colours::transparentBlack);
 		Graphics gr(tempFill);
@@ -209,12 +220,17 @@ public:
 		//
 		if (bipolar)
 		{
-			if (value > 0.5)
+			if (min < 0)
+			{
+				thumbPos = (double(background.getWidth() - thumb.getWidth()) * ((getValue() - float(min)) / float(totalInt)));
+			}
+			//
+			if (getValue() > 0.5)
 			{
 				tempFill.clear(Rectangle<int>(0, 0, filled.getWidth() / 2, tempFill.getHeight()), Colours::transparentBlack);
 				tempFill.clear(Rectangle<int>(thumbPos + 8, 0, filled.getWidth(), tempFill.getHeight()), Colours::transparentBlack);
 			}
-			else if (value < 0.5)
+			else if (getValue() < 0.5)
 			{
 				tempFill.clear(Rectangle<int>(filled.getWidth() / 2, 0, filled.getWidth() / 2, tempFill.getHeight()), Colours::transparentBlack);
 				tempFill.clear(Rectangle<int>(0, 0, thumbPos + 8, tempFill.getHeight()), Colours::transparentBlack);
@@ -236,9 +252,7 @@ public:
 		g.drawImage(originalSizeImage, double(getWidth()) * 0.4, 0, double(getWidth()) * 0.6, getHeight(), 0, 0, originalSizeImage.getWidth(), originalSizeImage.getHeight());
 		//
 		String xText;
-		if (integer) xText = String(int(value * totalInt) + min); 
-		else if (bipolar) xText = String((value * 2.0f) - 1.0f, 3);
-		else xText = String(value, 3);
+		if (valueType == kInt) xText = String(int(getValue())); else xText = String(getValue(), 3);
 		//
 		g.setColour(Colours::black.withAlpha(0.06f));
 		g.fillRect(Rectangle<int>(0, 0, double(getWidth()) * 0.3, getHeight()));
@@ -255,12 +269,17 @@ public:
 	Image& background;
 	Image& filled;
 	Image& thumb;
-	float& value;
+	void* value;
 	float startDragValue = 1.0f;
 	bool wasOntopOfValue = false;
 	bool bipolar = false;
-	bool integer = false;
 	int min = 0;
 	int max = 1;
 	float totalInt = 1.0f;
+	int valueType = kFloat;
+	//
+	enum
+	{
+		kFloat, kInt
+	};
 };

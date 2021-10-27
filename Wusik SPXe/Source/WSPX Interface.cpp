@@ -40,6 +40,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	#define AddCompo2(type, name, variable, label, showEditInsteead, callback) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, showEditInsteead, callback)))
 	#define AddCompo4(type, name, variable, label, min, max) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, min, max)))
 	#define AddCompo6(type, name, variable, label, PopupList) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, 0, 1, PopupList)))
+	#define AddMIDIKey(value) editOptions.getLast()->slider->midiKeyboard = &midiKeyboard; editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.value
+
 	//
 	if (editObject.type == WusikEditObject::kCollection)
 	{
@@ -126,11 +128,11 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompoLabelSM(xFile);
 		//
 		AddCompo(kSlider, "Volume", &soundFile->volume);
-		AddCompo(kSliderBipolar, "Pan", &soundFile->pan);
-		AddCompo(kSliderBipolar, "Pan", &soundFile->fineTune);
+		AddCompo4(kSliderBipolar, "Pan", &soundFile->pan, "", -1, 1);
+		AddCompo4(kSliderBipolar, "Pan", &soundFile->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &soundFile->coarseTune, "", -48, 48);
 		AddCompo(kOnOffButton, "Reverse", &soundFile->reverse);
-		AddCompo(kOnOffButton, "Release", &soundFile->isRelease);
+		AddCompo(kOnOffButton, "Release", &soundFile->release);
 		//
 		AddCompoLabel("Loop");
 		AddCompo6(kPopupList, "Type", &soundFile->loopType, "", soundFile->loopTypes);
@@ -138,23 +140,15 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kStringInt64, "End", &soundFile->loopEnd, "", 0, soundFile->totalSamples - 1);
 		//
 		AddCompoLabel("Zones");
-		AddCompo4(kSliderInteger, "Key Zone Low", &soundFile->keyZoneLow, "", 0, 127);
-		editOptions.getLast()->slider->midiKeyboard = &midiKeyboard;
-		editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.selectedLow;
-		//
-		AddCompo4(kSliderInteger, "Key Zone High", &soundFile->keyZoneHigh, "", 0, 127);
-		editOptions.getLast()->slider->midiKeyboard = &midiKeyboard;
-		editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.selectedHigh;
-		//
+		AddCompo4(kSliderInteger, "Key Zone Low", &soundFile->keyZoneLow, "", 0, 127); AddMIDIKey(selectedLow);
+		AddCompo4(kSliderInteger, "Key Zone High", &soundFile->keyZoneHigh, "", 0, 127); AddMIDIKey(selectedHigh);
 		AddCompo4(kSliderInteger, "Vel Zone Low", &soundFile->velZoneLow, "", 0, 127);
 		AddCompo4(kSliderInteger, "Vel Zone High", &soundFile->velZoneHigh, "", 0, 127);
-		AddCompo4(kSliderInteger, "Key Root", &soundFile->keyRoot, "", 0, 127);
-		editOptions.getLast()->slider->midiKeyboard = &midiKeyboard;
-		editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.rootKey;
+		AddCompo4(kSliderInteger, "Key Root", &soundFile->keyRoot, "", 0, 127); AddMIDIKey(rootKey);
 		//
-		midiKeyboard.selectedHigh = soundFile->keyZoneHigh * 127.0f;
-		midiKeyboard.selectedLow = soundFile->keyZoneLow * 127.0f;
-		midiKeyboard.rootKey = soundFile->keyRoot * 127.0f;
+		midiKeyboard.selectedHigh = soundFile->keyZoneHigh;
+		midiKeyboard.selectedLow = soundFile->keyZoneLow;
+		midiKeyboard.rootKey = soundFile->keyRoot;
 		midiKeyboard.repaint();
 	}
 	else if (editObject.type == WusikEditObject::kPreset)
@@ -169,8 +163,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kString, "Tags", &preset->tags);
 		AddCompo(kImage, "Preset Image Icon", &preset->imagePresetIcon);
 		AddCompo(kSlider, "Volume", &preset->volume);
-		AddCompo(kSliderBipolar, "Pan", &preset->pan);
-		AddCompo(kSliderBipolar, "Fine Tune", &preset->fineTune);
+		AddCompo4(kSliderBipolar, "Pan", &preset->pan, "", -1, 1);
+		AddCompo4(kSliderBipolar, "Fine Tune", &preset->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &preset->coarseTune, "", -48, 48);
 	}
 	else if (editObject.type == WusikEditObject::kPresetLayer)
@@ -181,8 +175,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompoLabel("Layer Details");
 		AddCompo(kString, "Name", &layer->name);
 		AddCompo(kSlider, "Volume", &layer->volume);
-		AddCompo(kSliderBipolar, "Pan", &layer->pan);
-		AddCompo(kSliderBipolar, "Fine Tune", &layer->fineTune);
+		AddCompo4(kSliderBipolar, "Pan", &layer->pan, "", -1, 1);
+		AddCompo4(kSliderBipolar, "Fine Tune", &layer->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &layer->coarseTune, "", -48, 48);
 		AddCompo4(kSliderInteger, "Voices", &layer->voices, "", 1, 128);
 		AddCompo(kSlider, "Glide", &layer->glide);
@@ -190,8 +184,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kOnOffButton, "Reverse", &layer->reverse);
 		//
 		AddCompoLabel("Zones");
-		AddCompo4(kSliderInteger, "Key Zone Low", &layer->keyZoneLow, "", 0, 127);
-		AddCompo4(kSliderInteger, "Key Zone High", &layer->keyZoneHigh, "", 0, 127);
+		AddCompo4(kSliderInteger, "Key Zone Low", &layer->keyZoneLow, "", 0, 127); AddMIDIKey(selectedLow);
+		AddCompo4(kSliderInteger, "Key Zone High", &layer->keyZoneHigh, "", 0, 127); AddMIDIKey(selectedHigh);
 		AddCompo4(kSliderInteger, "Vel Zone Low", &layer->velZoneLow, "", 0, 127);
 		AddCompo4(kSliderInteger, "Vel Zone High", &layer->velZoneHigh, "", 0, 127);
 		//
@@ -202,8 +196,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Release", &layer->ampEnvelope.release);
 		AddCompo(kSlider, "Max Seconds", &layer->ampEnvelope.maxSeconds);
 		AddCompo(kSlider, "Velocity %", &layer->ampEnvelope.velocity);
-		AddCompo(kSliderBipolar, "Key Track", &layer->ampEnvelope.keyTrack);
-		AddCompo(kSliderBipolar, "Velocity Track", &layer->ampEnvelope.velTrack);
+		AddCompo4(kSliderBipolar, "Key Track", &layer->ampEnvelope.keyTrack, "", -1, 1);
+		AddCompo4(kSliderBipolar, "Velocity Track", &layer->ampEnvelope.velTrack, "", -1, 1);
 		AddCompo6(kPopupList, "Type", &layer->ampEnvelope.type, "", layer->ampEnvelope.types);
 		//
 		AddCompoLabel("Filter");
@@ -223,8 +217,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Release", &layer->filter.envelope.release);
 		AddCompo(kSlider, "Max Seconds", &layer->filter.envelope.maxSeconds);
 		AddCompo(kSlider, "Velocity %", &layer->filter.envelope.velocity);
-		AddCompo(kSliderBipolar, "Key Track", &layer->filter.envelope.keyTrack);
-		AddCompo(kSliderBipolar, "Velocity Track", &layer->filter.envelope.velTrack);
+		AddCompo4(kSliderBipolar, "Key Track", &layer->filter.envelope.keyTrack, "", -1, 1);
+		AddCompo4(kSliderBipolar, "Velocity Track", &layer->filter.envelope.velTrack, "", -1, 1);
 		AddCompo6(kPopupList, "Type", &layer->filter.envelope.type, "", layer->filter.envelope.types);
 		//
 		for (int ll = 0; ll < 2; ll++)
@@ -254,8 +248,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
 		//
-		midiKeyboard.selectedHigh = layer->keyZoneHigh * 127.0f;
-		midiKeyboard.selectedLow = layer->keyZoneLow * 127.0f;
+		midiKeyboard.selectedHigh = layer->keyZoneHigh;
+		midiKeyboard.selectedLow = layer->keyZoneLow;
 		midiKeyboard.repaint();
 	}
 	else if (editObject.type == WusikEditObject::kSoundZones)
@@ -290,13 +284,13 @@ WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* 
 	if (type == kSlider || type == kSliderBipolar)
 	{
 		WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor->getActiveEditor();
-		slider = new WSlider(editor->sliderBackground, editor->sliderFilled, editor->sliderThumb, ((float*)object)[0], type == kSliderBipolar);
+		slider = new WSlider(editor->sliderBackground, editor->sliderFilled, editor->sliderThumb, object, type == kSliderBipolar, min, max);
 		addAndMakeVisible(slider);
 	}
 	else if (type == kSliderInteger || type == kSliderIntegerBipolar)
 	{
 		WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor->getActiveEditor();
-		slider = new WSlider(editor->sliderBackground, editor->sliderFilled, editor->sliderThumb, ((float*)object)[0], (type == kSliderIntegerBipolar), true, min, max);
+		slider = new WSlider(editor->sliderBackground, editor->sliderFilled, editor->sliderThumb, object, (type == kSliderIntegerBipolar), min, max, WSlider::kInt);
 		addAndMakeVisible(slider);
 	}
 	else if (type == kPopupList)

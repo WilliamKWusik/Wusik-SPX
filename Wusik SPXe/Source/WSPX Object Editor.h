@@ -61,7 +61,7 @@ public:
 	{
 		if (type == kPopupList)
 		{
-			int index = jlimit(0, popupList.size() - 1, int(((float*)object)[0] * float(popupList.size() - 1)));
+			int index = jlimit(0, popupList.size() - 1, ((int*)object)[0]);
 			PopupMenu mm;
 			//
 			for (int tt = 0; tt < popupList.size(); tt++)
@@ -70,14 +70,11 @@ public:
 			}
 			//
 			int result = mm.show();
-			if (result > 0)
-			{
-				((float*)object)[0] = float(result - 1) / float(popupList.size() - 1);
-			}
+			if (result > 0) ((int*)object)[0] = result - 1;
 		}
 		else if (type == kOnOffButton)
 		{
-			if (((float*)object)[0] > 0.0f) ((float*)object)[0] = 0.0f; else ((float*)object)[0] = 1.0f;
+			if (((bool*)object)[0]) ((bool*)object)[0] = false; else ((bool*)object)[0] = true;
 		}
 		else if (type == kString)
 		{
@@ -176,13 +173,12 @@ public:
 			//
 			if (type == kPopupList)
 			{
-				int index = ((float*)object)[0] * float(popupList.size() - 1);
-				String xText = popupList[jlimit(0, popupList.size() - 1, int(index))];
+				String xText = popupList[jlimit(0, popupList.size() - 1, ((int*)object)[0])];
 				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
 			else if (type == kOnOffButton)
 			{
-				if (((float*)object)[0] > 0.0f)
+				if (((bool*)object)[0])
 				{
 					g.drawFittedText("ENABLED", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 				}

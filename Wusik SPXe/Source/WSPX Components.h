@@ -86,35 +86,35 @@ public:
 		float multiply = 1.0f;
 		if (event.mods.isShiftDown() || event.mods.isRightButtonDown()) multiply = 0.1f;
 		//
-		float moveX = event.getDistanceFromDragStartX() * 0.001f * multiply;
-		float moveY = event.getDistanceFromDragStartY() * 0.001f * multiply;
+		float moveX = event.getDistanceFromDragStartX() * 0.8f * multiply;
+		float moveY = event.getDistanceFromDragStartY() * 0.8f * multiply;
 		//
 		if (type == kMove)
 		{
-			sound->keyZoneLow = jlimit(0.0f, 1.0f, keyZoneLow + moveX);
-			sound->keyZoneHigh = jlimit(0.0f, 1.0f, keyZoneHigh + moveX);
+			sound->keyZoneLow = jlimit(0, 127, int(keyZoneLow + moveX));
+			sound->keyZoneHigh = jlimit(0, 127, int(keyZoneLow + moveX));
 			//
 			if (!event.mods.isMiddleButtonDown())
 			{
-				sound->velZoneLow = jlimit(0.0f, 1.0f, velZoneLow - moveY);
-				sound->velZoneHigh = jlimit(0.0f, 1.0f, velZoneHigh - moveY);
+				sound->velZoneLow = jlimit(0, 127, int(velZoneLow - moveY));
+				sound->velZoneHigh = jlimit(0, 127, int(velZoneHigh - moveY));
 			}
 		}
 		else if (type == kLeft)
 		{
-			sound->keyZoneLow = jlimit(0.0f, 1.0f, keyZoneLow + moveX);
+			sound->keyZoneLow = jlimit(0, 127, int(keyZoneLow + moveX));
 		}
 		else if (type == kRight)
 		{
-			sound->keyZoneHigh = jlimit(0.0f, 1.0f, keyZoneHigh + moveX);
+			sound->keyZoneHigh = jlimit(0, 127, int(keyZoneLow + moveX));
 		}
 		else if (type == kTop)
 		{
-			sound->velZoneHigh = jlimit(0.0f, 1.0f, velZoneHigh - moveY);
+			sound->velZoneHigh = jlimit(0, 127, int(velZoneHigh - moveY));
 		}
 		else if (type == kBottom)
 		{
-			sound->velZoneLow = jlimit(0.0f, 1.0f, velZoneLow - moveY);
+			sound->velZoneLow = jlimit(0, 127, int(velZoneLow - moveY));
 		}
 		//
 		setPositionOnUI();
@@ -167,10 +167,10 @@ public:
 		int xExtraX = int((double(positionOnUI.getWidth()) / 127.0) / 2.0);
 		int xExtraY = int((double(positionOnUI.getHeight()) / 127.0) / 2.0);
 		//
-		double keyLow = double(int(sound->keyZoneLow * 127.0f)) / 127.0;
-		double keyHigh = double(int(sound->keyZoneHigh * 127.0f)) / 127.0;
-		double velLow = double(int(sound->velZoneLow * 127.0f)) / 127.0;
-		double velHigh = double(int(sound->velZoneHigh * 127.0f)) / 127.0;
+		double keyLow = double(sound->keyZoneLow);
+		double keyHigh = double(sound->keyZoneHigh);
+		double velLow = double(sound->velZoneLow);
+		double velHigh = double(sound->velZoneHigh);
 		//
 		double xPos = keyLow * double(positionOnUI.getWidth());
 		double yPos = (double(positionOnUI.getHeight()) - (velHigh * double(positionOnUI.getHeight())));
@@ -184,10 +184,10 @@ public:
 	WSPX_Collection_Sound_File* sound;
 	Rectangle<int> positionOnUI;
 	//
-	float keyZoneLow = 0.0;
-	float keyZoneHigh = 0.0f;
-	float velZoneLow = 0.0;
-	float velZoneHigh = 0.0f;
+	int keyZoneLow = 0;
+	int keyZoneHigh = 0;
+	int velZoneLow = 0;
+	int velZoneHigh = 0;
 	int type = kMove;
 	bool hasMoved = false;
 	//
