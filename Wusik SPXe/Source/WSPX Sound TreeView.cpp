@@ -112,7 +112,6 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			editor->editObject.set(WusikEditObject::kSound, 0, (void*)processor.collection->sounds.getLast());
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
-		else reselectParent();
 	}
 	else if (level == kLevel_Sounds)
 	{
@@ -167,10 +166,8 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				{
 					for (int ss = 0; ss < processor.collection->presets[pp]->layers[ll]->soundLinks.size(); ss++)
 					{
-						if (processor.collection->presets[pp]->layers[ll]->soundLinks[ss] == sound)
-						{
-							presetsUsingThisSound.add(processor.collection->presets[pp]->name);
-						}
+						WSPX_Collection_Sound* checkSound = processor.collection->presets[pp]->layers[ll]->soundLinks[ss];
+						if (checkSound == sound) presetsUsingThisSound.add(processor.collection->presets[pp]->name);
 					}
 				}
 			}

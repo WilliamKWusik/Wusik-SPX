@@ -37,16 +37,16 @@ void WSPX_Collection::streamData(void* stream, int type)
 	//
 	if (isWSPXEditor)
 	{
-		for (int pp = 0; pp < totalPresets; pp++)
-		{
-			if (type == WS::kRead) presets.add(new WSPX_Collection_Preset);
-			presets[pp]->streamData(stream, type, sounds);
-		}
-		//
 		for (int ss = 0; ss < totalsounds; ss++)
 		{
 			if (type == WS::kRead) sounds.add(new WSPX_Collection_Sound);
 			sounds[ss]->streamData(stream, type);
+		}
+		//
+		for (int pp = 0; pp < totalPresets; pp++)
+		{
+			if (type == WS::kRead) presets.add(new WSPX_Collection_Preset);
+			presets[pp]->streamData(stream, type, sounds);
 		}
 	}
 }
