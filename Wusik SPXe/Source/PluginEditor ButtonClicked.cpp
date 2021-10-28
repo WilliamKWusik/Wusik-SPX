@@ -58,7 +58,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 		mm.addItem(6, "Save As");
 		mm.addItem(12, "Save Bundle");
 		mm.addSeparator();
-		mm.addItem(8, "Export");
+		mm.addItem(8, "Export .WSPX");
 		mm.setLookAndFeel(newLookAndFeel);
 		//
 		int result = mm.show();
@@ -125,13 +125,14 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			}
 			else if (result == 8)
 			{
-				FileChooser browseFile("Export To WSPX Collection File", processor.collection->exportedFile, "*.WSPX");
+				WMessageBox("Not Implemented Yet!", "");
+				//
+				/*FileChooser browseFile("Export To WSPX Collection File", processor.collection->exportedFile, "*.WSPX");
 				//
 				if (browseFile.browseForFileToSave(true))
 				{
 					processor.collection->exportedFile = browseFile.getResult();
-					WAlert;
-				}
+				}*/
 			}
 			//
 			if (result == 1 || result == 2)
@@ -145,6 +146,6 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 	}
 	else
 	{
-		WAlert;
+		WMessageBox("Not Implemented Yet!", "");
 	}
 }
