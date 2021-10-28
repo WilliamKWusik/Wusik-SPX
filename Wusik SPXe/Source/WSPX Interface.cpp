@@ -172,6 +172,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kString, "Description", &preset->description);
 		AddCompo(kString, "Tags", &preset->tags);
 		AddCompo(kImage, "Preset Image Icon", &preset->imagePresetIcon);
+		AddCompo(kButtonCallback, "Scripting", &preset->scripting);
 		AddCompo(kSlider, "Volume", &preset->volume);
 		AddCompo4(kSliderBipolar, "Pan", &preset->pan, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Fine Tune", &preset->fineTune, "", -1, 1);
@@ -184,6 +185,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		editOptionsComponent = new Component;
 		AddCompoLabel("Layer Details");
 		AddCompo(kString, "Name", &layer->name);
+		AddCompo(kButtonCallback, "Scripting", &layer->scripting);
 		AddCompo(kSlider, "Volume", &layer->volume);
 		AddCompo4(kSliderBipolar, "Pan", &layer->pan, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Fine Tune", &layer->fineTune, "", -1, 1);
@@ -253,6 +255,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kTime, "Time", &layer->sequencer.time);
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
+		AddCompo(kButtonCallback, "Steps", &layer->sequencer);
 		//
 		midiKeyboard.selectedHigh = layer->keyZoneHigh;
 		midiKeyboard.selectedLow = layer->keyZoneLow;

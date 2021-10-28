@@ -136,7 +136,7 @@ public:
 	#if WSPXEDITOR
 		int exportBits = 24;
 		int exportFormat = 0;
-		String soundFile;
+		StringArray soundFiles;
 	#endif
 };
 //
@@ -428,6 +428,7 @@ public:
 	WSPX_Image imagePresetIcon;
 	String name = "Init Preset";
 	String tags, author, description;
+	MemoryBlock scripting;
 	//
 	float volume = 1.0f;
 	float pan = 0.0f;

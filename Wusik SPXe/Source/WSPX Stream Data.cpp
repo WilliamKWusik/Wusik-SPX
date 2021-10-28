@@ -65,6 +65,7 @@ void WSPX_Collection_Preset::streamData(void* stream, int type, OwnedArray<WSPX_
 	WS::stream(stream, fineTune, type);
 	WS::stream(stream, coarseTune, type);
 	WS::stream(stream, totalLayers, type);
+	WS::stream(stream, scripting, type);
 	WS::stream(stream, imagePresetIcon.imageFilename, type);
 	//
 	for (int ee = 0; ee < 4; ee++)

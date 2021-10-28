@@ -205,7 +205,7 @@ public:
 				//
 				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
-			else if (type == kSkinFolder)
+			else if (type == kSkinFolder || type == kButtonCallback)
 			{
 				g.drawFittedText("EDIT", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
@@ -279,6 +279,7 @@ public:
 		kSliderBipolar,
 		kSliderInteger,
 		kSliderIntegerBipolar,
-		kOnOffButton
+		kOnOffButton,
+		kButtonCallback
 	};
 };
