@@ -122,7 +122,7 @@ public:
 		if (isPresetTreeView)
 			tree.setRootItem(new WSPXPresetTreeItem(processor, _ui_ratio, WSPXPresetTreeItem::kLevel_Add_Preset, "Add Preset"));
 		else 
-			tree.setRootItem(new WSPXSoundTreeItem(processor, _ui_ratio, WSPXSoundTreeItem::kLevel_Add_Sound, "Add Sound"));
+			tree.setRootItem(new WSPXSoundTreeItem(processor, _ui_ratio, WSPXSoundTreeItem::kLevel_Add_Sound, "Add Sound(s)"));
 		//
 		tree.getRootItem()->setOpen(true);
 		tree.setColour(TreeView::linesColourId, Colours::white);
