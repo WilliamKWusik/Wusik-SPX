@@ -1,2 +1,7 @@
 /Wusik SPXe/Builds/*
 /Wusik SPXe/JuceLibraryCode/*
+/Releases/Shared Code/*
+/Releases/VST/*.exp
+/Releases/VST/*.lib
+/Releases/VST3/*.exp
+/Releases/VST3/*.lib
