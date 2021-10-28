@@ -130,7 +130,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		//
 		AddCompo(kSlider, "Volume", &soundFile->volume);
 		AddCompo4(kSliderBipolar, "Pan", &soundFile->pan, "", -1, 1);
-		AddCompo4(kSliderBipolar, "Pan", &soundFile->fineTune, "", -1, 1);
+		AddCompo4(kSliderBipolar, "Fine Tune", &soundFile->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &soundFile->coarseTune, "", -48, 48);
 		AddCompo(kOnOffButton, "Reverse", &soundFile->reverse);
 		AddCompo(kOnOffButton, "Release", &soundFile->release);
