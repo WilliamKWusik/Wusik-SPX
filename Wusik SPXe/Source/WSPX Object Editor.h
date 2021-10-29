@@ -27,7 +27,8 @@ public:
 		kSound,
 		kSoundFile,
 		kSoundLink,
-		kSoundZones
+		kSoundZones,
+		kSequencer
 	};
 };
 //
@@ -43,6 +44,37 @@ class WusikEditOptionCallback_UpdateCollectionName : public WusikEditOptionCallb
 {
 public:
 	virtual void process(WusikSpxAudioProcessor* processor);
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WusikEditOptionCallback_OpenEditSequencer : public WusikEditOptionCallback
+{
+public:
+	WusikEditOptionCallback_OpenEditSequencer(WSPX_Collection_Preset_Layer* _layer) : layer(_layer) { }
+	virtual void process(WusikSpxAudioProcessor* processor);
+	WSPX_Collection_Preset_Layer* layer;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WusikEditOptionCallback_Sequencer_Step : public WusikEditOptionCallback
+{
+public:
+	WusikEditOptionCallback_Sequencer_Step(WSPX_Sequencer* _sequencer, WSPX_Sequencer_Step* _step, int _type) : 
+		sequencer(_sequencer), type(_type), step(_step) { }
+	//
+	virtual void process(WusikSpxAudioProcessor* processor);
+	WSPX_Sequencer* sequencer;
+	WSPX_Sequencer_Step* step;
+	int type;
+	//
+	enum
+	{
+		kAddToStart = 0,
+		kAddToEnd,
+		kAppend16Steps,
+		kRemove,
+		kRemoveAll,
+	};
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -183,14 +215,30 @@ public:
 		}
 		else
 		{
-			g.fillAll(Colours::black.withAlpha(0.12f));
-			if (isMouseOver(true)) g.fillAll(Colours::red.withAlpha(0.12f));
-			//
-			g.setColour(Colours::white.withAlpha(0.26f));
-			g.drawRect(0, 0, getWidth(), getHeight(), 1);
-			g.setColour(Colours::white.withAlpha(0.86f));
 			g.setFont(LookAndFeelEx::getCustomFont().withHeight(double(getHeight()) * 0.32f));
-			g.drawFittedText(label, 8, 0, (double(getWidth()) * 0.26) - 16, getHeight(), Justification::centredLeft, 1);
+			//
+			if (type == kButtonCallback)
+			{
+				if (isMouseOver(true)) g.setColour(Colours::red.withAlpha(0.24f));
+					else g.setColour(Colours::black.withAlpha(0.14f));
+				g.fillRect(24, 8, getWidth() - 48, getHeight() - 16);
+				g.setColour(Colours::white.withAlpha(0.26f));
+				g.drawRect(24, 8, getWidth() - 48, getHeight() - 16, 2);
+				//
+				g.setColour(Colours::white.withAlpha(0.90f));
+				g.drawFittedText(label, 0, 0, getWidth(), getHeight(), Justification::centred, 1);
+			}
+			else
+			{
+				g.fillAll(Colours::black.withAlpha(0.12f));
+				if (isMouseOver(true)) g.fillAll(Colours::red.withAlpha(0.12f));
+				//
+				g.setColour(Colours::white.withAlpha(0.26f));
+				g.drawRect(0, 0, getWidth(), getHeight(), 1);
+				g.setColour(Colours::white.withAlpha(0.86f));
+				//
+				g.drawFittedText(label, 8, 0, (double(getWidth()) * 0.26) - 16, getHeight(), Justification::centredLeft, 1);
+			}
 			//
 			if (type == kPopupList)
 			{
@@ -205,7 +253,7 @@ public:
 				//
 				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
-			else if (type == kSkinFolder || type == kButtonCallback)
+			else if (type == kSkinFolder)
 			{
 				g.drawFittedText("EDIT", 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
@@ -230,7 +278,8 @@ public:
 			{
 				if (type == kString)
 				{
-					g.drawFittedText(((String*)object)[0], (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+					if (((String*)object)[0].isEmpty()) g.drawFittedText("Empty", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+						else g.drawFittedText(((String*)object)[0], (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
 				}
 				else if (type == kStringInt64)
 				{

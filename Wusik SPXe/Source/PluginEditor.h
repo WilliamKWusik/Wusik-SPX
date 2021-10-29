@@ -110,6 +110,8 @@ public:
 		kTimerAction_Remove_Sound_Link,
 		kTimerAction_Remove_Sound_File,
 		kTimerAction_Remove_Sound_File_From_Zones,
+		kTimerAction_Remove_Sequencer_Step,
+		kTimerAction_Open_Edit_Sequencer,
 		kTimerAction_Update_Interface,
 		kTimerAction_Update_Interface_Not_TreeViews,
 		kTimerAction_Update_Interface_Show_Collection

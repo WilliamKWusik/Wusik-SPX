@@ -75,6 +75,27 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		cleanInterface();
 		updateInterface();
 	}
+	else if (timerAction.get() == kTimerAction_Open_Edit_Sequencer)
+	{
+		editObject.set(WusikEditObject::kSequencer, 0, timerActionValueObject);
+		//
+		redoTreeViewsOnResize = false;
+		cleanInterface();
+		updateInterface();
+	}
+	else if (timerAction.get() == kTimerAction_Remove_Sequencer_Step)
+	{
+		WSPX_Sequencer* sequencer = (WSPX_Sequencer*)timerActionValueObject;
+		//
+		if (timerActionValue1 == -1) sequencer->steps.clear();
+		else sequencer->steps.remove(timerActionValue1);
+		//
+		editObject.set(WusikEditObject::kSequencer, 0, timerActionValueObject);
+		//
+		redoTreeViewsOnResize = false;
+		cleanInterface();
+		updateInterface();
+	}
 	else if (timerAction.get() == kTimerAction_Remove_Sound_File)
 	{
 		processor.stopAllAudio(); // We are about to mess with the audio data //

@@ -130,10 +130,12 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 void WSPX_Sequencer::streamData(void* stream, int type)
 {
 	time.streamData(stream, type);
-	int totalSteps = steps.size();
 	WS::stream(stream, loopStart, type);
 	WS::stream(stream, smoothOutput, type);
 	WS::stream(stream, mode, type);
+	//
+	int totalSteps = steps.size();
+	WS::stream(stream, totalSteps, type);
 	//
 	for (int tt = 0; tt < totalSteps; tt++)
 	{
