@@ -32,7 +32,12 @@ WusikSpxAudioProcessor::~WusikSpxAudioProcessor()
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+	lastSamplerate = sampleRate;
+	lastSamplesPerBlock = samplesPerBlock;
 	//
+	#if WSPXPLAYERPREVIEW
+		if (playerPreset != nullptr) playerPreset->prepareToPlay(sampleRate, samplesPerBlock);
+	#endif
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -69,14 +74,9 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 void WusikSpxAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
 	ScopedNoDenormals noDenormals;
-	auto totalNumInputChannels = getTotalNumInputChannels();
-	auto totalNumOutputChannels = getTotalNumOutputChannels();
+	lastSamplerate = getSampleRate();
 	//
-	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-		buffer.clear(i, 0, buffer.getNumSamples());
-	//
-	for (int channel = 0; channel < totalNumInputChannels; ++channel)
-	{
-		auto* channelData = buffer.getWritePointer(channel);
-	}
+	#if WSPXPLAYERPREVIEW
+		if (playerPreset != nullptr) playerPreset->processBlock(buffer, midiMessages);
+	#endif
 }

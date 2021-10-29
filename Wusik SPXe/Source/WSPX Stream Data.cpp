@@ -168,6 +168,7 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 	WS::stream(stream, format, type);
 	WS::stream(stream, sampleDataMetaValuesRead, type);
 	WS::stream(stream, totalSamples, type);
+	WS::stream(stream, totalChannels, type);
 	//
 	if (isWSPXEditor)
 	{
@@ -184,8 +185,9 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 			//
 			if (WSPXeBundle)
 			{
-				if (type == WS::kWrite) File(files[ff]->filename).loadFileAsData(soundData);
-				WS::stream(stream, soundData, type);
+				MemoryBlock _soundRAW;
+				if (type == WS::kWrite) File(files[ff]->filename).loadFileAsData(_soundRAW);
+				WS::stream(stream, _soundRAW, type);
 			}
 		}
 	}

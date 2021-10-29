@@ -128,4 +128,5 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 	}
 	//
 	soundFile->sampleDataMetaValuesRead = true;
+	soundFile->totalChannels = channels;
 }

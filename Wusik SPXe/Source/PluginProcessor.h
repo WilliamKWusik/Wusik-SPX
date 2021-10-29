@@ -103,6 +103,8 @@ public:
 	String lastSoundFilePath;
 	MidiKeyboardState midiKeyboardState;
 	MidiKeyboardState midiKeyboardStateBottom;
+	float lastSamplerate = 44100.0f;
+	int lastSamplesPerBlock = 128;
 	//
 	#if WSPXPLAYERPREVIEW
 		ScopedPointer<WSPX_Player_Preset> playerPreset;
