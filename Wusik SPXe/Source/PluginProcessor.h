@@ -4,9 +4,29 @@
 	This file is free to be used with any project.
 
 */
-
+//
 #pragma once
 #include "WSPX Definitions.h"
+#if WSPXPLAYERPREVIEW
+	#include "WSPX Player/WSX Player.h"
+#endif
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPXThread: public ThreadWithProgressWindow
+{
+public:
+	WSPXThread(void* __processor, Component* editor, int _type) :
+		ThreadWithProgressWindow("Sound Thumb Processing", true, false, 0, String(), editor), _processor(__processor), type(_type) { }
+	//
+	void run() override;
+	void* _processor;
+	int type;
+	//
+	enum
+	{
+		kLoadPreset = 0
+	};
+};
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WusikSpxAudioProcessor : public AudioProcessor
@@ -78,10 +98,15 @@ public:
 	}
 	//
 	ScopedPointer<WSPX_Collection> collection;
+	ScopedPointer<WSPXThread> processThread;
 	AudioFormatManager audioFormatManager;
 	String lastSoundFilePath;
 	MidiKeyboardState midiKeyboardState;
 	MidiKeyboardState midiKeyboardStateBottom;
+	//
+	#if WSPXPLAYERPREVIEW
+		ScopedPointer<WSPX_Player_Preset> playerPreset;
+	#endif
 	//
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WusikSpxAudioProcessor)

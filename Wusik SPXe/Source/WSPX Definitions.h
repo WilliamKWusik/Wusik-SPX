@@ -188,13 +188,39 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Parameter
+{
+public:
+	WSPX_Parameter(int _type, void* _value, float _min, float _max) : type(_type), value(_value), min(_min), max(_max) { }
+	//
+	void setValue(float newValue) { ((float*)value)[0] = newValue; }
+	void setValue(int newValue) { ((int*)value)[0] = newValue; }
+	void setValue(bool newValue) { ((bool*)value)[0] = newValue; }
+	//
+	float getFloat() { return ((float*)value)[0]; }
+	int getInt() { return ((int*)value)[0]; }
+	int getBool() { return ((bool*)value)[0]; }
+	//
+	void* value = nullptr;
+	String name = "None";
+	float min = 0.0f;
+	float max = 1.0f;
+	int type;
+	//
+	enum
+	{
+		kFloat = 1,
+		kInteger,
+		kBool
+	};
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Effect
 {
 public:
-	virtual void process(AudioSampleBuffer& buffer) { }
 	virtual void streamData(void* stream, int _type) { }
-	//
-	float volume = 1.0f;
+	OwnedArray<WSPX_Parameter> parameters;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -422,6 +448,7 @@ public:
 	WSPX_Collection_LFO lfos[2];
 	WSPX_Collection_Envelope ampEnvelope;
 	WSPX_Collection_Filter filter;
+	WSPX_Collection_Effect effects;
 	String name = "Layer";
 	bool reverse = false;
 	float volume = 1.0f;
@@ -446,7 +473,7 @@ public:
 	void streamData(void* stream, int type, OwnedArray<WSPX_Collection_Sound>& soundsList);
 	//
 	OwnedArray<WSPX_Collection_Preset_Layer> layers;
-	WSPX_Collection_Effect effects[4]; // Up to 4 Sends with up to 4 internal effects //
+	WSPX_Collection_Effect effects[4]; // Up to 4 Sends with up to 4 internal effects - each Layer has up to 4 insert effects //
 	WSPX_Image imagePresetIcon;
 	String name = "Init Preset";
 	String tags, author, description;
@@ -483,6 +510,7 @@ public:
 	#if WSPXEDITOR
 		OwnedArray<WSPX_Collection_Preset> presets;
 		OwnedArray<WSPX_Collection_Sound> sounds;
+		WSPX_Collection_Preset* lastSelectedPreset = nullptr;
 		bool hasUnsavedChanges = false;
 		File exportedFile;
 		bool isWSPXeBundle = false;

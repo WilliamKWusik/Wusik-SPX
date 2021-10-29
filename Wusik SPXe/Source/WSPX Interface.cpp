@@ -46,6 +46,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	if (editObject.type == WusikEditObject::kCollection)
 	{
 		editOptionsComponent = new Component;
+		processor.collection->lastSelectedPreset = nullptr;
+		//
 		AddCompoLabel("Collection Details");
 		AddCompo2(kString, "Name", &processor.collection->name, "", false, new WusikEditOptionCallback_UpdateCollectionName);
 		AddCompo(kString, "Author", &processor.collection->author);
@@ -61,6 +63,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	else if (editObject.type == WusikEditObject::kSound || editObject.type == WusikEditObject::kSoundLink)
 	{
 		WSPX_Collection_Sound* sound = (WSPX_Collection_Sound*)editObject.object;
+		processor.collection->lastSelectedPreset = nullptr;
 		editOptionsComponent = new Component;
 		//
 		if (editObject.type == WusikEditObject::kSound)
@@ -117,6 +120,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	{
 		WSPX_Collection_Sound_File* soundFile = (WSPX_Collection_Sound_File*)editObject.object;
 		editOptionsComponent = new Component;
+		processor.collection->lastSelectedPreset = nullptr;
 		//
 		for (int ff = 0; ff < soundFile->files.size(); ff++)
 		{
@@ -170,8 +174,9 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	else if (editObject.type == WusikEditObject::kPreset)
 	{
 		WSPX_Collection_Preset* preset = (WSPX_Collection_Preset*)editObject.object;
-		//
 		editOptionsComponent = new Component;
+		processor.collection->lastSelectedPreset = preset;
+		//
 		AddCompoLabel("Preset Details");
 		AddCompo(kString, "Name", &preset->name);
 		AddCompo(kString, "Author", &preset->author);
@@ -187,8 +192,17 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	else if (editObject.type == WusikEditObject::kPresetLayer)
 	{
 		WSPX_Collection_Preset_Layer* layer = (WSPX_Collection_Preset_Layer*)editObject.object;
-		//
 		editOptionsComponent = new Component;
+		//
+		for (int xs = 0; xs < processor.collection->presets.size(); xs++)
+		{
+			if (processor.collection->presets[xs]->layers.contains(layer))
+			{
+				processor.collection->lastSelectedPreset = processor.collection->presets[xs];
+				break;
+			}
+		}
+		//
 		AddCompoLabel("Layer Details");
 		AddCompo(kString, "Name", &layer->name);
 		AddCompo(kSlider, "Volume", &layer->volume);
@@ -271,6 +285,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	{
 		WSPX_Sequencer* sequencer = (WSPX_Sequencer*)editObject.object;
 		editOptionsComponent = new Component;
+		processor.collection->lastSelectedPreset = nullptr;
 		//
 		AddCompoLabel("Sequencer");
 		AddCompo(kTime, "Time", &sequencer->time);
@@ -311,6 +326,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	}
 	else if (editObject.type == WusikEditObject::kSoundZones)
 	{
+		processor.collection->lastSelectedPreset = nullptr;
 		WSPX_Collection_Sound* sound = (WSPX_Collection_Sound*)editObject.object;
 		//
 		for (int ss = 0; ss < sound->soundFiles.size(); ss++)

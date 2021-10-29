@@ -17,22 +17,39 @@
         <FILE id="J2O08T" name="Interface.png" compile="0" resource="1" file="../Interface/Interface.png"/>
         <FILE id="eweZFQ" name="Logo.png" compile="0" resource="1" file="Source/Logo.png"/>
       </GROUP>
-      <FILE id="mkT0bz" name="WSPX Object Editor.h" compile="0" resource="0"
-            file="Source/WSPX Object Editor.h"/>
-      <FILE id="EICxAz" name="WSPX TreeViews.h" compile="0" resource="0"
-            file="Source/WSPX TreeViews.h"/>
+      <GROUP id="{6191B1BD-165D-9B29-24D3-6B431FAEC4F4}" name="Headers">
+        <FILE id="NoqJdT" name="WSPX Knob.h" compile="0" resource="0" file="Source/WSPX Knob.h"/>
+        <FILE id="uh9ivI" name="WSPX Components.h" compile="0" resource="0"
+              file="Source/WSPX Components.h"/>
+        <FILE id="XLD4ID" name="WSPX Look And Feel.h" compile="0" resource="0"
+              file="Source/WSPX Look And Feel.h"/>
+        <FILE id="mkT0bz" name="WSPX Object Editor.h" compile="0" resource="0"
+              file="Source/WSPX Object Editor.h"/>
+        <FILE id="EICxAz" name="WSPX TreeViews.h" compile="0" resource="0"
+              file="Source/WSPX TreeViews.h"/>
+      </GROUP>
+      <GROUP id="{AD595F15-EE45-F77C-D84F-07FF269E6438}" name="Main">
+        <FILE id="OzMepl" name="PluginEditor ButtonClicked.cpp" compile="1"
+              resource="0" file="Source/PluginEditor ButtonClicked.cpp"/>
+        <FILE id="Va19DE" name="PluginEditor Resized.cpp" compile="1" resource="0"
+              file="Source/PluginEditor Resized.cpp"/>
+        <FILE id="LyUcGu" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="Source/PluginProcessor.cpp"/>
+        <FILE id="JKt4Dc" name="PluginProcessor.h" compile="0" resource="0"
+              file="Source/PluginProcessor.h"/>
+        <FILE id="Is6JDf" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/PluginEditor.cpp"/>
+        <FILE id="OKXkY2" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      </GROUP>
+      <GROUP id="{ACC900F8-3795-4684-74E6-692C45C35E96}" name="Player">
+        <FILE id="BmH4im" name="WSX Player.cpp" compile="1" resource="0" file="Source/WSPX Player/WSX Player.cpp"/>
+        <FILE id="PU81iq" name="WSX Player.h" compile="0" resource="0" file="Source/WSPX Player/WSX Player.h"/>
+      </GROUP>
+      <FILE id="I3xXVL" name="WSPX Process Thread.cpp" compile="1" resource="0"
+            file="Source/WSPX Process Thread.cpp"/>
       <FILE id="hNcW6x" name="WSPX Timer.cpp" compile="1" resource="0" file="Source/WSPX Timer.cpp"/>
-      <FILE id="NoqJdT" name="WSPX Knob.h" compile="0" resource="0" file="Source/WSPX Knob.h"/>
-      <FILE id="XLD4ID" name="WSPX Look And Feel.h" compile="0" resource="0"
-            file="Source/WSPX Look And Feel.h"/>
-      <FILE id="OzMepl" name="PluginEditor ButtonClicked.cpp" compile="1"
-            resource="0" file="Source/PluginEditor ButtonClicked.cpp"/>
-      <FILE id="Va19DE" name="PluginEditor Resized.cpp" compile="1" resource="0"
-            file="Source/PluginEditor Resized.cpp"/>
       <FILE id="qRkl5n" name="WSPX Stream Data.cpp" compile="1" resource="0"
             file="Source/WSPX Stream Data.cpp"/>
-      <FILE id="uh9ivI" name="WSPX Components.h" compile="0" resource="0"
-            file="Source/WSPX Components.h"/>
       <FILE id="IHS2vV" name="WSPX Interface.cpp" compile="1" resource="0"
             file="Source/WSPX Interface.cpp"/>
       <FILE id="DMFg7q" name="WSPX Sound TreeView.cpp" compile="1" resource="0"
@@ -44,18 +61,11 @@
             file="Source/WSPX Loading.cpp"/>
       <FILE id="xLjelP" name="WSPX Definitions.h" compile="0" resource="0"
             file="Source/WSPX Definitions.h"/>
-      <FILE id="LyUcGu" name="PluginProcessor.cpp" compile="1" resource="0"
-            file="Source/PluginProcessor.cpp"/>
-      <FILE id="JKt4Dc" name="PluginProcessor.h" compile="0" resource="0"
-            file="Source/PluginProcessor.h"/>
-      <FILE id="Is6JDf" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="OKXkY2" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
     <VS2017 targetFolder="Builds/VisualStudio2017" windowsTargetPlatformVersion="8.1"
-            smallIcon="eweZFQ" bigIcon="eweZFQ" extraDefs="WSPXEDITOR">
+            smallIcon="eweZFQ" bigIcon="eweZFQ" extraDefs="WSPXEDITOR&#10;WSPXPLAYERPREVIEW">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" binaryPath="C:\Work Ready\Wusik SPX\Wusik-SPXe\Releases"
                        headerPath="c:\Work Ready\VST SDK 2.4 (r2)&#10;c:\Work Ready\ASIOSDK2.3.2\common"

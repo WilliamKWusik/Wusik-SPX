@@ -33,6 +33,7 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*)timerActionValueObject;
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue2);
 		processor.collection->presets.remove(timerActionValue1);
+		processor.collection->lastSelectedPreset = nullptr;
 		//
 		presetChanged();
 		redoTreeViewsOnResize = false;

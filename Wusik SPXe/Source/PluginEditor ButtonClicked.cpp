@@ -146,6 +146,11 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 	}
 	else
 	{
-		WMessageBox("Not Implemented Yet!", "");
+		if (processor.collection->lastSelectedPreset == nullptr) WMessageBox("Preset Preview", "Select a preset first!");
+		else
+		{
+			processor.processThread = new WSPXThread((void*)&processor, this, WSPXThread::kLoadPreset);
+			processor.processThread->startThread(4);
+		}
 	}
 }

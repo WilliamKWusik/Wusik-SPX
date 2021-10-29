@@ -43,7 +43,7 @@ public:
 class WusikEditOptionCallback_UpdateCollectionName : public WusikEditOptionCallback
 {
 public:
-	virtual void process(WusikSpxAudioProcessor* processor);
+	void process(WusikSpxAudioProcessor* processor) override;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -51,7 +51,7 @@ class WusikEditOptionCallback_OpenEditSequencer : public WusikEditOptionCallback
 {
 public:
 	WusikEditOptionCallback_OpenEditSequencer(WSPX_Collection_Preset_Layer* _layer) : layer(_layer) { }
-	virtual void process(WusikSpxAudioProcessor* processor);
+	void process(WusikSpxAudioProcessor* processor) override;
 	WSPX_Collection_Preset_Layer* layer;
 };
 //
@@ -62,7 +62,7 @@ public:
 	WusikEditOptionCallback_Sequencer_Step(WSPX_Sequencer* _sequencer, WSPX_Sequencer_Step* _step, int _type) : 
 		sequencer(_sequencer), type(_type), step(_step) { }
 	//
-	virtual void process(WusikSpxAudioProcessor* processor);
+	void process(WusikSpxAudioProcessor* processor) override;
 	WSPX_Sequencer* sequencer;
 	WSPX_Sequencer_Step* step;
 	int type;
