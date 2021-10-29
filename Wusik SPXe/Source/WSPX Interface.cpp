@@ -81,29 +81,33 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		int64 totalSize;
 		for (int ss = 0; ss < sound->soundFiles.size(); ss++)
 		{
-			String sFile = "File #" + String(ss + 1) + " ";
-			//
-			if (sound->soundFiles[ss]->soundFile.isEmpty())
+			for (int ff = 0; ff < sound->soundFiles[ss]->files.size(); ff++)
 			{
-				sFile.append("No File", 9999);
-			}
-			else
-			{
-				sFile.append("\"" + File(sound->soundFiles[ss]->soundFile).getFileName() + "\"", 9999);
+				String sFile = "File #" + String(ss + 1) + " ";
+				if (sound->soundFiles[ss]->files.size() > 1) sFile.append("(channel set " + String(ff + 1) + ") ", 9999);
 				//
-				if (File(sound->soundFiles[ss]->soundFile).existsAsFile())
+				if (sound->soundFiles[ss]->files[ff]->filename.isEmpty())
 				{
-					int64 xSize = File(sound->soundFiles[ss]->soundFile).getSize();
-					totalSize += xSize;
-					sFile.append(" " + WS::getSize(xSize), 9999);
+					sFile.append("No File", 9999);
 				}
 				else
 				{
-					sFile.append(" ! MISSING FILE !", 9999);
+					sFile.append("\"" + File(sound->soundFiles[ss]->files[ff]->filename).getFileName() + "\"", 9999);
+					//
+					if (File(sound->soundFiles[ss]->files[ff]->filename).existsAsFile())
+					{
+						int64 xSize = File(sound->soundFiles[ss]->files[ff]->filename).getSize();
+						totalSize += xSize;
+						sFile.append(" " + WS::getSize(xSize), 9999);
+					}
+					else
+					{
+						sFile.append(" ! MISSING FILE !", 9999);
+					}
 				}
+				//
+				AddCompoLabelSM(sFile);
 			}
-			//
-			AddCompoLabelSM(sFile);
 		}
 		//
 		AddCompoLabelSM("Total Size " + WS::getSize(totalSize));
@@ -112,22 +116,33 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	else if (editObject.type == WusikEditObject::kSoundFile)
 	{
 		WSPX_Collection_Sound_File* soundFile = (WSPX_Collection_Sound_File*)editObject.object;
-		//
 		editOptionsComponent = new Component;
-		AddCompoLabel("Sound File Details");
 		//
-		String xFile;
+		for (int ff = 0; ff < soundFile->files.size(); ff++)
+		{
+			AddCompoLabel("Sound File #" + String(ff + 1));
+			//
+			String xFile;
+			//
+			if (soundFile->files[ff]->filename.isEmpty()) xFile = "No File";
+			else if (File(soundFile->files[ff]->filename).existsAsFile()) xFile = "\"" + File(soundFile->files[ff]->filename).getFileName() + "\"";
+			else xFile = File(soundFile->files[ff]->filename).getFileName() + " ! MISSING FILE !";
+			//
+			AddCompoLabelSM(xFile);
+			AddCompoLabelSM("Channels " + String(soundFile->files[ff]->channels) + " - Samples " + String(soundFile->totalSamples) + " - SampleRate " + String(soundFile->sampleRate));
+			//
+			xFile = "Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds - Size " + WS::getSize(File(soundFile->files[ff]->filename).getSize());
+			AddCompoLabelSM(xFile);
+			//
+			for (int cc = 0; cc < soundFile->files[ff]->channelsInfo.size(); cc++)
+			{
+				AddCompo(kString, "Channel Name", &soundFile->files[ff]->channelsInfo[cc]->name);
+				AddCompo4(kSliderBipolar, "Pan", &soundFile->files[ff]->channelsInfo[cc]->pan, "", -1, 1);
+				AddCompo4(kSliderBipolar, "Volume", &soundFile->files[ff]->channelsInfo[cc]->volume, "", -1, 1);
+			}
+		}
 		//
-		if (soundFile->soundFile.isEmpty()) xFile = "No File";
-		else if (File(soundFile->soundFile).existsAsFile()) xFile = "\"" + soundFile->soundFile + "\"";
-		else xFile = File(soundFile->soundFile).getFileName() + " ! MISSING FILE !";
-		//
-		AddCompoLabelSM(xFile);
-		AddCompoLabelSM("Channels " + String(soundFile->channels) + " - Samples " + String(soundFile->totalSamples) + " - SampleRate " + String(soundFile->sampleRate));
-		//
-		xFile = "Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds - Size " + WS::getSize(File(soundFile->soundFile).getSize());
-		AddCompoLabelSM(xFile);
-		//
+		AddCompoLabelSM("Global Settings");
 		AddCompo(kSlider, "Volume", &soundFile->volume);
 		AddCompo4(kSliderBipolar, "Pan", &soundFile->pan, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Fine Tune", &soundFile->fineTune, "", -1, 1);
@@ -147,14 +162,14 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderInteger, "Vel Zone High", &soundFile->velZoneHigh, "", 0, 127);
 		AddCompo4(kSliderInteger, "Key Root", &soundFile->keyRoot, "", 0, 127); AddMIDIKey(rootKey);
 		//
-		if (soundFile->channelInformation.size() > 0) AddCompoLabel("Channel Information");
+		/*if (soundFile->channelInformation.size() > 0) AddCompoLabel("Channel Information");
 		for (int cc = 0; cc < soundFile->channelInformation.size(); cc++)
 		{
 			AddCompoLabelSM("Channel #" + String(cc + 1));
 			AddCompo(kString, "Name", &soundFile->channelInformation[cc]->name);
 			AddCompo(kSlider, "Volume", &soundFile->channelInformation[cc]->volume);
 			AddCompo4(kSliderBipolar, "Pan", &soundFile->channelInformation[cc]->pan, "", -1.0f, 1.0f);
-		}
+		}*/
 		//
 		midiKeyboard.selectedHigh = soundFile->keyZoneHigh;
 		midiKeyboard.selectedLow = soundFile->keyZoneLow;

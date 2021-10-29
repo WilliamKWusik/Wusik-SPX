@@ -17,6 +17,7 @@ Check the Releases folder for the Application (.exe) and VST2/VST3 Plugins. Agai
 - 16, 24 and 32 bits support
 - Collection, Preset and About PNG files
 - Skin data for the Player
+- Every filename is stored as relative to the .WSPXe project file.
 
 .WSPX Engine Support
 - Multi layer presets. Each layer has a link to a Sound that has its own set of sub-sounds, or Sound Files
@@ -28,6 +29,7 @@ Check the Releases folder for the Application (.exe) and VST2/VST3 Plugins. Agai
 - Round Robin, Random Probability and Key Switching
 - Visual Scripting (from the editor)
 - Reverse, Ping Pong and Regular playbacks
+- Multi-Channel support for sound files and the option to merge multiple stereo or mono sound files into a multi-channel sound file directly from the interface.
 
 When IMPORTING sound files (WAV,AIFF,OGG,MP3,FLAC) you can name those in the following format for easier key/velocity zone setup.
 
@@ -40,5 +42,7 @@ When IMPORTING sound files (WAV,AIFF,OGG,MP3,FLAC) you can name those in the fol
 - KRR: Key Root
 
 Always keep in a 000 format, so 000 to 127. When you load a sound file the editor will only save the filename and path location. It won’t save any sound data. So keep the original files until you finish up the project. You can save to a BUNDLE format which will save the sound data information along.
+
+Handling multi-channel files can be easy if you export each pair of stereo channels to a separated file. When importing the files, create a new sound and load the new files from there. Select all the files that will make one multi-channel file and the import process will add those to a single Sound File.
 
 ![Screenshot](/Screenshots/2021-10-26%2022_06_51-Window.png)

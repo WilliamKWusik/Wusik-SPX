@@ -80,6 +80,30 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_Collection_Sound_File_Filename
+{
+public:
+	void streamData(void* stream, int type)
+	{
+		WS::stream(stream, channels, type);
+		WS::streamRelativePath(stream, filename, type);
+		//
+		int totalChannelsInfo = channelsInfo.size();
+		WS::stream(stream, totalChannelsInfo, type);
+		//
+		for (int cc = 0; cc < totalChannelsInfo; cc++)
+		{
+			if (type == WS::kRead) channelsInfo.add(new WSPX_Channel_Info);
+			channelsInfo[cc]->streamData(stream, type);
+		}
+	}
+	//
+	int channels = 1;
+	String filename;
+	OwnedArray<WSPX_Channel_Info> channelsInfo;
+};
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Sound_File
 {
 public:
@@ -102,7 +126,6 @@ public:
 	int velZoneHigh = 127;
 	int keyRoot = 60;
 	//
-	OwnedArray<WSPX_Channel_Info> channelInformation;
 	int keySwitchType = 0;
 	int64 loopStart = 0;
 	int64 loopEnd = 0;
@@ -112,7 +135,6 @@ public:
 	//
 	bool sampleDataMetaValuesRead = false;
 	int64 totalSamples = 0;
-	int channels = 0;
 	int sampleRate = 44100;
 	//
 	const String formats = "Binary\nFlac\nGZIP";
@@ -136,7 +158,7 @@ public:
 	#if WSPXEDITOR
 		int exportBits = 24;
 		int exportFormat = 0;
-		StringArray soundFiles;
+		OwnedArray<WSPX_Collection_Sound_File_Filename> files;
 	#endif
 };
 //

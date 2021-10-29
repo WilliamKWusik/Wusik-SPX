@@ -164,28 +164,27 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 	WS::stream(stream, coarseTune, type);
 	WS::stream(stream, bits, type);
 	WS::stream(stream, format, type);
-	WS::stream(stream, channels, type);
 	WS::stream(stream, sampleDataMetaValuesRead, type);
 	WS::stream(stream, totalSamples, type);
-	//
-	int totalChannelsInfo = channelInformation.size();
-	WS::stream(stream, totalChannelsInfo, type);
-	for (int cc = 0; cc < totalChannelsInfo; cc++)
-	{
-		if (type == WS::kRead) channelInformation.add(new WSPX_Channel_Info);
-		channelInformation[cc]->streamData(stream, type);
-	}
 	//
 	if (isWSPXEditor)
 	{
 		WS::stream(stream, exportBits, type);
 		WS::stream(stream, exportFormat, type);
-		WS::streamRelativePath(stream, soundFile, type);
 		//
-		if (WSPXeBundle)
+		int totalFiles = files.size();
+		WS::stream(stream, totalFiles, type);
+		//
+		for (int ff = 0; ff < totalFiles; ff++)
 		{
-			if (type == WS::kWrite) File(soundFile).loadFileAsData(soundData);
-			WS::stream(stream, soundData, type);
+			if (type == WS::kRead) files.add(new WSPX_Collection_Sound_File_Filename);
+			files[ff]->streamData(stream, type);
+			//
+			if (WSPXeBundle)
+			{
+				if (type == WS::kWrite) File(files[ff]->filename).loadFileAsData(soundData);
+				WS::stream(stream, soundData, type);
+			}
 		}
 	}
 	else
