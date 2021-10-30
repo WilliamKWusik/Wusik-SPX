@@ -68,7 +68,7 @@ public:
 	Image backgroundImage;
 	Image redSaveImage; // UnSaved Changes //
 	Image originalBackgroundImage;
-	Image sliderBackground, sliderFilled, sliderThumb;
+	Image sliderBackground, sliderFilled, sliderThumb, previewOn;
 	double uiRatio = 1.0;
 	ResizableCornerComponent* resizer;
 	ComponentBoundsConstrainer resizerConstrainer;
@@ -87,6 +87,7 @@ public:
 	WSPXSoundFileThumbView soundFileThumbView;
 	WMidiKeyboardComponent midiKeyboard;
 	WSPXStatusLabel* statusLabel;
+	WSPX_Player_Preset* lastPlayerPreset = nullptr;
 	//
 	Atomic<int> timerAction = 0;
 	int timerActionValue1 = 0;

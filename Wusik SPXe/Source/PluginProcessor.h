@@ -16,7 +16,7 @@ class WSPXThread: public ThreadWithProgressWindow
 {
 public:
 	WSPXThread(void* __processor, Component* editor, int _type) :
-		ThreadWithProgressWindow("Sound Thumb Processing", true, false, 0, String(), editor), _processor(__processor), type(_type) { }
+		ThreadWithProgressWindow("Sound Loading", true, false, 0, String(), editor), _processor(__processor), type(_type) { }
 	//
 	void run() override;
 	void* _processor;
@@ -95,6 +95,20 @@ public:
 	{
 		saveGlobalSettings(key, "");
 		if (WindowsRegistry::keyExists(XRGKEY + key)) WindowsRegistry::deleteKey(XRGKEY + key);
+	}
+	//
+	void unloadSounds(WSPX_Collection_Preset* preset)
+	{
+		for (int ll = 0; ll < preset->layers.size(); ll++)
+		{
+			for (int ss = 0; ss < preset->layers[ll]->soundLinks.size(); ss++)
+			{
+				for (int ff = 0; ff < preset->layers[ll]->soundLinks[ss]->soundFiles.size(); ff++)
+				{
+					preset->layers[ll]->soundLinks[ss]->soundFiles[ff]->soundData.reset();
+				}
+			}
+		}
 	}
 	//
 	ScopedPointer<WSPX_Collection> collection;

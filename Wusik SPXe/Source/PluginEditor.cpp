@@ -17,6 +17,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	sliderBackground = ImageCache::getFromMemory(BinaryData::SliderBack_png, BinaryData::SliderBack_pngSize);
 	sliderFilled = ImageCache::getFromMemory(BinaryData::SliderFilled_png, BinaryData::SliderFilled_pngSize);
 	sliderThumb = ImageCache::getFromMemory(BinaryData::SliderThumb_png, BinaryData::SliderThumb_pngSize);
+	previewOn = ImageCache::getFromMemory(BinaryData::Interface2_png, BinaryData::Interface2_pngSize);
 	//
 	multRatio = double(getHeight()) / double(backgroundImage.getHeight());
 	//
@@ -77,7 +78,24 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 			//
 			if (processor.collection->hasUnsavedChanges)
 			{
+				gg.drawImageAt(backgroundImage, 0, 0);
 				gg.drawImageAt(redSaveImage, backgroundImage.getWidth() - redSaveImage.getWidth(), 0);
+			}
+			else
+			{
+				gg.drawImageAt(backgroundImage, 0, 0);
+			}
+		}
+		//
+		if (lastPlayerPreset != processor.playerPreset)
+		{
+			lastPlayerPreset = processor.playerPreset;
+			Graphics gg(originalBackgroundImage);
+			//
+			if (lastPlayerPreset != nullptr)
+			{
+				gg.drawImageAt(backgroundImage, 0, 0);
+				gg.drawImageAt(previewOn, backgroundImage.getWidth() - previewOn.getWidth(), 0);
 			}
 			else
 			{

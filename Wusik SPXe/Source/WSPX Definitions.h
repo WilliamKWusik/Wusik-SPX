@@ -7,7 +7,7 @@
 //
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
-#define WIGNORE_SET_STATE 1
+#define WIGNORE_SET_STATE 0
 #define WVERSION "1.0.0 BETA 00"
 #define XRGKEY "HKEY_CURRENT_USER\\Software\\Wusik\\Wusik SPXe\\"
 extern bool isWSPXEditor;
@@ -104,39 +104,12 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Samples
-{
-public:
-	inline virtual void* getSamples(int _channel) { return nullptr; }
-	virtual void setSize(int _channels, int _samples) { }
-	int type = kEmpty;
-	//
-	enum
-	{
-		kEmpty = 0,
-		kFloat_32bits,
-		kInt_24bits,
-		kInt_16bits
-	};
-};
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Samples_Float_32bits : public WSPX_Samples
-{
-public:
-	WSPX_Samples_Float_32bits() { type = kFloat_32bits; }
-	inline void* getSamples(int _channel) override { return samples.getWritePointer(_channel); }
-	void setSize(int _channels, int _samples) override { samples.setSize(_channels, _samples); }
-	AudioSampleBuffer samples;
-};
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Sound_File
 {
 public:
 	void streamData(void* stream, int type);
 	//
-	ScopedPointer<WSPX_Samples> soundData; // The type of storage will depend on the format: float, int24, int32 //
+	MemoryBlock soundData;
 	float volume = 1.0f;
 	float pan = 0.0f;
 	bool roundRobin = false;

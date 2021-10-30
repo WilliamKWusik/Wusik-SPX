@@ -20,24 +20,10 @@ void WSPXThread::run()
 	if (type == kLoadPreset)
 	{
 		#if WSPXPLAYERPREVIEW
-			//
 			// Unload previous Sound //
-			if (processor->playerPreset != nullptr)
-			{
-				for (int ll = 0; ll < processor->playerPreset->preset.layers.size(); ll++)
-				{
-					for (int ss = 0; ss < processor->playerPreset->preset.layers[ll]->soundLinks.size(); ss++)
-					{
-						for (int ff = 0; ff < processor->playerPreset->preset.layers[ll]->soundLinks[ss]->soundFiles.size(); ff++)
-						{
-							processor->playerPreset->preset.layers[ll]->soundLinks[ss]->soundFiles[ff]->soundData = nullptr;
-						}
-					}
-				}
-			}
+			if (processor->playerPreset != nullptr) processor->unloadSounds(&processor->playerPreset->preset);
 			//
-			// First count how many sounds we are about to load //
-			//
+			// Count how many sounds we are about to load //
 			int totalSounds = 0;
 			//
 			for (int ll = 0; ll < processor->collection->lastSelectedPreset->layers.size(); ll++)
@@ -48,10 +34,10 @@ void WSPXThread::run()
 				}
 			}
 			//
-			// Now we load the actual sounds //
-			//
+			// Load the actual sounds //
 			bool allOK = true;
 			double progressRatio = 1.0 / double(totalSounds);
+			//
 			for (int ll = 0; ll < processor->collection->lastSelectedPreset->layers.size(); ll++)
 			{
 				if (!allOK) break;
@@ -65,12 +51,11 @@ void WSPXThread::run()
 						if (!allOK) break;
 						WSPX_Collection_Sound_File* sound = processor->collection->lastSelectedPreset->layers[ll]->soundLinks[ss]->soundFiles[ff];
 						//
-						if (sound->soundData == nullptr)
+						if (sound->soundData.getSize() == 0)
 						{
-							int channelPosition = 0;
-							WSPX_Samples_Float_32bits* soundData = new WSPX_Samples_Float_32bits;
-							sound->soundData = soundData;
-							soundData->setSize(sound->totalChannels, sound->totalSamples);
+							int samplePosition = 0;
+							sound->soundData.setSize(sound->totalSamples * sound->totalChannels * sizeof(float));
+							sound->bits = 32;
 							//
 							for (int cc = 0; cc < sound->files.size(); cc++)
 							{
@@ -89,8 +74,14 @@ void WSPXThread::run()
 									//
 									for (int ch = 0; ch < reader->numChannels; ch++)
 									{
-										soundData->samples.copyFrom(channelPosition, 0, samples, ch, 0, sound->totalSamples);
-										channelPosition++;
+										float* samplesDestinaton = (float*) sound->soundData.getData();
+										const float* samplesSource = samples.getReadPointer(ch);
+										//
+										for (int ss = 0; ss < sound->totalSamples; ss++)
+										{
+											samplesDestinaton[samplePosition] = samplesSource[ss];
+											samplePosition++;
+										}
 									}
 								}
 								//
@@ -114,6 +105,4 @@ void WSPXThread::run()
 	}
 	//
 	processor->resumeAudio();
-	WAlert;
-	processor->processThread = nullptr;
 }
