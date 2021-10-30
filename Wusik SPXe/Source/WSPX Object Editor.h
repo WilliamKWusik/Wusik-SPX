@@ -36,14 +36,14 @@ public:
 class WusikEditOptionCallback
 {
 public:
-	virtual void process(WusikSpxAudioProcessor* processor) { }
+	virtual bool process(WusikSpxAudioProcessor* processor) { return false; } // Return true if the interface is about to be redrawn //
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WusikEditOptionCallback_UpdateCollectionName : public WusikEditOptionCallback
 {
 public:
-	void process(WusikSpxAudioProcessor* processor) override;
+	bool process(WusikSpxAudioProcessor* processor) override;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -51,7 +51,7 @@ class WusikEditOptionCallback_OpenEditSequencer : public WusikEditOptionCallback
 {
 public:
 	WusikEditOptionCallback_OpenEditSequencer(WSPX_Collection_Preset_Layer* _layer) : layer(_layer) { }
-	void process(WusikSpxAudioProcessor* processor) override;
+	bool process(WusikSpxAudioProcessor* processor) override;
 	WSPX_Collection_Preset_Layer* layer;
 };
 //
@@ -62,7 +62,7 @@ public:
 	WusikEditOptionCallback_Sequencer_Step(WSPX_Sequencer* _sequencer, WSPX_Sequencer_Step* _step, int _type) : 
 		sequencer(_sequencer), type(_type), step(_step) { }
 	//
-	void process(WusikSpxAudioProcessor* processor) override;
+	bool process(WusikSpxAudioProcessor* processor) override;
 	WSPX_Sequencer* sequencer;
 	WSPX_Sequencer_Step* step;
 	int type;
@@ -127,18 +127,6 @@ public:
 				processor->collection->hasUnsavedChanges = true;
 			}
 		}
-		else if (type == kTime)
-		{
-			WSPX_Time* time = (WSPX_Time*) object;
-			String sValue = time->speed;
-			//
-			AskValue(label, "Enter time in 1/1 format for host sync or 10hz for free run (0.0001hz up to 99999hz)", sValue, "", "OK", "Cancel", sValue);
-			if (sValue.isNotEmpty())
-			{
-				time->speed = sValue;
-				processor->collection->hasUnsavedChanges = true;
-			}
-		}
 		else if (type == kStringInt64)
 		{
 			String sValue;
@@ -189,7 +177,7 @@ public:
 			}
 		}
 		//
-		if (callback != nullptr) callback->process(processor);
+		if (callback != nullptr && callback->process(processor)) return; // we exit quickly as this is about to go down //
 		editor->repaint();
 	}
 	//
@@ -243,14 +231,6 @@ public:
 			if (type == kPopupList)
 			{
 				String xText = popupList[jlimit(0, popupList.size() - 1, ((int*)object)[0])];
-				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
-			}
-			if (type == kTime)
-			{
-				WSPX_Time* time = (WSPX_Time*)object;
-				String xText = time->speed;
-				if (time->speed.containsIgnoreCase("/")) xText.append(" (host sync)", 9999); else xText.append(" (free run)", 9999);
-				//
 				g.drawFittedText(xText, 0, 0, getWidth() - 16, getHeight(), Justification::centredRight, 1);
 			}
 			else if (type == kSkinFolder)
@@ -323,7 +303,6 @@ public:
 		kLabel,
 		kLabelSmall,
 		kPopupList,
-		kTime,
 		kSlider,
 		kSliderBipolar,
 		kSliderInteger,

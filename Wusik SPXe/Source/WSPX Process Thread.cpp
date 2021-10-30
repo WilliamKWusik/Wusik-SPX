@@ -16,8 +16,15 @@ void WSPXThread::run()
 	processor->stopAllAudio();
 	double progress = 0.0;
 	setProgress(progress);
+	sleep(50);
 	//
-	if (type == kLoadPreset)
+	if (type == kSaveBundle)
+	{
+		setProgress(2.0f);
+		FileOutputStream stream(processor->collection->file);
+		processor->saveCompilation(stream);
+	}
+	else if (type == kLoadPreset)
 	{
 		#if WSPXPLAYERPREVIEW
 			// Unload previous Sound //
@@ -104,5 +111,6 @@ void WSPXThread::run()
 		#endif
 	}
 	//
+	sleep(50);
 	processor->resumeAudio();
 }

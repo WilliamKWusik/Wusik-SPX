@@ -15,8 +15,8 @@
 class WSPXThread: public ThreadWithProgressWindow
 {
 public:
-	WSPXThread(void* __processor, Component* editor, int _type) :
-		ThreadWithProgressWindow("Sound Loading", true, false, 0, String(), editor), _processor(__processor), type(_type) { }
+	WSPXThread(void* __processor, Component* editor, int _type, String title) :
+		ThreadWithProgressWindow(title, true, false, 0, String(), editor), _processor(__processor), type(_type) { }
 	//
 	void run() override;
 	void* _processor;
@@ -24,7 +24,8 @@ public:
 	//
 	enum
 	{
-		kLoadPreset = 0
+		kLoadPreset = 0,
+		kSaveBundle
 	};
 };
 //

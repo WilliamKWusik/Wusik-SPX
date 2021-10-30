@@ -265,19 +265,12 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Time
-{
-public:
-	void streamData(void* stream, int _type) { WS::stream(stream, speed, _type); }
-	String speed = "1/4";
-};
-// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_LFO
 {
 public:
 	void streamData(void* stream, int _type)
 	{
-		time.streamData(stream, _type);
+		WS::stream(stream, time, _type);
 		WS::stream(stream, waveform, _type);
 		WS::stream(stream, inverted, _type);
 		WS::stream(stream, noteOnReset, _type);
@@ -293,7 +286,7 @@ public:
 	}
 	//
 	const String waveforms = "Sine\nSawtooth\nPulse\nRandom\nNoise\nTriangle";
-	WSPX_Time time;
+	String time = "1/4";
 	int waveform = 0;
 	bool inverted = false;
 	bool noteOnReset = false;
@@ -424,7 +417,7 @@ public:
 	//
 	const String modes = "Forward\nBackwards\nPingPong\nRandom";
 	OwnedArray<WSPX_Sequencer_Step> steps;
-	WSPX_Time time;
+	String time = "1/4";
 	int loopStart = 0;
 	float smoothOutput = 0.0f;
 	int mode = 0;
@@ -438,12 +431,42 @@ public:
 	};
 };
 //
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+class WSPX_ARP
+{
+public:
+	void streamData(void* stream, int type)
+	{
+		WS::stream(stream, mode, type);
+		WS::stream(stream, glissando, type);
+		WS::stream(stream, octaves, type);
+		WS::stream(stream, time, type);
+	}
+	//
+	const String modes = "Off\nForward\nBackwards\nPingPong\nRandom";
+	String time = "1/4";
+	int mode = 0;
+	bool glissando = true;
+	int octaves = 2;
+	//
+	enum
+	{
+		kOff = 0,
+		kForward,
+		kBackwards,
+		kPingPong,
+		kRandom
+	};
+};
+//
 // ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Preset_Layer
 {
 public:
 	void streamData(void* stream, int type, OwnedArray<WSPX_Collection_Sound>& soundsList);
 	//
+	WSPX_ARP ARP;
 	WSPX_Sequencer sequencer;
 	Array<WSPX_Collection_Sound*> soundLinks;
 	WSPX_Collection_LFO lfos[2];

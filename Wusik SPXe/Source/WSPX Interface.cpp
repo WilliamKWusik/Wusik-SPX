@@ -42,6 +42,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	#define AddCompo6(type, name, variable, label, PopupList) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::type, name, variable, label, false, nullptr, 0, 1, PopupList)))
 	#define AddMIDIKey(value) editOptions.getLast()->slider->midiKeyboard = &midiKeyboard; editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.value
 	#define AddSequencerButton(name, type) AddCompo2(kButtonCallback, name, nullptr, "", false, new WusikEditOptionCallback_Sequencer_Step(sequencer, nullptr, WusikEditOptionCallback_Sequencer_Step::type))
+	#define AddTime(variable) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kString, "Time", variable, "Enter time in 1 / 1 format for host sync or 10hz for free run(0.0001hz up to 99999hz")))
 	//
 	if (editObject.type == WusikEditObject::kCollection)
 	{
@@ -257,7 +258,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		{
 			AddCompoLabel("LFO " + String(ll + 1));
 			AddCompo6(kPopupList, "Waveform", &layer->lfos[ll].waveform, "", layer->lfos[ll].waveforms);
-			AddCompo(kTime, "Time", &layer->lfos[ll].time);
+			AddTime(&layer->lfos[ll].time);
 			AddCompo(kSlider, "Phase", &layer->lfos[ll].phase);
 			AddCompo(kSlider, "Smooth", &layer->lfos[ll].smooth);
 			AddCompo4(kSliderBipolar, "To Filter Frequency", &layer->lfos[ll].toFilterFreq, "", -1, 1);
@@ -271,8 +272,14 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			AddCompo(kOnOffButton, "Inverted", &layer->lfos[ll].inverted);
 		}
 		//
+		AddCompoLabel("ARP");
+		AddTime(&layer->ARP.time);
+		AddCompo6(kPopupList, "Mode", &layer->ARP.mode, "", layer->ARP.modes);
+		AddCompo4(kSliderInteger, "Octaves", &layer->ARP.octaves, "", 1, 24);
+		AddCompo(kOnOffButton, "Glissando", &layer->ARP.glissando);
+		//
 		AddCompoLabel("Sequencer");
-		AddCompo(kTime, "Time", &layer->sequencer.time);
+		AddTime(&layer->sequencer.time);
 		AddCompo(kSlider, "Smooth", &layer->sequencer.smoothOutput);
 		AddCompo6(kPopupList, "Mode", &layer->sequencer.mode, "", layer->sequencer.modes);
 		AddCompo2(kButtonCallback, "Edit Sequencer", nullptr, "", false, new WusikEditOptionCallback_OpenEditSequencer(layer));
@@ -288,7 +295,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		processor.collection->lastSelectedPreset = nullptr;
 		//
 		AddCompoLabel("Sequencer");
-		AddCompo(kTime, "Time", &sequencer->time);
+		AddTime(&sequencer->time);
 		AddCompo(kSlider, "Smooth", &sequencer->smoothOutput);
 		AddCompo6(kPopupList, "Mode", &sequencer->mode, "", sequencer->modes);
 		//
@@ -311,17 +318,20 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			AddSequencerButton("Remove All Steps", kRemoveAll);
 		}
 		//
-		for (int tt = 0; tt < sequencer->steps.size(); tt++)
+		if (sequencer->steps.size() > 0)
 		{
-			AddCompoLabel("Step #" + String(tt + 1));
-			AddCompo4(kSliderInteger, "Time", &sequencer->steps[tt]->time, "", 1, 128);
-			AddCompo(kSlider, "Volume", &sequencer->steps[tt]->volume);
-			AddCompo4(kSliderBipolar, "Pan", &sequencer->steps[tt]->pan, "", -1, 1);
-			AddCompo4(kSliderBipolar, "Fine Tune", &sequencer->steps[tt]->fine, "", -1, 1);
-			AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &sequencer->steps[tt]->tune, "", -48, 48);
-			AddCompo4(kSliderBipolar, "To Filter Frequency", &sequencer->steps[tt]->filterFreq, "", -1, 1);
-			//
-			AddCompo2(kButtonCallback, "Remove Step", nullptr, "", false, new WusikEditOptionCallback_Sequencer_Step(sequencer, sequencer->steps[tt], WusikEditOptionCallback_Sequencer_Step::kRemove));
+			for (int tt = 0; tt < sequencer->steps.size(); tt++)
+			{
+				AddCompoLabel("Step #" + String(tt + 1));
+				AddCompo4(kSliderInteger, "Time", &sequencer->steps[tt]->time, "", 1, 128);
+				AddCompo(kSlider, "Volume", &sequencer->steps[tt]->volume);
+				AddCompo4(kSliderBipolar, "Pan", &sequencer->steps[tt]->pan, "", -1, 1);
+				AddCompo4(kSliderBipolar, "Fine Tune", &sequencer->steps[tt]->fine, "", -1, 1);
+				AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &sequencer->steps[tt]->tune, "", -48, 48);
+				AddCompo4(kSliderBipolar, "To Filter Frequency", &sequencer->steps[tt]->filterFreq, "", -1, 1);
+				//
+				AddCompo2(kButtonCallback, "Remove Step", nullptr, "", false, new WusikEditOptionCallback_Sequencer_Step(sequencer, sequencer->steps[tt], WusikEditOptionCallback_Sequencer_Step::kRemove));
+			}
 		}
 	}
 	else if (editObject.type == WusikEditObject::kSoundZones)
@@ -373,21 +383,23 @@ WusikEditOption::WusikEditOption(WusikSpxAudioProcessor* _processor, Component* 
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WusikEditOptionCallback_UpdateCollectionName::process(WusikSpxAudioProcessor* processor)
+bool WusikEditOptionCallback_UpdateCollectionName::process(WusikSpxAudioProcessor* processor)
 {
 	((WusikSpxAudioProcessorEditor*)processor->getActiveEditor())->
 		collectionNameLabel->setText(processor->collection->name, NotificationType::dontSendNotification);
+	return false;
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WusikEditOptionCallback_OpenEditSequencer::process(WusikSpxAudioProcessor* processor)
+bool WusikEditOptionCallback_OpenEditSequencer::process(WusikSpxAudioProcessor* processor)
 {
 	((WusikSpxAudioProcessorEditor*)processor->getActiveEditor())->
-		createAction(WusikSpxAudioProcessorEditor::kTimerAction_Open_Edit_Sequencer, 0, 0, 0, 0, (void*) layer);
+		createAction(WusikSpxAudioProcessorEditor::kTimerAction_Open_Edit_Sequencer, 0, 0, 0, 0, (void*) &layer->sequencer);
+	return true;
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-void WusikEditOptionCallback_Sequencer_Step::process(WusikSpxAudioProcessor* processor)
+bool WusikEditOptionCallback_Sequencer_Step::process(WusikSpxAudioProcessor* processor)
 {
 	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*) processor->getActiveEditor();
 	//
@@ -398,7 +410,7 @@ void WusikEditOptionCallback_Sequencer_Step::process(WusikSpxAudioProcessor* pro
 		if (WConfirmBox("Remove All Steps", "Are you sure?")) 
 		{ 
 			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Remove_Sequencer_Step, -1, 0, 0, 0, sequencer);
-			return; // we exit quickly as this is about to go down //
+			return true; // we exit quickly as this is about to go down //
 		}
 	}
 	else if (type == kAppend16Steps)
@@ -411,9 +423,9 @@ void WusikEditOptionCallback_Sequencer_Step::process(WusikSpxAudioProcessor* pro
 	else if (type == kRemove)
 	{
 		editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Remove_Sequencer_Step, sequencer->steps.indexOf(step), 0, 0, 0, sequencer);
-		return; // we exit quickly as this is about to go down //
+		return true; // we exit quickly as this is about to go down //
 	}
 	//
 	editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
-	return; // we exit quickly as this is about to go down //
+	return true; // we exit quickly as this is about to go down //
 }

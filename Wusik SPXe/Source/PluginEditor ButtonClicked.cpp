@@ -93,27 +93,29 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			}
 			else if (result == 12)
 			{
-				WSPXeBundle = true;
 				FileChooser browseFile("Save WSPXe Bundle Collection File (includes all samples - this is not the final WSPX file format)", processor.collection->file, "*.WSPXeBundle");
 				//
 				if (browseFile.browseForFileToSave(true))
 				{
+					WSPXeBundle = true;
 					processor.collection->file = browseFile.getResult();
 					processor.collection->file.deleteFile();
 					//
-					FileOutputStream stream(processor.collection->file);
-					processor.saveCompilation(stream);
+					processor.processThread = new WSPXThread((void*)&processor, this, WSPXThread::kSaveBundle, "Saving WSPXe Bundle");
+					processor.processThread->runThread(4);
+					processor.processThread = nullptr;
+					WSPXeBundle = false;
 					//
 					repaint();
 				}
 			}
 			else if (result == 6)
 			{
-				WSPXeBundle = false;
 				FileChooser browseFile("Save WSPXe Collection File (this is not the final WSPX file format)", processor.collection->file, "*.WSPXe");
 				//
 				if (browseFile.browseForFileToSave(true))
 				{
+					WSPXeBundle = false;
 					processor.collection->file = browseFile.getResult();
 					processor.collection->file.deleteFile();
 					//
@@ -153,7 +155,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			//
 			if (processor.playerPreset == nullptr)
 			{
-				processor.processThread = new WSPXThread((void*)&processor, this, WSPXThread::kLoadPreset);
+				processor.processThread = new WSPXThread((void*)&processor, this, WSPXThread::kLoadPreset, "Sound Loading");
 				processor.processThread->runThread(4);
 				processor.processThread = nullptr;
 			}
