@@ -37,6 +37,7 @@ WSPXSoundTreeItem::WSPXSoundTreeItem(WusikSpxAudioProcessor& _processor, double 
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Remove", kSound_File_Remove, sound, soundFile));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Open", kSound_File_Open, sound, soundFile));
 		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Load", kSound_File_Load, sound, soundFile));
+		addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_File_Options, "Load M.Channel", kSound_File_Multi_Channel_Load, sound, soundFile));
 	}
 }
 //
@@ -66,52 +67,25 @@ void WSPXSoundTreeItem::paintItem(Graphics& g, int width, int height)
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 {
+	#define WLOADSOUNDMSG "Load New Sound File(s) (multi select will group files as zones - when possible - use FILENAME_LLL_HHH_VLL_VHH_RRR.EXT)"
 	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)processor.getActiveEditor();
 	//
 	if (level == kLevel_Add_Sound)
 	{
-		FileChooser browseFile("Load New Sound File(s) (multi select will group files as zones - when possible - use FILENAME_LLL_HHH_VLL_VHH_RRR.EXT)", processor.getLastSoundFilePath(), processor.audioFormatManager.getWildcardForAllFormats());
+		FileChooser browseFile(WLOADSOUNDMSG, processor.getLastSoundFilePath(), processor.audioFormatManager.getWildcardForAllFormats());
 		//
 		if (browseFile.browseForMultipleFilesToOpen())
 		{
 			processor.collection->sounds.add(new WSPX_Collection_Sound);
 			sound = processor.collection->sounds.getLast();
-			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "", kRegular_Item, processor.collection->sounds.getLast()));
+			addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sounds, "", kRegular_Item, sound));
 			openOnlyLast(this);
 			//
-			for (int ff = 0; ff < browseFile.getResults().size(); ff++)
-			{
-				sound->soundFiles.add(new WSPX_Collection_Sound_File);
-				sound->soundFiles.getLast()->files.add(new WSPX_Collection_Sound_File_Filename);
-				sound->soundFiles.getLast()->files.getFirst()->filename = browseFile.getResults()[ff].getFullPathName();
-				processor.loadSoundFileDetails(sound->soundFiles.getLast());
-				editor->loadSoundFileThumb(sound->soundFiles.getLast());
-				//
-				String filename = browseFile.getResults()[ff].getFileNameWithoutExtension();
-				if (filename.contains("_") && filename.dropLastCharacters(3).getLastCharacter() == '_' && filename.dropLastCharacters(7).getLastCharacter() == '_')
-				{
-					sound->soundFiles.getLast()->keyRoot = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
-					filename = filename.upToLastOccurrenceOf("_", false, false);
-					//
-					sound->soundFiles.getLast()->velZoneHigh = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
-					filename = filename.upToLastOccurrenceOf("_", false, false);
-					//
-					sound->soundFiles.getLast()->velZoneLow = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
-					filename = filename.upToLastOccurrenceOf("_", false, false);
-					//
-					sound->soundFiles.getLast()->keyZoneHigh = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
-					filename = filename.upToLastOccurrenceOf("_", false, false);
-					//
-					sound->soundFiles.getLast()->keyZoneLow = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
-					filename = filename.upToLastOccurrenceOf("_", false, false);
-				}
-				//
-				getSubItem(getNumSubItems() - 1)->addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "", kRegular_Item, sound, sound->soundFiles.getLast()));
-			}
+			processor.addSoundFiles(browseFile.getResults(), *sound, getSubItem(getNumSubItems() - 1));
+			editor->editObject.set(WusikEditObject::kSound, 0, (void*)sound);
 			//
-			editor->presetChanged();
-			editor->editObject.set(WusikEditObject::kSound, 0, (void*)processor.collection->sounds.getLast());
-			editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			if (processor.playerPreset != nullptr) processor.loadPreset(true);
+				else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 		}
 	}
 	else if (level == kLevel_Sounds)
@@ -136,26 +110,15 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else if (specialItem == kSound_Add)
 		{
-			FileChooser browseFile("Load New Sound File(s) (multi select will group files as multi channels)", processor.getLastSoundFilePath(), processor.audioFormatManager.getWildcardForAllFormats());
+			FileChooser browseFile(WLOADSOUNDMSG, processor.getLastSoundFilePath(), processor.audioFormatManager.getWildcardForAllFormats());
 			//
 			if (browseFile.browseForMultipleFilesToOpen())
 			{
-				sound->soundFiles.add(new WSPX_Collection_Sound_File);
+				processor.addSoundFiles(browseFile.getResults(), *sound, getParentItem());
+				editor->editObject.set(WusikEditObject::kSound, 0, (void*)sound);
 				//
-				for (int ff = 0; ff < browseFile.getResults().size(); ff++)
-				{
-					sound->soundFiles.getLast()->files.add(new WSPX_Collection_Sound_File_Filename);
-					sound->soundFiles.getLast()->files.getLast()->filename = browseFile.getResults()[ff].getFullPathName();
-				}
-				//
-				processor.loadSoundFileDetails(sound->soundFiles.getLast());
-				editor->loadSoundFileThumb(sound->soundFiles.getLast());
-				getParentItem()->addSubItem(new WSPXSoundTreeItem(processor, ui_ratio, kLevel_Sound_Files, "", kRegular_Item, sound, sound->soundFiles.getLast()));
-				//
-				openOnlyLast(getParentItem());
-				editor->presetChanged();
-				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)sound->soundFiles.getLast());
-				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				if (processor.playerPreset != nullptr) processor.loadPreset(true);
+					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
 			else reselectParent();
 		}
@@ -218,9 +181,9 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			}
 			else reselectParent();
 		}
-		else // Load File(s) //
+		else if (specialItem == kSound_File_Multi_Channel_Load)
 		{
-			FileChooser browseFile("Load/Replace Sound File(s) (multi select will group files as multi channels)", processor.getLastSoundFilePath(""), processor.audioFormatManager.getWildcardForAllFormats());
+			FileChooser browseFile("Load/Replace Sound Files to Multi Channels (merge all files)", processor.getLastSoundFilePath(""), processor.audioFormatManager.getWildcardForAllFormats());
 			//
 			if (browseFile.browseForMultipleFilesToOpen())
 			{
@@ -238,7 +201,33 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				//
 				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
-				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				//
+				if (processor.playerPreset != nullptr) processor.loadPreset(true);
+				else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			}
+			//
+			reselectParent();
+		}
+		else // Load File //
+		{
+			FileChooser browseFile("Load/Replace Sound File", processor.getLastSoundFilePath(""), processor.audioFormatManager.getWildcardForAllFormats());
+			//
+			if (browseFile.browseForFileToOpen())
+			{
+				soundFile->files.clear();
+				//
+				soundFile->files.add(new WSPX_Collection_Sound_File_Filename);
+				soundFile->files.getLast()->filename = browseFile.getResult().getFullPathName();
+				//
+				soundFile->sampleDataMetaValuesRead = false;
+				processor.loadSoundFileDetails(soundFile);
+				editor->loadSoundFileThumb(soundFile);
+				//
+				editor->presetChanged();
+				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
+				//
+				if (processor.playerPreset != nullptr) processor.loadPreset(true);
+					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
 			//
 			reselectParent();

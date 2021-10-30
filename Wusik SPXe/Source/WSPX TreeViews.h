@@ -107,7 +107,8 @@ public:
 		//
 		kSound_File_Remove = 1,
 		kSound_File_Open,
-		kSound_File_Load
+		kSound_File_Load,
+		kSound_File_Multi_Channel_Load
 	};
 };
 //

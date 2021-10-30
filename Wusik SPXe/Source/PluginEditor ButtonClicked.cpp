@@ -148,24 +148,6 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 	}
 	else
 	{
-		if (processor.collection->lastSelectedPreset == nullptr) WMessageBox("Preset Preview", "Select a preset first!");
-		else
-		{
-			while (processor.processThread != nullptr && processor.processThread->isThreadRunning()) { Thread::sleep(100); }
-			//
-			if (processor.playerPreset == nullptr)
-			{
-				processor.processThread = new WSPXThread((void*)&processor, this, WSPXThread::kLoadPreset, "Sound Loading");
-				processor.processThread->runThread(4);
-				processor.processThread = nullptr;
-			}
-			else
-			{
-				processor.unloadSounds(&processor.playerPreset->preset);
-				processor.playerPreset = nullptr;
-			}
-			//
-			repaint();
-		}
+		processor.loadPreset();
 	}
 }

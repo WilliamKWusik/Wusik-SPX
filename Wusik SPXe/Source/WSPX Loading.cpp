@@ -5,7 +5,8 @@
 
 */
 #pragma once
-#include "PluginProcessor.h"
+#include "PluginEditor.h"
+#include "WSPX Definitions.h"
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessor::newCompilation()
@@ -129,4 +130,96 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 	//
 	soundFile->sampleDataMetaValuesRead = true;
 	soundFile->totalChannels = channels;
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WusikSpxAudioProcessor::loadPreset(bool forceLoad)
+{
+	if (forceLoad)
+	{
+		if (playerPreset != nullptr) unloadSounds(&playerPreset->preset);
+		while (processThread != nullptr && processThread->isThreadRunning()) { Thread::sleep(100); }
+		processThread = new WSPXThread((void*)this, getActiveEditor(), WSPXThread::kLoadPreset, "Sound Loading");
+		processThread->runThread(4);
+		processThread = nullptr;
+	}
+	else
+	{
+		if (playerPreset != nullptr)
+		{
+			unloadSounds(&playerPreset->preset);
+			playerPreset = nullptr;
+		}
+		else
+		{
+			if (collection->lastSelectedPreset == nullptr) AlertWindow::showMessageBox(AlertWindow::NoIcon, "Preset Preview", "Select a preset first!");
+			else
+			{
+				while (processThread != nullptr && processThread->isThreadRunning()) { Thread::sleep(100); }
+				processThread = new WSPXThread((void*)this, getActiveEditor(), WSPXThread::kLoadPreset, "Sound Loading");
+				processThread->runThread(4);
+				processThread = nullptr;
+			}
+		}
+	}
+	//
+	getActiveEditor()->repaint();
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WusikSpxAudioProcessor::addSoundFiles(Array<File>& files, WSPX_Collection_Sound& sound, void* treeItem)
+{
+	WusikSpxAudioProcessorEditor* editor = (WusikSpxAudioProcessorEditor*)getActiveEditor();
+	//
+	for (int ff = 0; ff < files.size(); ff++)
+	{
+		sound.soundFiles.add(new WSPX_Collection_Sound_File);
+		sound.soundFiles.getLast()->files.add(new WSPX_Collection_Sound_File_Filename);
+		sound.soundFiles.getLast()->files.getFirst()->filename = files[ff].getFullPathName();
+		loadSoundFileDetails(sound.soundFiles.getLast());
+		editor->loadSoundFileThumb(sound.soundFiles.getLast());
+		//
+		String filename = files[ff].getFileNameWithoutExtension();
+		//
+		if (filename.contains("_") && filename.dropLastCharacters(3).getLastCharacter() == '_' && filename.dropLastCharacters(7).getLastCharacter() == '_')
+		{
+			sound.soundFiles.getLast()->keyRoot = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
+			filename = filename.upToLastOccurrenceOf("_", false, false);
+			//
+			sound.soundFiles.getLast()->velZoneHigh = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
+			filename = filename.upToLastOccurrenceOf("_", false, false);
+			//
+			sound.soundFiles.getLast()->velZoneLow = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
+			filename = filename.upToLastOccurrenceOf("_", false, false);
+			//
+			sound.soundFiles.getLast()->keyZoneHigh = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
+			filename = filename.upToLastOccurrenceOf("_", false, false);
+			//
+			sound.soundFiles.getLast()->keyZoneLow = filename.fromLastOccurrenceOf("_", false, false).getIntValue();
+			filename = filename.upToLastOccurrenceOf("_", false, false);
+		}
+		//
+		((WSPXSoundTreeItem*)treeItem)->addSubItem(new WSPXSoundTreeItem(*this, editor->multRatio, WSPXSoundTreeItem::kLevel_Sound_Files, "", WSPXSoundTreeItem::kRegular_Item, &sound, sound.soundFiles.getLast()));
+	}
+	//
+	editor->presetChanged();
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+int WusikSpxAudioProcessor::pickSound()
+{
+	StringArray soundItems;
+	for (int gg = 0; gg < collection->sounds.size(); gg++)
+	{
+		soundItems.add("Sound " + String(gg + 1) + ": " + collection->sounds[gg]->name);
+	}
+	//
+	AlertWindow w("Select a Sound", "", AlertWindow::NoIcon);
+	w.addComboBox("Sound", soundItems);
+	w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+	w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+	w.setAlwaysOnTop(true);
+	//
+	if (w.runModalLoop() == 1) return w.getComboBoxComponent("Sound")->getSelectedItemIndex();
+	return -1;
 }

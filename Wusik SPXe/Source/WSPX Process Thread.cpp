@@ -37,7 +37,10 @@ void WSPXThread::run()
 			{
 				for (int ss = 0; ss < processor->collection->lastSelectedPreset->layers[ll]->soundLinks.size(); ss++)
 				{
-					totalSounds += processor->collection->lastSelectedPreset->layers[ll]->soundLinks[ss]->soundFiles.size();
+					for (int xs = 0; xs < processor->collection->lastSelectedPreset->layers[ll]->soundLinks[ss]->soundFiles.size(); xs++)
+					{
+						totalSounds += processor->collection->lastSelectedPreset->layers[ll]->soundLinks[ss]->soundFiles[xs]->files.size();
+					}
 				}
 			}
 			//

@@ -56,6 +56,9 @@ public:
 	bool loadCompilation(InputStream& stream);
 	void saveCompilation(OutputStream& stream);
 	void loadSoundFileDetails(WSPX_Collection_Sound_File* soundFile);
+	void loadPreset(bool forceLoad = false);
+	void addSoundFiles(Array<File>& files, WSPX_Collection_Sound& sound, void* treeItem);
+	int pickSound();
 	//
 	String getLastSoundFilePath(String inputFile = String())
 	{

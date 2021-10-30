@@ -41,7 +41,7 @@ WSPXPresetTreeItem::WSPXPresetTreeItem(WusikSpxAudioProcessor& _processor, doubl
 		//
 		for (int ss = 0; ss < layer->soundLinks.size(); ss++)
 		{
-			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, processor.collection->sounds[ss]));
+			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks[ss]));
 		}
 	}
 	else if (level == kLevel_Sound_Links && specialItem == kRegular_Item)
@@ -75,11 +75,23 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 	//
 	if (level == kLevel_Add_Preset)
 	{
-		if (WConfirmBox("Add New Preset", "Are you sure?"))
+		int pickSound = processor.pickSound();
+		//
+		if (pickSound != -1)
 		{
 			processor.collection->presets.add(new WSPX_Collection_Preset);
+			processor.collection->presets.getLast()->layers.add(new WSPX_Collection_Preset_Layer);
+			processor.collection->presets.getLast()->layers.getLast()->soundLinks.add(processor.collection->sounds[pickSound]);
+			//
 			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
 			openOnlyLast(this);
+			//
+			if (processor.playerPreset != nullptr)
+			{
+				processor.unloadSounds(&processor.playerPreset->preset);
+				processor.playerPreset = nullptr;
+				processor.collection->lastSelectedPreset = processor.collection->presets.getLast();
+			}
 			//
 			editor->presetChanged();
 			editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
@@ -107,29 +119,19 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else if (specialItem == kPreset_Layer_Add_Sound_Link)
 		{
-			StringArray soundItems;
-			for (int gg = 0; gg < processor.collection->sounds.size(); gg++)
-			{
-				soundItems.add("Sound " + String(gg + 1) + ": " + processor.collection->sounds[gg]->name);
-			}
+			int pickSound = processor.pickSound();
 			//
-			AlertWindow w("Link Sound", "", AlertWindow::NoIcon);
-			w.addComboBox("Sound", soundItems);
-			w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-			w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-			w.setAlwaysOnTop(true);
-			//
-			int result = w.runModalLoop();
-			if (result == 1)
+			if (pickSound != -1)
 			{
-				int selectedSound = w.getComboBoxComponent("Sound")->getSelectedItemIndex();
-				layer->soundLinks.add(processor.collection->sounds[selectedSound]);
+				layer->soundLinks.add(processor.collection->sounds[pickSound]);
 				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Sound_Links, "", preset, kRegular_Item, layer, layer->soundLinks.getLast()));
 				openOnlyLast(getParentItem());
 				//
 				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kSoundLink, 0, (void*)layer->soundLinks.getLast());
-				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				//
+				if (processor.playerPreset != nullptr) processor.loadPreset(true);
+					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
 			else reselectParent();
 		}
@@ -184,7 +186,10 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				//
 				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
-				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				//
+				processor.collection->lastSelectedPreset = processor.collection->presets.getLast();
+				if (processor.playerPreset != nullptr) processor.loadPreset(true);
+					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
 			}
 			else reselectParent();
 		}
@@ -212,9 +217,13 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 		}
 		else if (specialItem == kPreset_Add_Layer)
 		{
-			if (WConfirmBox("Add New Layer", "Are you sure?"))
+			int pickSound = processor.pickSound();
+			//
+			if (pickSound != -1)
 			{
 				preset->layers.add(new WSPX_Collection_Preset_Layer);
+				preset->layers.getLast()->soundLinks.add(processor.collection->sounds[pickSound]);
+				//
 				getParentItem()->addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Preset_Layers, "", preset, kRegular_Item, preset->layers.getLast()));
 				openOnlyLast(getParentItem());
 				//
