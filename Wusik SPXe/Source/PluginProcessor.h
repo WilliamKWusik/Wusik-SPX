@@ -70,12 +70,18 @@ public:
 	{
 		suspendProcessing(true);
 		// Reset any Synth information Here //
+		#if WSPXPLAYERPREVIEW
+			if (playerPreset != nullptr && playerPreset->isReady.get() == 1) playerPreset->voices.clear();
+		#endif	
 	}
 	//
 	void resumeAudio()
 	{
 		suspendProcessing(false);
 		// Restart the Synth engine //
+		#if WSPXPLAYERPREVIEW
+			if (playerPreset != nullptr && playerPreset->isReady.get() == 1) playerPreset->voices.clear();
+		#endif	
 	}
 	//
 	String readGlobalSettings(String key, String defaultVal)
@@ -120,7 +126,6 @@ public:
 	AudioFormatManager audioFormatManager;
 	String lastSoundFilePath;
 	MidiKeyboardState midiKeyboardState;
-	MidiKeyboardState midiKeyboardStateBottom;
 	float lastSamplerate = 44100.0f;
 	int lastSamplesPerBlock = 128;
 	//

@@ -33,11 +33,13 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		WSPXPresetTreeItem* treeViewItem = (WSPXPresetTreeItem*)timerActionValueObject;
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue2);
 		//
-		if (processor.playerPreset != nullptr)
-		{
-			processor.unloadSounds(&processor.playerPreset->preset);
-			processor.playerPreset = nullptr;
-		}
+		#if WSPXPLAYERPREVIEW
+			if (processor.playerPreset != nullptr)
+			{
+				processor.unloadSounds(&processor.playerPreset->preset);
+				processor.playerPreset = nullptr;
+			}
+		#endif
 		//
 		processor.collection->lastSelectedPreset = nullptr;
 		processor.collection->presets.remove(timerActionValue1);
@@ -54,7 +56,9 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue3);
 		processor.collection->presets[timerActionValue1]->layers.remove(timerActionValue2);
 		//
-		if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#if WSPXPLAYERPREVIEW
+			if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#endif
 		//
 		presetChanged();
 		redoTreeViewsOnResize = false;
@@ -68,7 +72,9 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue4);
 		processor.collection->presets[timerActionValue1]->layers[timerActionValue2]->soundLinks.remove(timerActionValue3);
 		//
-		if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#if WSPXPLAYERPREVIEW
+			if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#endif
 		//
 		presetChanged();
 		redoTreeViewsOnResize = false;
@@ -117,7 +123,9 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 		treeViewItem->getParentItem()->removeSubItem(timerActionValue3);
 		processor.collection->sounds[timerActionValue1]->soundFiles.remove(timerActionValue2);
 		//
-		if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#if WSPXPLAYERPREVIEW
+			if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#endif
 		//
 		presetChanged();
 		redoTreeViewsOnResize = false;
@@ -141,7 +149,10 @@ void WusikSpxAudioProcessorEditor::timerCallback()
 			}
 		}
 		//
-		if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#if WSPXPLAYERPREVIEW
+			if (processor.playerPreset != nullptr) processor.loadPreset(true);
+		#endif
+		//
 		presetChanged();
 		cleanInterface();
 		updateInterface();

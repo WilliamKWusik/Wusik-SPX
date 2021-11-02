@@ -87,7 +87,10 @@ public:
 	WSPXSoundFileThumbView soundFileThumbView;
 	WMidiKeyboardComponent midiKeyboard;
 	WSPXStatusLabel* statusLabel;
-	WSPX_Player_Preset* lastPlayerPreset = nullptr;
+	//
+	#if WSPXPLAYERPREVIEW
+		WSPX_Player_Preset* lastPlayerPreset = nullptr;
+	#endif
 	//
 	Atomic<int> timerAction = 0;
 	int timerActionValue1 = 0;

@@ -87,21 +87,23 @@ void WusikSpxAudioProcessorEditor::paint (Graphics& g)
 			}
 		}
 		//
-		if (lastPlayerPreset != processor.playerPreset)
-		{
-			lastPlayerPreset = processor.playerPreset;
-			Graphics gg(originalBackgroundImage);
-			//
-			if (lastPlayerPreset != nullptr)
+		#if WSPXPLAYERPREVIEW
+			if (lastPlayerPreset != processor.playerPreset)
 			{
-				gg.drawImageAt(backgroundImage, 0, 0);
-				gg.drawImageAt(previewOn, backgroundImage.getWidth() - previewOn.getWidth(), 0);
+				lastPlayerPreset = processor.playerPreset;
+				Graphics gg(originalBackgroundImage);
+				//
+				if (lastPlayerPreset != nullptr)
+				{
+					gg.drawImageAt(backgroundImage, 0, 0);
+					gg.drawImageAt(previewOn, backgroundImage.getWidth() - previewOn.getWidth(), 0);
+				}
+				else
+				{
+					gg.drawImageAt(backgroundImage, 0, 0);
+				}
 			}
-			else
-			{
-				gg.drawImageAt(backgroundImage, 0, 0);
-			}
-		}
+		#endif
 	}
 	//
 	g.drawImage(originalBackgroundImage, 0, 0, getWidth(), getHeight(), 0, 0, originalBackgroundImage.getWidth(), originalBackgroundImage.getHeight());

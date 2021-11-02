@@ -49,6 +49,8 @@ void WSPX_Collection::streamData(void* stream, int type)
 			presets[pp]->streamData(stream, type, sounds);
 		}
 	}
+	//
+	// For the WSPX Export, the last thing we write is the MD5 of the entire file BUT the final bytes where the MD5 gets stored //
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

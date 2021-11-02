@@ -84,8 +84,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			processor.addSoundFiles(browseFile.getResults(), *sound, getSubItem(getNumSubItems() - 1));
 			editor->editObject.set(WusikEditObject::kSound, 0, (void*)sound);
 			//
-			if (processor.playerPreset != nullptr) processor.loadPreset(true);
-				else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			#if WSPXPLAYERPREVIEW
+				if (processor.playerPreset != nullptr) processor.loadPreset(true);
+					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			#else
+				editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+			#endif
 		}
 	}
 	else if (level == kLevel_Sounds)
@@ -117,8 +121,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				processor.addSoundFiles(browseFile.getResults(), *sound, getParentItem());
 				editor->editObject.set(WusikEditObject::kSound, 0, (void*)sound);
 				//
-				if (processor.playerPreset != nullptr) processor.loadPreset(true);
-					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#if WSPXPLAYERPREVIEW
+					if (processor.playerPreset != nullptr) processor.loadPreset(true);
+						else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#else
+					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#endif
 			}
 			else reselectParent();
 		}
@@ -202,8 +210,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
 				//
-				if (processor.playerPreset != nullptr) processor.loadPreset(true);
-				else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#if WSPXPLAYERPREVIEW
+					if (processor.playerPreset != nullptr) processor.loadPreset(true);
+						else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#else
+					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#endif
 			}
 			//
 			reselectParent();
@@ -226,8 +238,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kSoundFile, 0, (void*)soundFile);
 				//
-				if (processor.playerPreset != nullptr) processor.loadPreset(true);
-					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#if WSPXPLAYERPREVIEW
+					if (processor.playerPreset != nullptr) processor.loadPreset(true);
+						else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#else
+					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#endif
 			}
 			//
 			reselectParent();

@@ -1,3 +1,4 @@
+
 /*
 
 	Created by William Kalfelz @ Wusik.com (c) 2021
@@ -107,6 +108,7 @@ void WSPXThread::run()
 			{
 				processor->playerPreset = new WSPX_Player_Preset(*processor->collection->lastSelectedPreset, _processor);
 				processor->playerPreset->prepareToPlay(processor->lastSamplerate, processor->lastSamplesPerBlock);
+				processor->playerPreset->isReady.set(1);
 			}
 			//
 		#else

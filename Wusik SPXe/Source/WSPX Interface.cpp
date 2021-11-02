@@ -177,7 +177,10 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		if (processor.collection->lastSelectedPreset != preset)
 		{
 			processor.collection->lastSelectedPreset = preset;
-			if (processor.playerPreset != nullptr) processor.loadPreset(true);
+			//
+			#if WSPXPLAYERPREVIEW
+				if (processor.playerPreset != nullptr) processor.loadPreset(true);
+			#endif
 		}
 		//
 		AddCompoLabel("Preset Details");
@@ -204,7 +207,10 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 				if (processor.collection->lastSelectedPreset != processor.collection->presets[xs])
 				{
 					processor.collection->lastSelectedPreset = processor.collection->presets[xs];
-					if (processor.playerPreset != nullptr) processor.loadPreset(true);
+					//
+					#if WSPXPLAYERPREVIEW
+						if (processor.playerPreset != nullptr) processor.loadPreset(true);
+					#endif
 				}
 				break;
 			}

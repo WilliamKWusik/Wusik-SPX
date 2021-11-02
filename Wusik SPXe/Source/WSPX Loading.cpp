@@ -135,35 +135,39 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WusikSpxAudioProcessor::loadPreset(bool forceLoad)
 {
-	if (forceLoad)
-	{
-		if (playerPreset != nullptr) unloadSounds(&playerPreset->preset);
-		while (processThread != nullptr && processThread->isThreadRunning()) { Thread::sleep(100); }
-		processThread = new WSPXThread((void*)this, getActiveEditor(), WSPXThread::kLoadPreset, "Sound Loading");
-		processThread->runThread(4);
-		processThread = nullptr;
-	}
-	else
-	{
-		if (playerPreset != nullptr)
+	#if WSPXPLAYERPREVIEW
+		stopAllAudio();
+		//
+		if (forceLoad)
 		{
-			unloadSounds(&playerPreset->preset);
-			playerPreset = nullptr;
+			if (playerPreset != nullptr) unloadSounds(&playerPreset->preset);
+			while (processThread != nullptr && processThread->isThreadRunning()) { Thread::sleep(100); }
+			processThread = new WSPXThread((void*)this, getActiveEditor(), WSPXThread::kLoadPreset, "Sound Loading");
+			processThread->runThread(4);
+			processThread = nullptr;
 		}
 		else
 		{
-			if (collection->lastSelectedPreset == nullptr) AlertWindow::showMessageBox(AlertWindow::NoIcon, "Preset Preview", "Select a preset first!");
+			if (playerPreset != nullptr)
+			{
+				unloadSounds(&playerPreset->preset);
+				playerPreset = nullptr;
+			}
 			else
 			{
-				while (processThread != nullptr && processThread->isThreadRunning()) { Thread::sleep(100); }
-				processThread = new WSPXThread((void*)this, getActiveEditor(), WSPXThread::kLoadPreset, "Sound Loading");
-				processThread->runThread(4);
-				processThread = nullptr;
+				if (collection->lastSelectedPreset == nullptr) AlertWindow::showMessageBox(AlertWindow::NoIcon, "Preset Preview", "Select a preset first!");
+				else
+				{
+					while (processThread != nullptr && processThread->isThreadRunning()) { Thread::sleep(100); }
+					processThread = new WSPXThread((void*)this, getActiveEditor(), WSPXThread::kLoadPreset, "Sound Loading");
+					processThread->runThread(4);
+					processThread = nullptr;
+				}
 			}
 		}
-	}
-	//
-	getActiveEditor()->repaint();
+		//
+		getActiveEditor()->repaint();
+	#endif
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

@@ -36,7 +36,7 @@ void WusikSpxAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	lastSamplesPerBlock = samplesPerBlock;
 	//
 	#if WSPXPLAYERPREVIEW
-		if (playerPreset != nullptr) playerPreset->prepareToPlay(sampleRate, samplesPerBlock);
+		if (playerPreset != nullptr && playerPreset->isReady.get() == 1) playerPreset->prepareToPlay(sampleRate, samplesPerBlock);
 	#endif
 }
 //
@@ -76,7 +76,9 @@ void WusikSpxAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
 	ScopedNoDenormals noDenormals;
 	lastSamplerate = getSampleRate();
 	//
+	midiKeyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+	//
 	#if WSPXPLAYERPREVIEW
-		if (playerPreset != nullptr) playerPreset->processBlock(buffer, midiMessages);
+		if (playerPreset != nullptr && playerPreset->isReady.get() == 1) playerPreset->processBlock(buffer, midiMessages);
 	#endif
 }

@@ -86,12 +86,14 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 			addSubItem(new WSPXPresetTreeItem(processor, ui_ratio, kLevel_Presets, "", processor.collection->presets.getLast()));
 			openOnlyLast(this);
 			//
-			if (processor.playerPreset != nullptr)
-			{
-				processor.unloadSounds(&processor.playerPreset->preset);
-				processor.playerPreset = nullptr;
-				processor.collection->lastSelectedPreset = processor.collection->presets.getLast();
-			}
+			#if WSPXPLAYERPREVIEW
+				if (processor.playerPreset != nullptr)
+				{
+					processor.unloadSounds(&processor.playerPreset->preset);
+					processor.playerPreset = nullptr;
+					processor.collection->lastSelectedPreset = processor.collection->presets.getLast();
+				}
+			#endif
 			//
 			editor->presetChanged();
 			editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
@@ -130,8 +132,12 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				editor->presetChanged();
 				editor->editObject.set(WusikEditObject::kSoundLink, 0, (void*)layer->soundLinks.getLast());
 				//
-				if (processor.playerPreset != nullptr) processor.loadPreset(true);
-					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#if WSPXPLAYERPREVIEW
+					if (processor.playerPreset != nullptr) processor.loadPreset(true);
+						else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#else
+					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#endif
 			}
 			else reselectParent();
 		}
@@ -188,8 +194,13 @@ void WSPXPresetTreeItem::itemClicked(const MouseEvent& e)
 				editor->editObject.set(WusikEditObject::kPreset, processor.collection->presets.size() - 1, (void*)processor.collection->presets.getLast());
 				//
 				processor.collection->lastSelectedPreset = processor.collection->presets.getLast();
-				if (processor.playerPreset != nullptr) processor.loadPreset(true);
-					else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				//
+				#if WSPXPLAYERPREVIEW
+					if (processor.playerPreset != nullptr) processor.loadPreset(true);
+						else editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#else
+					editor->createAction(WusikSpxAudioProcessorEditor::kTimerAction_Update_Interface_Not_TreeViews);
+				#endif
 			}
 			else reselectParent();
 		}
