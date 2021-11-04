@@ -41,7 +41,9 @@ public:
 	void presetChanged() { processor.collection->hasUnsavedChanges = true; }
 	void showAbout()
 	{
-		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Wusik WSPX Editor", "Created by William Kalfelz @ Wusik.com (c) 2021\n\nVersion " + String(WVERSION));
+		String extra = "\n\nSSE2 Enabled";
+		if (SystemStats::hasAVX() && SystemStats::hasFMA3()) extra = "\n\nAVX+FM3 Enabled";
+		AlertWindow::showMessageBox(AlertWindow::NoIcon, "Wusik WSPX Editor", "Created by William Kalfelz @ Wusik.com (c) 2021\n\nVersion " + String(WVERSION) + extra);
 	}
 	//
 	void boundsSet(int xx, int yy, int ww, int hh, Component* compo, double multRatio)

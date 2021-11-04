@@ -59,6 +59,9 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 		mm.addItem(12, "Save Bundle");
 		mm.addSeparator();
 		mm.addItem(8, "Export .WSPX");
+		mm.addSeparator();
+		mm.addItem(14, "About");
+		//
 		mm.setLookAndFeel(newLookAndFeel);
 		//
 		int result = mm.show();
@@ -73,6 +76,7 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 				processor.newCompilation();
 				repaint();
 			}
+			else if (result == 14) showAbout();
 			else if (result == 1)
 			{
 				if (!processor.collection->hasUnsavedChanges || AlertWindow::showOkCancelBox(AlertWindow::NoIcon, "There are unsaved changes!", "Are you sure you want to continue?"))

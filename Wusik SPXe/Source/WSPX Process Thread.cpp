@@ -28,6 +28,13 @@ void WSPXThread::run()
 	else if (type == kLoadPreset)
 	{
 		#if WSPXPLAYERPREVIEW
+			if (!SystemStats::hasSSE2())
+			{
+				WMessageBox("Can't start preset engine!", "SSE2 is required!");
+				processor->resumeAudio();
+				return;
+			}
+			//
 			// Unload previous Sound //
 			if (processor->playerPreset != nullptr) processor->unloadSounds(&processor->playerPreset->preset);
 			//

@@ -33,8 +33,11 @@ public:
 class WusikSpxAudioProcessor : public AudioProcessor
 {
 public:
+	DECLARE_ALIGNED(32);
+	//
     WusikSpxAudioProcessor();
     ~WusikSpxAudioProcessor();
+	//
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
 	void releaseResources() override { }
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
@@ -130,7 +133,7 @@ public:
 	int lastSamplesPerBlock = 128;
 	//
 	#if WSPXPLAYERPREVIEW
-		ScopedPointer<WSPX_Player_Preset> playerPreset;
+		JUCE_ALIGN(32) ScopedPointer<WSPX_Player_Preset> playerPreset; // We align the data so variables can be aligned to SSE/AVX requirements //
 	#endif
 	//
 private:

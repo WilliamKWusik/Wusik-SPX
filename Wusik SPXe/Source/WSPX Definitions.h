@@ -16,6 +16,9 @@ extern String collectionFile;
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 #if WSPXEDITOR
+	// Special Macro to declare a class aligned - specially used for SSE support //
+	#define DECLARE_ALIGNED(bits) void *operator new(size_t size){ return _aligned_malloc(size, bits); } void operator delete(void *ptr) { _aligned_free(ptr); }
+	//
 	class WS // Small Static Class to handle streams of data (read and write) //
 	{
 	public:
