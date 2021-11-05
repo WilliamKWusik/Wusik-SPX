@@ -43,6 +43,10 @@
         <FILE id="OKXkY2" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       </GROUP>
       <GROUP id="{ACC900F8-3795-4684-74E6-692C45C35E96}" name="Player">
+        <FILE id="Skcgb8" name="WSX Player Process.cpp" compile="1" resource="0"
+              file="Source/WSPX Player/WSX Player Process.cpp"/>
+        <FILE id="LRPqPE" name="WSX Player Voice.cpp" compile="1" resource="0"
+              file="Source/WSPX Player/WSX Player Voice.cpp"/>
         <FILE id="BmH4im" name="WSX Player.cpp" compile="1" resource="0" file="Source/WSPX Player/WSX Player.cpp"/>
         <FILE id="PU81iq" name="WSX Player.h" compile="0" resource="0" file="Source/WSPX Player/WSX Player.h"/>
       </GROUP>

@@ -78,15 +78,14 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 	//
 	for (int ff = 0; ff < soundFile->files.size(); ff++)
 	{
-		if (soundFile->files[ff]->filename.isNotEmpty())
+		if (soundFile->files[ff].isNotEmpty())
 		{
-			ScopedPointer<AudioFormatReader> audioReader = audioFormatManager.createReaderFor(File(soundFile->files[ff]->filename));
+			ScopedPointer<AudioFormatReader> audioReader = audioFormatManager.createReaderFor(File(soundFile->files[ff]));
 			//
 			if (audioReader != nullptr)
 			{
 				soundFile->totalSamples = audioReader->lengthInSamples;
 				soundFile->sampleRate = audioReader->sampleRate;
-				soundFile->files[ff]->channels = audioReader->numChannels;
 				//
 				if (!soundFile->sampleDataMetaValuesRead)
 				{
@@ -94,21 +93,19 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 					soundFile->loopEnd = jlimit(0, (int)soundFile->totalSamples - 1, audioReader->metadataValues.getValue("Loop0End", "0").getIntValue());
 					soundFile->keyRoot = jlimit(0, 127, audioReader->metadataValues.getValue("MidiUnityNote", "60").getIntValue());
 					//
-					if (soundFile->files[ff]->channelsInfo.size() > 0) soundFile->files[ff]->channelsInfo.clear();
-					//
 					for (int cc = 0; cc < audioReader->numChannels; cc++)
 					{
 						channels++;
-						soundFile->files[ff]->channelsInfo.add(new WSPX_Channel_Info);
-						soundFile->files[ff]->channelsInfo.getLast()->name = "Channel " + String(channels);
-						soundFile->files[ff]->channelsInfo.getLast()->pan = panning;
+						soundFile->channelsInfo.add(new WSPX_Channel_Info);
+						soundFile->channelsInfo.getLast()->name = "Channel " + String(channels);
+						soundFile->channelsInfo.getLast()->pan = panning;
 						if (panning == -1.0f) panning = 1.0f; else panning = -1.0f;
 					}
 				}
 			}
 			else
 			{
-				AlertWindow::showMessageBox(AlertWindow::NoIcon, "Error Loading Sound File! Couldn't create a reader for it...", soundFile->files[ff]->filename);
+				AlertWindow::showMessageBox(AlertWindow::NoIcon, "Error Loading Sound File! Couldn't create a reader for it...", soundFile->files[ff]);
 			}
 		}
 		else
@@ -119,17 +116,16 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 	//
 	if (channels == 1) // Mono, one file //
 	{
-		soundFile->files.getFirst()->channelsInfo.getFirst()->pan = 0.0f;
-		soundFile->files.getFirst()->channelsInfo.getFirst()->name = "Mono";
+		soundFile->channelsInfo.getFirst()->pan = 0.0f;
+		soundFile->channelsInfo.getFirst()->name = "Mono";
 	}
 	else if (channels == 2 && soundFile->files.size() == 1) // Stereo, one file //
 	{
-		soundFile->files.getFirst()->channelsInfo.getFirst()->name = "Left";
-		soundFile->files.getFirst()->channelsInfo.getLast()->name = "Right";
+		soundFile->channelsInfo.getFirst()->name = "Left";
+		soundFile->channelsInfo.getLast()->name = "Right";
 	}
 	//
 	soundFile->sampleDataMetaValuesRead = true;
-	soundFile->totalChannels = channels;
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -178,8 +174,7 @@ void WusikSpxAudioProcessor::addSoundFiles(Array<File>& files, WSPX_Collection_S
 	for (int ff = 0; ff < files.size(); ff++)
 	{
 		sound.soundFiles.add(new WSPX_Collection_Sound_File);
-		sound.soundFiles.getLast()->files.add(new WSPX_Collection_Sound_File_Filename);
-		sound.soundFiles.getLast()->files.getFirst()->filename = files[ff].getFullPathName();
+		sound.soundFiles.getLast()->files.add(files[ff].getFullPathName());
 		loadSoundFileDetails(sound.soundFiles.getLast());
 		editor->loadSoundFileThumb(sound.soundFiles.getLast());
 		//

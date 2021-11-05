@@ -67,6 +67,7 @@ void WSPX_Collection_Preset::streamData(void* stream, int type, OwnedArray<WSPX_
 	WS::stream(stream, fineTune, type);
 	WS::stream(stream, coarseTune, type);
 	WS::stream(stream, totalLayers, type);
+	WS::stream(stream, frequencyOfA, type);
 	WS::stream(stream, scripting, type);
 	WS::stream(stream, imagePresetIcon.imageFilename, type);
 	//
@@ -99,6 +100,8 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 	WS::stream(stream, coarseTune, type);
 	WS::stream(stream, output, type);
 	WS::stream(stream, voices, type);
+	WS::stream(stream, overSample, type);
+	WS::stream(stream, pitchBendRange, type);
 	WS::stream(stream, scripting, type);
 	//
 	sequencer.streamData(stream, type);
@@ -169,8 +172,17 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 	WS::stream(stream, bits, type);
 	WS::stream(stream, format, type);
 	WS::stream(stream, sampleDataMetaValuesRead, type);
+	WS::stream(stream, boostVolume, type);
 	WS::stream(stream, totalSamples, type);
-	WS::stream(stream, totalChannels, type);
+	//
+	int totalChannelsInfo = channelsInfo.size();
+	WS::stream(stream, totalChannelsInfo, type);
+	//
+	for (int cc = 0; cc < totalChannelsInfo; cc++)
+	{
+		if (type == WS::kRead) channelsInfo.add(new WSPX_Channel_Info);
+		channelsInfo[cc]->streamData(stream, type);
+	}
 	//
 	if (isWSPXEditor)
 	{
@@ -182,13 +194,15 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 		//
 		for (int ff = 0; ff < totalFiles; ff++)
 		{
-			if (type == WS::kRead) files.add(new WSPX_Collection_Sound_File_Filename);
-			files[ff]->streamData(stream, type);
+			String fileName;
+			if (type == WS::kWrite) fileName = files[ff];
+			WS::streamRelativePath(stream, fileName, type);
+			if (type == WS::kRead) files.add(fileName);
 			//
 			if (WSPXeBundle)
 			{
 				MemoryBlock _soundRAW;
-				if (type == WS::kWrite) File(files[ff]->filename).loadFileAsData(_soundRAW);
+				if (type == WS::kWrite) File(files[ff]).loadFileAsData(_soundRAW);
 				WS::stream(stream, _soundRAW, type);
 			}
 		}

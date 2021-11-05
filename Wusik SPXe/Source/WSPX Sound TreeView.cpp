@@ -57,8 +57,8 @@ void WSPXSoundTreeItem::paintItem(Graphics& g, int width, int height)
 	else if (level == kLevel_Sounds) g.drawText(sound->name, 0, 0, width, height, Justification::left);
 	else if (level == kLevel_Sound_Files)
 	{
-		if (soundFile->files.size() > 0 && File(soundFile->files[0]->filename).existsAsFile())
-			g.drawFittedText(File(soundFile->files[0]->filename).getFileNameWithoutExtension(), 0, 0, width, height, Justification::left, 1);
+		if (soundFile->files.size() > 0 && File(soundFile->files[0]).existsAsFile())
+			g.drawFittedText(File(soundFile->files[0]).getFileNameWithoutExtension(), 0, 0, width, height, Justification::left, 1);
 		else 
 			g.drawText("No File", 0, 0, width, height, Justification::left);
 	}
@@ -170,12 +170,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 				PopupMenu mm;
 				for (int ff = 0; ff < soundFile->files.size(); ff++)
 				{
-					mm.addItem(ff + 1, File(soundFile->files[ff]->filename).getFileName());
+					mm.addItem(ff + 1, File(soundFile->files[ff]).getFileName());
 				}
 				int result = mm.show();
-				if (result > 0) File(soundFile->files[result - 1]->filename).startAsProcess();
+				if (result > 0) File(soundFile->files[result - 1]).startAsProcess();
 			}
-			else if (File(soundFile->files[0]->filename).existsAsFile()) File(soundFile->files[0]->filename).startAsProcess();
+			else if (File(soundFile->files[0]).existsAsFile()) File(soundFile->files[0]).startAsProcess();
 			reselectParent();
 		}
 		else if (specialItem == kSound_File_Remove)
@@ -196,11 +196,11 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			if (browseFile.browseForMultipleFilesToOpen())
 			{
 				soundFile->files.clear();
+				soundFile->channelsInfo.clear();
 				//
 				for (int ff = 0; ff < browseFile.getResults().size(); ff++)
 				{
-					soundFile->files.add(new WSPX_Collection_Sound_File_Filename);
-					soundFile->files.getLast()->filename = browseFile.getResults()[ff].getFullPathName();
+					soundFile->files.add(browseFile.getResults()[ff].getFullPathName());
 				}
 				//
 				soundFile->sampleDataMetaValuesRead = false;
@@ -227,9 +227,8 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 			if (browseFile.browseForFileToOpen())
 			{
 				soundFile->files.clear();
-				//
-				soundFile->files.add(new WSPX_Collection_Sound_File_Filename);
-				soundFile->files.getLast()->filename = browseFile.getResult().getFullPathName();
+				soundFile->channelsInfo.clear();
+				soundFile->files.add(browseFile.getResult().getFullPathName());
 				//
 				soundFile->sampleDataMetaValuesRead = false;
 				processor.loadSoundFileDetails(soundFile);
@@ -255,12 +254,12 @@ void WSPXSoundTreeItem::itemClicked(const MouseEvent& e)
 void WusikSpxAudioProcessorEditor::loadSoundFileThumb(WSPX_Collection_Sound_File* soundFile)
 {
 	soundFileThumbView.reset();
-	if (soundFile->files.size() == 0 || soundFile->files[0]->filename.isEmpty() || !File(soundFile->files[0]->filename).existsAsFile()) return;
+	if (soundFile->files.size() == 0 || soundFile->files[0].isEmpty() || !File(soundFile->files[0]).existsAsFile()) return;
 	//
 	// Check for a thumb file first //
 	//
-	File thumbFile = File::addTrailingSeparator(File(soundFile->files[0]->filename).getParentDirectory().getFullPathName()) +
-		File(soundFile->files[0]->filename).getFileNameWithoutExtension() + ".WSPXeThumb";
+	File thumbFile = File::addTrailingSeparator(File(soundFile->files[0]).getParentDirectory().getFullPathName()) +
+		File(soundFile->files[0]).getFileNameWithoutExtension() + ".WSPXeThumb";
 	//
 	soundFileThumbView.loopEnd = soundFile->loopEnd;
 	soundFileThumbView.loopStart = soundFile->loopStart;
@@ -275,7 +274,7 @@ void WusikSpxAudioProcessorEditor::loadSoundFileThumb(WSPX_Collection_Sound_File
 		char version = stream->readByte();
 		String time = stream->readString();
 		//
-		if (File(soundFile->files[0]->filename).getLastModificationTime().toString(true, true).compare(time) == 0)
+		if (File(soundFile->files[0]).getLastModificationTime().toString(true, true).compare(time) == 0)
 		{
 			PNGImageFormat pngReader;
 			soundFileThumbView.waveform = pngReader.loadFrom(*stream);
@@ -284,7 +283,7 @@ void WusikSpxAudioProcessorEditor::loadSoundFileThumb(WSPX_Collection_Sound_File
 		}
 	}
 	//
-	WSPXSoundFileThumbThreadCreation soundFileThumbThread(this, soundFile->files[0]->filename, thumbFile);
+	WSPXSoundFileThumbThreadCreation soundFileThumbThread(this, soundFile->files[0], thumbFile);
 	soundFileThumbThread.getAlertWindow()->setColour(AlertWindow::ColourIds::outlineColourId, Colours::red);
 	soundFileThumbThread.runThread(6);
 	if (soundFileThumbView.waveform.getWidth() > 0) soundFileThumbView.ready.set(1);
@@ -451,8 +450,8 @@ void WSPXKeyVelZone::updateKeysAndLabel(bool mouseAway)
 		editor->midiKeyboard.rootKey = sound->keyRoot;
 		editor->midiKeyboard.repaint();
 		//
-		if (sound->files.size() == 0 || sound->files[0]->filename.isEmpty()) ((WSPXStatusLabel*)editor->statusLabel)->text = "No File";
-		else if (File(sound->files[0]->filename).existsAsFile()) ((WSPXStatusLabel*)editor->statusLabel)->text = File(sound->files[0]->filename).getFileName();
+		if (sound->files.size() == 0 || sound->files[0].isEmpty()) ((WSPXStatusLabel*)editor->statusLabel)->text = "No File";
+		else if (File(sound->files[0]).existsAsFile()) ((WSPXStatusLabel*)editor->statusLabel)->text = File(sound->files[0]).getFileName();
 		else ((WSPXStatusLabel*)editor->statusLabel)->text = "Missing File";
 		//
 		editor->statusLabel->setBounds(getBounds().getX() + 8, getBounds().getY() + 8, 320, 42);
@@ -480,7 +479,7 @@ void WSPXKeyVelZone::mouseUp(const MouseEvent& event)
 			//
 			if (result == 2)
 			{
-				if (sound->files.size() > 0 && File(sound->files[0]->filename).existsAsFile()) File(sound->files[0]->filename).startAsProcess();
+				if (sound->files.size() > 0 && File(sound->files[0]).existsAsFile()) File(sound->files[0]).startAsProcess();
 			}
 			else if (result == 6)
 			{
@@ -493,11 +492,14 @@ void WSPXKeyVelZone::mouseUp(const MouseEvent& event)
 			else if (result == 1)
 			{
 				WusikSpxAudioProcessor* processor = ((WusikSpxAudioProcessor*)editor->getAudioProcessor());
-				FileChooser browseFile("Load/Replace Sound File", processor->getLastSoundFilePath(sound->files[0]->filename), processor->audioFormatManager.getWildcardForAllFormats());
+				FileChooser browseFile("Load/Replace Sound File", processor->getLastSoundFilePath(sound->files[0]), processor->audioFormatManager.getWildcardForAllFormats());
 				//
 				if (browseFile.browseForFileToOpen())
 				{
-					sound->files[0]->filename = browseFile.getResult().getFullPathName();
+					sound->files.clear();
+					sound->channelsInfo.clear();
+					//
+					sound->files.add(browseFile.getResult().getFullPathName());
 					sound->sampleDataMetaValuesRead = false;
 					processor->loadSoundFileDetails(sound);
 					editor->loadSoundFileThumb(sound);

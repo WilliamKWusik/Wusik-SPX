@@ -88,17 +88,17 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 				String sFile = "File #" + String(ss + 1) + " ";
 				if (sound->soundFiles[ss]->files.size() > 1) sFile.append("(channel set " + String(ff + 1) + ") ", 9999);
 				//
-				if (sound->soundFiles[ss]->files[ff]->filename.isEmpty())
+				if (sound->soundFiles[ss]->files[ff].isEmpty())
 				{
 					sFile.append("No File", 9999);
 				}
 				else
 				{
-					sFile.append("\"" + File(sound->soundFiles[ss]->files[ff]->filename).getFileName() + "\"", 9999);
+					sFile.append("\"" + File(sound->soundFiles[ss]->files[ff]).getFileName() + "\"", 9999);
 					//
-					if (File(sound->soundFiles[ss]->files[ff]->filename).existsAsFile())
+					if (File(sound->soundFiles[ss]->files[ff]).existsAsFile())
 					{
-						int64 xSize = File(sound->soundFiles[ss]->files[ff]->filename).getSize();
+						int64 xSize = File(sound->soundFiles[ss]->files[ff]).getSize();
 						totalSize += xSize;
 						sFile.append(" " + WS::getSize(xSize), 9999);
 					}
@@ -126,27 +126,28 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			//
 			String xFile;
 			//
-			if (soundFile->files[ff]->filename.isEmpty()) xFile = "No File";
-			else if (File(soundFile->files[ff]->filename).existsAsFile()) xFile = "\"" + File(soundFile->files[ff]->filename).getFileName() + "\"";
-			else xFile = File(soundFile->files[ff]->filename).getFileName() + " ! MISSING FILE !";
+			if (soundFile->files[ff].isEmpty()) xFile = "No File";
+			else if (File(soundFile->files[ff]).existsAsFile()) xFile = "\"" + File(soundFile->files[ff]).getFileName() + "\"";
+			else xFile = File(soundFile->files[ff]).getFileName() + " ! MISSING FILE !";
 			//
 			AddCompoLabelSM(xFile);
-			AddCompoLabelSM("Channels " + String(soundFile->files[ff]->channels) + " - Samples " + String(soundFile->totalSamples) + " - SampleRate " + String(soundFile->sampleRate));
+			AddCompoLabelSM("Samples " + String(soundFile->totalSamples) + " - SampleRate " + String(soundFile->sampleRate));
 			//
-			xFile = "Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds - Size " + WS::getSize(File(soundFile->files[ff]->filename).getSize());
+			xFile = "Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds - Size " + WS::getSize(File(soundFile->files[ff]).getSize());
 			AddCompoLabelSM(xFile);
 			//
-			for (int cc = 0; cc < soundFile->files[ff]->channelsInfo.size(); cc++)
+			for (int cc = 0; cc < soundFile->channelsInfo.size(); cc++)
 			{
-				AddCompo(kString, "Channel Name", &soundFile->files[ff]->channelsInfo[cc]->name);
-				AddCompo4(kSliderBipolar, "Pan", &soundFile->files[ff]->channelsInfo[cc]->pan, "", -1, 1);
-				AddCompo4(kSlider, "Volume", &soundFile->files[ff]->channelsInfo[cc]->volume, "", 0, 1);
+				AddCompo(kString, "Channel Name", &soundFile->channelsInfo[cc]->name);
+				AddCompo4(kSliderBipolar, "Pan", &soundFile->channelsInfo[cc]->pan, "", -1, 1);
+				AddCompo4(kSlider, "Volume", &soundFile->channelsInfo[cc]->volume, "", 0, 1);
 			}
 		}
 		//
 		AddCompoLabelSM("Global Settings");
 		AddCompo(kSlider, "Volume", &soundFile->volume);
 		AddCompo4(kSliderBipolar, "Pan", &soundFile->pan, "", -1, 1);
+		AddCompo(kSlider, "Boost Volume", &soundFile->boostVolume);
 		AddCompo4(kSliderBipolar, "Fine Tune", &soundFile->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &soundFile->coarseTune, "", -48, 48);
 		AddCompo(kOnOffButton, "Reverse", &soundFile->reverse);
@@ -193,6 +194,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderBipolar, "Pan", &preset->pan, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Fine Tune", &preset->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &preset->coarseTune, "", -48, 48);
+		AddCompo(kString, "Note 'A' Frequency", &preset->frequencyOfA);
 		AddCompo(kButtonCallback, "Edit Scripting", &preset->scripting);
 	}
 	else if (editObject.type == WusikEditObject::kPresetLayer)
@@ -226,6 +228,8 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Glide", &layer->glide);
 		AddCompo(kOnOffButton, "Auto Glide", &layer->autoGlide);
 		AddCompo(kOnOffButton, "Reverse", &layer->reverse);
+		AddCompo(kString, "PitchBend Range", &layer->pitchBendRange);
+		AddCompo4(kSliderInteger, "Oversample", &layer->overSample, "", 0, 16);
 		AddCompo(kButtonCallback, "Edit Scripting", &layer->scripting);
 		//
 		AddCompoLabel("Zones");

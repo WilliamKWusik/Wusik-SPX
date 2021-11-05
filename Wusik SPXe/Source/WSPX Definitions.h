@@ -83,30 +83,6 @@ public:
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
-class WSPX_Collection_Sound_File_Filename
-{
-public:
-	void streamData(void* stream, int type)
-	{
-		WS::stream(stream, channels, type);
-		WS::streamRelativePath(stream, filename, type);
-		//
-		int totalChannelsInfo = channelsInfo.size();
-		WS::stream(stream, totalChannelsInfo, type);
-		//
-		for (int cc = 0; cc < totalChannelsInfo; cc++)
-		{
-			if (type == WS::kRead) channelsInfo.add(new WSPX_Channel_Info);
-			channelsInfo[cc]->streamData(stream, type);
-		}
-	}
-	//
-	int channels = 1;
-	String filename;
-	OwnedArray<WSPX_Channel_Info> channelsInfo;
-};
-//
-// ------------------------------------------------------------------------------------------------------------------------- //
 class WSPX_Collection_Sound_File
 {
 public:
@@ -114,6 +90,7 @@ public:
 	//
 	MemoryBlock soundData;
 	float volume = 1.0f;
+	float boostVolume = 0.0f;
 	float pan = 0.0f;
 	bool roundRobin = false;
 	bool random = false;
@@ -135,12 +112,12 @@ public:
 	int loopType = 0;
 	int bits = 24; // 16 (int16), 24 (int16 + int8) or 32 bits (float) //
 	int format = 0;
-	int totalChannels = 1;
 	//
 	bool sampleDataMetaValuesRead = false;
 	int64 totalSamples = 0;
 	int sampleRate = 44100;
 	//
+	OwnedArray<WSPX_Channel_Info> channelsInfo;
 	const String formats = "Binary\nFlac\nGZIP";
 	const String keySwitchTypes = "Normal\nMomentary\nLatch";
 	const String loopTypes = "Normal\nPingPong";
@@ -162,7 +139,7 @@ public:
 	#if WSPXEDITOR
 		int exportBits = 24;
 		int exportFormat = 0;
-		OwnedArray<WSPX_Collection_Sound_File_Filename> files;
+		StringArray files;
 	#endif
 };
 //
@@ -490,6 +467,8 @@ public:
 	int keyZoneHigh = 127;
 	int velZoneLow = 0;
 	int velZoneHigh = 127;
+	int overSample = 0;
+	String pitchBendRange = "12.0";
 	MemoryBlock scripting;
 };
 //
@@ -510,6 +489,7 @@ public:
 	float pan = 0.0f;
 	float fineTune = 0.0f;
 	int coarseTune = 0;
+	String frequencyOfA = "440.0";
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

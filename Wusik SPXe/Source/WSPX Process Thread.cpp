@@ -69,19 +69,19 @@ void WSPXThread::run()
 						if (!allOK) break;
 						WSPX_Collection_Sound_File* sound = processor->collection->lastSelectedPreset->layers[ll]->soundLinks[ss]->soundFiles[ff];
 						//
-						if (sound->soundData.getSize() == 0)
+						if (sound->soundData.getSize() == 0 && (sound->totalSamples * sound->channelsInfo.size()) > 0)
 						{
 							int samplePosition = 0;
-							sound->soundData.setSize(sound->totalSamples * sound->totalChannels * sizeof(float));
+							sound->soundData.setSize(sound->totalSamples * sound->channelsInfo.size() * sizeof(float));
 							sound->bits = 32;
 							//
 							for (int cc = 0; cc < sound->files.size(); cc++)
 							{
-								ScopedPointer<AudioFormatReader> reader = processor->audioFormatManager.createReaderFor(sound->files[cc]->filename);
+								ScopedPointer<AudioFormatReader> reader = processor->audioFormatManager.createReaderFor(sound->files[cc]);
 								//
 								if (reader == nullptr)
 								{
-									WMessageBox("Error loading sound file!", sound->files[cc]->filename);
+									WMessageBox("Error loading sound file!", sound->files[cc]);
 									allOK = false;
 									break;
 								}
