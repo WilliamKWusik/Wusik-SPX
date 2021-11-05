@@ -140,7 +140,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			{
 				AddCompo(kString, "Channel Name", &soundFile->files[ff]->channelsInfo[cc]->name);
 				AddCompo4(kSliderBipolar, "Pan", &soundFile->files[ff]->channelsInfo[cc]->pan, "", -1, 1);
-				AddCompo4(kSliderBipolar, "Volume", &soundFile->files[ff]->channelsInfo[cc]->volume, "", -1, 1);
+				AddCompo4(kSlider, "Volume", &soundFile->files[ff]->channelsInfo[cc]->volume, "", 0, 1);
 			}
 		}
 		//
