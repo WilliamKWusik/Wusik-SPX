@@ -455,6 +455,7 @@ public:
 	WSPX_Collection_Effect effects;
 	String name = "Layer";
 	bool reverse = false;
+	bool highQuality = true;
 	float volume = 1.0f;
 	float pan = 0.0f;
 	float fineTune = 0.0f;
@@ -468,6 +469,7 @@ public:
 	int velZoneLow = 0;
 	int velZoneHigh = 127;
 	int overSample = 0;
+	float sampleStart = 0.0f;
 	String pitchBendRange = "12.0";
 	MemoryBlock scripting;
 };

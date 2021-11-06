@@ -227,7 +227,9 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderInteger, "Voices", &layer->voices, "", 1, 128);
 		AddCompo(kSlider, "Glide", &layer->glide);
 		AddCompo(kOnOffButton, "Auto Glide", &layer->autoGlide);
+		AddCompo(kSlider, "Sample Start", &layer->sampleStart);
 		AddCompo(kOnOffButton, "Reverse", &layer->reverse);
+		AddCompo(kOnOffButton, "High Quality", &layer->highQuality);
 		AddCompo(kString, "PitchBend Range", &layer->pitchBendRange);
 		AddCompo4(kSliderInteger, "Oversample", &layer->overSample, "", 0, 16);
 		AddCompo(kButtonCallback, "Edit Scripting", &layer->scripting);

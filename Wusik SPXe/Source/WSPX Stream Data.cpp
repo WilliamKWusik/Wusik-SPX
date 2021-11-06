@@ -99,8 +99,10 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 	WS::stream(stream, reverse, type);
 	WS::stream(stream, coarseTune, type);
 	WS::stream(stream, output, type);
+	WS::stream(stream, sampleStart, type);
 	WS::stream(stream, voices, type);
 	WS::stream(stream, overSample, type);
+	WS::stream(stream, highQuality, type);
 	WS::stream(stream, pitchBendRange, type);
 	WS::stream(stream, scripting, type);
 	//
