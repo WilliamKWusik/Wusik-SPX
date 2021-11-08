@@ -173,6 +173,7 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 	WS::stream(stream, coarseTune, type);
 	WS::stream(stream, bits, type);
 	WS::stream(stream, format, type);
+	WS::stream(stream, sampleRate, type);
 	WS::stream(stream, sampleDataMetaValuesRead, type);
 	WS::stream(stream, boostVolume, type);
 	WS::stream(stream, totalSamples, type);
