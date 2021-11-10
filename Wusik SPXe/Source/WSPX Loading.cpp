@@ -118,11 +118,14 @@ void WusikSpxAudioProcessor::loadSoundFileDetails(WSPX_Collection_Sound_File* so
 	{
 		soundFile->channelsInfo.getFirst()->pan = 0.0f;
 		soundFile->channelsInfo.getFirst()->name = "Mono";
+		soundFile->channelsInfo.getFirst()->addNextStereo = false;
 	}
 	else if (channels == 2 && soundFile->files.size() == 1) // Stereo, one file //
 	{
 		soundFile->channelsInfo.getFirst()->name = "Left";
+		soundFile->channelsInfo.getFirst()->addNextStereo = true;
 		soundFile->channelsInfo.getLast()->name = "Right";
+		soundFile->channelsInfo.getLast()->addNextStereo = false;
 	}
 	//
 	soundFile->sampleDataMetaValuesRead = true;

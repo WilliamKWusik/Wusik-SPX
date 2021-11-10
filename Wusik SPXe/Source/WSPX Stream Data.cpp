@@ -96,6 +96,9 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 	WS::stream(stream, velZoneHigh, type);
 	WS::stream(stream, velZoneLow, type);
 	WS::stream(stream, autoGlide, type);
+	WS::stream(stream, monoLegato, type);
+	WS::stream(stream, monoRetrigger, type);
+	WS::stream(stream, stealSameNote, type);
 	WS::stream(stream, reverse, type);
 	WS::stream(stream, coarseTune, type);
 	WS::stream(stream, output, type);

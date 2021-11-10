@@ -136,15 +136,20 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 			xFile = "Time " + String(double(soundFile->totalSamples) / double(soundFile->sampleRate), 2) + " seconds - Size " + WS::getSize(File(soundFile->files[ff]).getSize());
 			AddCompoLabelSM(xFile);
 			//
+			AddCompoLabel("Channels List");
+			//
 			for (int cc = 0; cc < soundFile->channelsInfo.size(); cc++)
 			{
+				AddCompoLabelSM("Channel #" + String(cc + 1));
 				AddCompo(kString, "Channel Name", &soundFile->channelsInfo[cc]->name);
 				AddCompo4(kSliderBipolar, "Pan", &soundFile->channelsInfo[cc]->pan, "", -1, 1);
 				AddCompo4(kSlider, "Volume", &soundFile->channelsInfo[cc]->volume, "", 0, 1);
+				AddCompo(kOnOffButton, "Show Volume Knob", &soundFile->channelsInfo[cc]->showVolumeKnob);
+				AddCompo(kOnOffButton, "+ Next -> Stereo", &soundFile->channelsInfo[cc]->addNextStereo);
 			}
 		}
 		//
-		AddCompoLabelSM("Global Settings");
+		AddCompoLabel("Global Settings");
 		AddCompo(kSlider, "Volume", &soundFile->volume);
 		AddCompo4(kSliderBipolar, "Pan", &soundFile->pan, "", -1, 1);
 		AddCompo(kSlider, "Boost Volume", &soundFile->boostVolume);
@@ -154,6 +159,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kOnOffButton, "Release", &soundFile->release);
 		//
 		AddCompoLabel("Loop");
+		AddCompoLabelSM("Set Start and End to 0 for One Shot");
 		AddCompo6(kPopupList, "Type", &soundFile->loopType, "", soundFile->loopTypes);
 		AddCompo4(kStringInt64, "Start", &soundFile->loopStart, "", 0, soundFile->totalSamples - 1);
 		AddCompo4(kStringInt64, "End", &soundFile->loopEnd, "", 0, soundFile->totalSamples - 1);
@@ -227,6 +233,9 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderInteger, "Voices", &layer->voices, "", 1, 128);
 		AddCompo(kSlider, "Glide", &layer->glide);
 		AddCompo(kOnOffButton, "Auto Glide", &layer->autoGlide);
+		AddCompo(kOnOffButton, "Mono Legato", &layer->monoLegato);
+		AddCompo(kOnOffButton, "Mono Retrigger", &layer->monoRetrigger);
+		AddCompo(kOnOffButton, "Steal Same Note", &layer->stealSameNote);
 		AddCompo(kSlider, "Sample Start", &layer->sampleStart);
 		AddCompo(kOnOffButton, "Reverse", &layer->reverse);
 		AddCompo(kOnOffButton, "High Quality", &layer->highQuality);
@@ -247,6 +256,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kSlider, "Release", &layer->ampEnvelope.release);
 		AddCompo4(kSliderInteger, "Max Seconds", &layer->ampEnvelope.maxSeconds, "", 1, 99);
 		AddCompo(kSlider, "Velocity %", &layer->ampEnvelope.velocity);
+		AddCompo(kSlider, "Clip Output %", &layer->ampEnvelope.clip);
 		AddCompo4(kSliderBipolar, "Key Track", &layer->ampEnvelope.keyTrack, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Velocity Track", &layer->ampEnvelope.velTrack, "", -1, 1);
 		AddCompo6(kPopupList, "Type", &layer->ampEnvelope.type, "", layer->ampEnvelope.types);

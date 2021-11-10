@@ -75,11 +75,15 @@ public:
 		WS::stream(stream, volume, type);
 		WS::stream(stream, pan, type);
 		WS::stream(stream, name, type);
+		WS::stream(stream, showVolumeKnob, type);
+		WS::stream(stream, addNextStereo, type);
 	}
 	//
 	float volume = 1.0f;
 	float pan = 0.0f;
 	String name;
+	bool showVolumeKnob = true;
+	bool addNextStereo = true;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -303,6 +307,7 @@ public:
 		WS::stream(stream, sustain, _type);
 		WS::stream(stream, release, _type);
 		WS::stream(stream, velocity, _type);
+		WS::stream(stream, clip, _type);
 		WS::stream(stream, maxSeconds, _type);
 		WS::stream(stream, keyTrack, _type);
 		WS::stream(stream, velTrack, _type);
@@ -318,6 +323,7 @@ public:
 	int maxSeconds = 4;
 	float keyTrack = 0.0f;
 	float velTrack = 0.0f;
+	float clip = 0.0f;
 	//
 	enum
 	{
@@ -464,13 +470,16 @@ public:
 	int output = 0; // Main Out //
 	float glide = 0.0f;
 	bool autoGlide = true;
+	bool monoLegato = true;
+	bool monoRetrigger = false;
+	bool stealSameNote = false;
 	int keyZoneLow = 0;
 	int keyZoneHigh = 127;
 	int velZoneLow = 0;
 	int velZoneHigh = 127;
 	int overSample = 0;
 	float sampleStart = 0.0f;
-	String pitchBendRange = "12.0";
+	String pitchBendRange = "12";
 	MemoryBlock scripting;
 };
 //
