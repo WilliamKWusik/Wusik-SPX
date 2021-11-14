@@ -117,6 +117,8 @@ public:
 		{
 			((int*)value)[0] = jlimit(min, max, int(_value));
 		}
+		//
+		if (allNotesOffOnChanges && allNotesOff != nullptr) allNotesOff[0] = true;
 	}
 	//
 	void mouseEnter(const MouseEvent& e) override
@@ -161,6 +163,8 @@ public:
 			midiKeyboardValue[0] = getValue();
 			midiKeyboard->repaint();
 		}
+		//
+		if (allNotesOffOnChanges && allNotesOff != nullptr) allNotesOff[0] = true;
 	}
 	//
 	void mouseDown(const MouseEvent& e) override
@@ -171,6 +175,8 @@ public:
 		if (e.mods.isMiddleButtonDown()) setValue(0.0f);
 		repaint();
 		if (getParentComponent() != nullptr) getParentComponent()->repaint();
+		//
+		if (allNotesOffOnChanges && allNotesOff != nullptr) allNotesOff[0] = true;
 	}
 	//
 	void mouseDrag(const MouseEvent& e) override
@@ -191,6 +197,8 @@ public:
 			midiKeyboardValue[0] = getValue();
 			midiKeyboard->repaint();
 		}
+		//
+		if (allNotesOffOnChanges && allNotesOff != nullptr) allNotesOff[0] = true;
 	}
 	//
 	void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override
@@ -204,6 +212,8 @@ public:
 			midiKeyboardValue[0] = getValue();
 			midiKeyboard->repaint();
 		}
+		//
+		if (allNotesOffOnChanges && allNotesOff != nullptr) allNotesOff[0] = true;
 	}
 	//
 	void paint(Graphics& g) override
@@ -264,6 +274,8 @@ public:
 	//
 	WMidiKeyboardComponent* midiKeyboard = nullptr;
 	int* midiKeyboardValue = nullptr;
+	bool allNotesOffOnChanges = false;
+	bool* allNotesOff = nullptr;
 	Image originalSizeImage;
 	Image tempFill;
 	Image& background;

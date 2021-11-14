@@ -9,6 +9,7 @@
 #include "WSPX Definitions.h"
 #if WSPXPLAYERPREVIEW
 	#include "WSPX Player/WSX Player.h"
+	#pragma pack(32)
 #endif
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -131,9 +132,10 @@ public:
 	MidiKeyboardState midiKeyboardState;
 	float lastSamplerate = 44100.0f;
 	int lastSamplesPerBlock = 128;
+	bool allNotesOff = false;
 	//
 	#if WSPXPLAYERPREVIEW
-		JUCE_ALIGN(32) ScopedPointer<WSPX_Player_Preset> playerPreset; // We align the data so variables can be aligned to SSE/AVX requirements //
+		alignas(32) ScopedPointer<WSPX_Player_Preset> playerPreset; // We align the data so variables can be aligned to SSE/AVX requirements //
 	#endif
 	//
 private:

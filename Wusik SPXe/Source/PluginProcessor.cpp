@@ -67,7 +67,7 @@ void WusikSpxAudioProcessor::setStateInformation (const void* data, int sizeInBy
 // ------------------------------------------------------------------------------------------------------------------------- //
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new WusikSpxAudioProcessor();
+	return new WusikSpxAudioProcessor();
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -79,6 +79,15 @@ void WusikSpxAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
 	midiKeyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 	//
 	#if WSPXPLAYERPREVIEW
-		if (playerPreset != nullptr && playerPreset->isReady.get() == 1) playerPreset->processBlock(buffer, midiMessages);
+		if (playerPreset != nullptr && playerPreset->isReady.get() == 1) 
+		{
+			if (allNotesOff) 
+			{ 
+				playerPreset->reset(); 
+				allNotesOff = false; 
+			}
+			//
+			playerPreset->processBlock(buffer, midiMessages);
+		}
 	#endif
 }

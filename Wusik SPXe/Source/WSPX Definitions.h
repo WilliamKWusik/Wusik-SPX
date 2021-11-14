@@ -500,6 +500,9 @@ public:
 	float pan = 0.0f;
 	float fineTune = 0.0f;
 	int coarseTune = 0;
+	float pitchDrift = 0.0f;
+	float pitchDriftRate = 1.0f;
+	float pitchDriftRandomness = 0.9f;
 	String frequencyOfA = "440.0";
 };
 //

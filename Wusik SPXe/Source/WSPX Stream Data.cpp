@@ -66,6 +66,9 @@ void WSPX_Collection_Preset::streamData(void* stream, int type, OwnedArray<WSPX_
 	WS::stream(stream, pan, type);
 	WS::stream(stream, fineTune, type);
 	WS::stream(stream, coarseTune, type);
+	WS::stream(stream, pitchDrift, type);
+	WS::stream(stream, pitchDriftRate, type);
+	WS::stream(stream, pitchDriftRandomness, type);
 	WS::stream(stream, totalLayers, type);
 	WS::stream(stream, frequencyOfA, type);
 	WS::stream(stream, scripting, type);

@@ -43,6 +43,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 	#define AddMIDIKey(value) editOptions.getLast()->slider->midiKeyboard = &midiKeyboard; editOptions.getLast()->slider->midiKeyboardValue = &midiKeyboard.value
 	#define AddSequencerButton(name, type) AddCompo2(kButtonCallback, name, nullptr, "", false, new WusikEditOptionCallback_Sequencer_Step(sequencer, nullptr, WusikEditOptionCallback_Sequencer_Step::type))
 	#define AddTime(variable) editOptionsComponent->addAndMakeVisible(editOptions.add(new WusikEditOption(&processor, this, WusikEditOption::kString, "Time", variable, "Enter time in 1 / 1 format for host sync or 10hz for free run(0.0001hz up to 99999hz")))
+	#define SetAllNotesOffOnChanges() editOptions.getLast()->slider->allNotesOff = &processor.allNotesOff; editOptions.getLast()->slider->allNotesOffOnChanges = true
 	//
 	if (editObject.type == WusikEditObject::kCollection)
 	{
@@ -201,6 +202,12 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderBipolar, "Fine Tune", &preset->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &preset->coarseTune, "", -48, 48);
 		AddCompo(kString, "Note 'A' Frequency", &preset->frequencyOfA);
+		//
+		AddCompoLabelSM("Pitch Drift");
+		AddCompo(kSlider, "Percentage", &preset->pitchDrift);
+		AddCompo(kSlider, "Rate", &preset->pitchDriftRate);
+		AddCompo(kSlider, "Randomness", &preset->pitchDriftRandomness);
+		//
 		AddCompo(kButtonCallback, "Edit Scripting", &preset->scripting);
 	}
 	else if (editObject.type == WusikEditObject::kPresetLayer)
@@ -230,7 +237,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderBipolar, "Pan", &layer->pan, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Fine Tune", &layer->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &layer->coarseTune, "", -48, 48);
-		AddCompo4(kSliderInteger, "Voices", &layer->voices, "", 1, 128);
+		AddCompo4(kSliderInteger, "Voices", &layer->voices, "", 1, 128); SetAllNotesOffOnChanges();
 		AddCompo(kSlider, "Glide", &layer->glide);
 		AddCompo(kOnOffButton, "Auto Glide", &layer->autoGlide);
 		AddCompo(kOnOffButton, "Mono Legato", &layer->monoLegato);
