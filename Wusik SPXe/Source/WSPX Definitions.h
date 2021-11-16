@@ -333,8 +333,8 @@ public:
 		WS::stream(stream, velTrack, _type);
 	}
 	//
-	const String types = "Linear\nExp\nLog";
-	int type = 0;
+	const String types = "Linear\nExponentional";
+	int type = kType_Exp;
 	float attack = 0.0f;
 	float decay = 0.0f;
 	float sustain = 1.0f;
@@ -348,8 +348,7 @@ public:
 	enum
 	{
 		kType_Linear = 0,
-		kType_Exp,
-		kType_Log
+		kType_Exp
 	};
 };
 //
