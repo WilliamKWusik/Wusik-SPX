@@ -27,7 +27,7 @@ Check the Releases folder for the Application (.exe) and VST2/VST3 Plugins. Agai
 
 .WSPX Engine Support
 - Multi layer presets. Each layer has a link to a Sound that has its own set of sub-sounds, or Sound Files and all the below features per layer;
-- ADSR AMP and Filter Envelope;
+- ADSR AMP and Filter Envelope with Clipping;
 - 2 LFOs;
 - Sequencer with any number of steps;
 - ARP with Glissando option;
@@ -36,7 +36,8 @@ Check the Releases folder for the Application (.exe) and VST2/VST3 Plugins. Agai
 - Round Robin, Random Probability and Key Switching;
 - Visual Scripting (from the editor);
 - Reverse, Ping Pong and Regular playbacks;
-- Pitch Drift;
+- Pitch drift option;
+- Play Types: Normal, Release, First Note, Last Note Release;
 - Multi-Channel support for sound files and the option to merge multiple stereo or mono sound files into a multi-channel sound file directly from the interface.
 
 -----------------------------------------------------------------------------------

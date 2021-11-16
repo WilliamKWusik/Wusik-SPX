@@ -76,14 +76,14 @@ public:
 		WS::stream(stream, pan, type);
 		WS::stream(stream, name, type);
 		WS::stream(stream, showVolumeKnob, type);
-		WS::stream(stream, addNextStereo, type);
+		WS::stream(stream, linkNextAsStereo, type);
 	}
 	//
 	float volume = 1.0f;
 	float pan = 0.0f;
 	String name;
-	bool showVolumeKnob = true;
-	bool addNextStereo = true;
+	bool showVolumeKnob = false;
+	bool linkNextAsStereo = false;
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -92,13 +92,27 @@ class WSPX_Collection_Sound_File
 public:
 	void streamData(void* stream, int type);
 	//
+	bool doPlayNoteOn(bool isFirstNote)
+	{
+		if (playType == kPlay_FirstNote) return isFirstNote;
+		else if (playType == kPlay_Normal) return true;
+		//
+		return false;
+	}
+	//
+	bool isRelease(bool isLastNote) 
+	{ 
+		if (playType == kPlay_LastNoteRelease) return isLastNote;
+		return (playType == kPlay_Release);
+	}
+	//
 	MemoryBlock soundData;
 	float volume = 1.0f;
 	float boostVolume = 0.0f;
 	float pan = 0.0f;
 	bool roundRobin = false;
 	bool random = false;
-	bool release = false;
+	int playType = kPlay_Normal;
 	bool reverse = false;
 	int keySwitch = 0;
 	float randomProbability = 1.0f;
@@ -115,13 +129,14 @@ public:
 	int64 loopEnd = 0;
 	int loopType = 0;
 	int bits = 24; // 16 (int16), 24 (int16 + int8) or 32 bits (float) //
-	int format = 0;
+	int format = kFormat_Flac;
 	//
 	bool sampleDataMetaValuesRead = false;
 	int64 totalSamples = 0;
 	int sampleRate = 44100;
 	//
 	OwnedArray<WSPX_Channel_Info> channelsInfo;
+	const String playTypes = "Normal\nRelease\nFirst Note\nLast Note Release";
 	const String formats = "Binary\nFlac\nGZIP";
 	const String keySwitchTypes = "Normal\nMomentary\nLatch";
 	const String loopTypes = "Normal\nPingPong";
@@ -137,7 +152,12 @@ public:
 		//
 		kFormat_Binary = 0,
 		kFormat_Flac,
-		kFormat_GZIP
+		kFormat_GZIP,
+		//
+		kPlay_Normal = 0,
+		kPlay_Release,
+		kPlay_FirstNote,
+		kPlay_LastNoteRelease
 	};
 	//
 	#if WSPXEDITOR

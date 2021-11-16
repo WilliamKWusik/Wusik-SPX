@@ -146,7 +146,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 				AddCompo4(kSliderBipolar, "Pan", &soundFile->channelsInfo[cc]->pan, "", -1, 1);
 				AddCompo4(kSlider, "Volume", &soundFile->channelsInfo[cc]->volume, "", 0, 1);
 				AddCompo(kOnOffButton, "Show Volume Knob", &soundFile->channelsInfo[cc]->showVolumeKnob);
-				AddCompo(kOnOffButton, "+ Next -> Stereo", &soundFile->channelsInfo[cc]->addNextStereo);
+				AddCompo(kOnOffButton, "Link Next As Stereo", &soundFile->channelsInfo[cc]->linkNextAsStereo);
 			}
 		}
 		//
@@ -157,7 +157,9 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderBipolar, "Fine Tune", &soundFile->fineTune, "", -1, 1);
 		AddCompo4(kSliderIntegerBipolar, "Coarse Tune", &soundFile->coarseTune, "", -48, 48);
 		AddCompo(kOnOffButton, "Reverse", &soundFile->reverse);
-		AddCompo(kOnOffButton, "Release", &soundFile->release);
+		AddCompo6(kPopupList, "Play Type", &soundFile->playType, "", soundFile->playTypes);
+		AddCompo6(kPopupList, "Export Type", &soundFile->format, "", soundFile->formats);
+		AddCompo6(kPopupList, "Key Switch Type", &soundFile->keySwitchType, "", soundFile->keySwitchTypes);
 		//
 		AddCompoLabel("Loop");
 		AddCompoLabelSM("Set Start and End to 0 for One Shot");
