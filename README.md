@@ -4,11 +4,11 @@
 
 This Project is in ALPHA stage. The file format can be changed at any time rendering any save file unusable.
 
-NEW: preview is now partially working!
+NEW: preview is now partially working! Keep in mind that Wusik SPXe is the Editor, not the player. You can load .wspxe (project) files but not .wspx (export) files.
 
-Here you will find the definition of the format plus a full free open-source editor. There's no player yet, but soon there will be one. The player will not be open-source. You will need a license to be able to distribute your sounds with the player. Or, you can create your own player. The use of the file format is free and not tied to the player in any way. The editor doesn't feature sample manipulation. So you need to use something like Ocean Audio to edit and loop your sounds. https://www.ocenaudio.com/
+Here you will find the definition of the format plus a full free open-source editor. There's no player yet, but soon there will be one soon. But you can preview your .wspxe files inside the editor. The player will not be open-source. You will need a license to be able to distribute your sounds with the player. Or, you can create your own player. The use of the file format is free and not tied to the player in any way. The editor doesn't feature sample manipulation. So you need to use something like Ocean Audio to edit and loop your sounds. https://www.ocenaudio.com/
 
-Check the Releases folder for the Application (.exe) and VST2/VST3 Plugins. Again, this is an EDITOR, to create presets + sounds. Not the actual PLAYER. But I have included plugins in case you want to use it inside a DAW.
+Check the Releases folder for the Application (.exe) and VST2/VST3 Plugins. Again, this is an EDITOR, to create presets + sounds. Not the actual PLAYER. But I have included plugins in case you want to use it inside a DAW and the editor has a preview option that allows you to fully test the presets.
 
 -----------------------------------------------------------------------------------
 
