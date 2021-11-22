@@ -252,6 +252,12 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo4(kSliderInteger, "Oversample", &layer->overSample, "", 0, 16);
 		AddCompo(kButtonCallback, "Edit Scripting", &layer->scripting);
 		//
+		AddCompoLabel("SFX Sends");
+		AddCompo(kSlider, "Effect 1", &layer->effectSends[0]);
+		AddCompo(kSlider, "Effect 2", &layer->effectSends[1]);
+		AddCompo(kSlider, "Effect 3", &layer->effectSends[2]);
+		AddCompo(kSlider, "Effect 4", &layer->effectSends[3]);
+		//
 		AddCompoLabel("Zones");
 		AddCompo4(kSliderInteger, "Key Zone Low", &layer->keyZoneLow, "", 0, 127); AddMIDIKey(selectedLow);
 		AddCompo4(kSliderInteger, "Key Zone High", &layer->keyZoneHigh, "", 0, 127); AddMIDIKey(selectedHigh);

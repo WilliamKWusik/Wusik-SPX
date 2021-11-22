@@ -112,6 +112,9 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 	WS::stream(stream, pitchBendRange, type);
 	WS::stream(stream, scripting, type);
 	//
+	for (int fx = 0; fx < 4; fx++) { WS::stream(stream, effectSends[fx], type); }
+	//
+	effects.streamData(stream, type);
 	sequencer.streamData(stream, type);
 	filter.streamData(stream, type);
 	ampEnvelope.streamData(stream, type);

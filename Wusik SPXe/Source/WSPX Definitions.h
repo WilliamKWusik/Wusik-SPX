@@ -498,6 +498,7 @@ public:
 	int velZoneHigh = 127;
 	int overSample = 0;
 	float sampleStart = 0.0f;
+	float effectSends[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	String pitchBendRange = "12";
 	MemoryBlock scripting;
 };
