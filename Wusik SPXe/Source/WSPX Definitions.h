@@ -524,6 +524,10 @@ public:
 	float pitchDriftRate = 1.0f;
 	float pitchDriftRandomness = 0.9f;
 	String frequencyOfA = "440.0";
+	//
+	#if WSPXEDITOR
+		File previewSoundFile;
+	#endif
 };
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

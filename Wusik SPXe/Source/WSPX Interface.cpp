@@ -199,6 +199,7 @@ void WusikSpxAudioProcessorEditor::updateInterface()
 		AddCompo(kString, "Description", &preset->description);
 		AddCompo(kString, "Tags", &preset->tags);
 		AddCompo(kImage, "Preset Image Icon", &preset->imagePresetIcon);
+		AddCompo(kPreviewSound, "Preview Sound", &preset->previewSoundFile);
 		AddCompo(kSlider, "Volume", &preset->volume);
 		AddCompo4(kSliderBipolar, "Pan", &preset->pan, "", -1, 1);
 		AddCompo4(kSliderBipolar, "Fine Tune", &preset->fineTune, "", -1, 1);

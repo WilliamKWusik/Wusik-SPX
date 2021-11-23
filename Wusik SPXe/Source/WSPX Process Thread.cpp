@@ -8,7 +8,11 @@
 //
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include  "WSPX Player/WSX Player.h"
+//
+#if WSPXPLAYERPREVIEW
+	#include "WSPX Player/WSX Player.h"
+	#include "WSPX Player/WSX Player UI.h"
+#endif
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
 void WSPXThread::run()
@@ -116,6 +120,15 @@ void WSPXThread::run()
 				processor->playerPreset = new WSPX_Player_Preset(*processor->collection->lastSelectedPreset, _processor);
 				processor->playerPreset->prepareToPlay(processor->lastSamplerate, processor->lastSamplesPerBlock);
 				processor->playerPreset->isReady.set(1);
+				//
+				// Open The UI //
+				processor->playerUI = new WSXPlayerUIWindow();
+				WSXPlayerUI* playerUI = new WSXPlayerUI;
+				playerUI->setBounds(0, 0, playerUI->getWidth(), playerUI->getHeight());
+				processor->playerUI->setContentOwned(playerUI, true);
+				processor->playerUI->centreAroundComponent(processor->getActiveEditor(), playerUI->getWidth(), playerUI->getHeight());
+				processor->playerUI->setAlwaysOnTop(true);
+				processor->playerUI->setVisible(true);
 			}
 			//
 		#else

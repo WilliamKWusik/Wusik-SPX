@@ -45,12 +45,18 @@
         <FILE id="OKXkY2" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       </GROUP>
       <GROUP id="{ACC900F8-3795-4684-74E6-692C45C35E96}" name="Player">
+        <GROUP id="{8AFB8522-248B-2C92-C392-726C76AB7EEF}" name="Images">
+          <FILE id="bJuPah" name="Background.png" compile="0" resource="1" file="../Interface/Player/Background.png"/>
+        </GROUP>
         <FILE id="Th1f5V" name="WSX Player Note Mono.cpp" compile="1" resource="0"
               file="Source/WSPX Player/WSX Player Note Mono.cpp"/>
         <FILE id="jGyVmB" name="WSX Player Note Poly.cpp" compile="1" resource="0"
               file="Source/WSPX Player/WSX Player Note Poly.cpp"/>
         <FILE id="Skcgb8" name="WSX Player Process.cpp" compile="1" resource="0"
               file="Source/WSPX Player/WSX Player Process.cpp"/>
+        <FILE id="ejWF3B" name="WSX Player UI.cpp" compile="1" resource="0"
+              file="Source/WSPX Player/WSX Player UI.cpp"/>
+        <FILE id="gMMXzJ" name="WSX Player UI.h" compile="0" resource="0" file="Source/WSPX Player/WSX Player UI.h"/>
         <FILE id="hH8GBL" name="WSX Player Voice AVX.cpp" compile="1" resource="0"
               file="Source/WSPX Player/WSX Player Voice AVX.cpp"/>
         <FILE id="Ysg5aE" name="WSX Player Voice C++.cpp" compile="1" resource="0"

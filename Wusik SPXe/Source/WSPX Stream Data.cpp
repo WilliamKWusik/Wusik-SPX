@@ -35,8 +35,7 @@ void WSPX_Collection::streamData(void* stream, int type)
 	WS::stream(stream, totalsounds, type);
 	WS::stream(stream, totalPresets, type);
 	//
-	if (isWSPXEditor)
-	{
+	#if WSPXEDITOR
 		for (int ss = 0; ss < totalsounds; ss++)
 		{
 			if (type == WS::kRead) sounds.add(new WSPX_Collection_Sound);
@@ -48,7 +47,7 @@ void WSPX_Collection::streamData(void* stream, int type)
 			if (type == WS::kRead) presets.add(new WSPX_Collection_Preset);
 			presets[pp]->streamData(stream, type, sounds);
 		}
-	}
+	#endif
 	//
 	// For the WSPX Export, the last thing we write is the MD5 of the entire file BUT the final bytes where the MD5 gets stored //
 }
@@ -84,6 +83,19 @@ void WSPX_Collection_Preset::streamData(void* stream, int type, OwnedArray<WSPX_
 		if (type == WS::kRead) layers.add(new WSPX_Collection_Preset_Layer);
 		layers[ll]->streamData(stream, type, soundsList);
 	}
+	//
+	#if WSPXEDITOR
+		String filePreview = previewSoundFile.getFullPathName();
+		WS::stream(stream, filePreview, type);
+		if (type == WS::kRead) previewSoundFile = File(filePreview);
+		//
+		if (WSPXeBundle)
+		{
+			MemoryBlock _soundRAW;
+			if (type == WS::kWrite) previewSoundFile.loadFileAsData(_soundRAW);
+			WS::stream(stream, _soundRAW, type);
+		}
+	#endif
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -123,9 +135,9 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 	//
 	int totalsounds = soundLinks.size();
 	WS::stream(stream, totalsounds, type);
-	for (int ss = 0; ss < totalsounds; ss++)
-	{
-		if (isWSPXEditor)
+	//
+	#if WSPXEDITOR
+		for (int ss = 0; ss < totalsounds; ss++)
 		{
 			if (type == WS::kRead)
 			{
@@ -139,7 +151,7 @@ void WSPX_Collection_Preset_Layer::streamData(void* stream, int type, OwnedArray
 				WS::stream(stream, soundID, type);
 			}
 		}
-	}
+	#endif
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -196,8 +208,7 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 		channelsInfo[cc]->streamData(stream, type);
 	}
 	//
-	if (isWSPXEditor)
-	{
+	#if WSPXEDITOR
 		WS::stream(stream, exportBits, type);
 		WS::stream(stream, exportFormat, type);
 		//
@@ -218,11 +229,9 @@ void WSPX_Collection_Sound_File::streamData(void* stream, int type)
 				WS::stream(stream, _soundRAW, type);
 			}
 		}
-	}
-	else
-	{
+	#else
 		//
-	}
+	#endif
 }
 //
 // ------------------------------------------------------------------------------------------------------------------------- //

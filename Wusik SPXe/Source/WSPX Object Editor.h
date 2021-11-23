@@ -176,6 +176,43 @@ public:
 				}
 			}
 		}
+		else if (type == kPreviewSound)
+		{
+			bool loadSound = true;
+			File* theSound = (File*)object;
+			//
+			if (theSound->existsAsFile())
+			{
+				loadSound = false;
+				PopupMenu mm;
+				mm.addItem(1, "Open Sound");
+				mm.addItem(2, "Remove Sound");
+				mm.addItem(4, "Replace Sound");
+				//
+				int result = mm.show();
+				if (result > 0)
+				{
+					if (result == 2)
+					{
+						*theSound = File();
+						processor->collection->hasUnsavedChanges = true;
+					}
+					else if (result == 4) loadSound = true;
+					else if (result == 1) theSound->startAsProcess();
+				}
+			}
+			//
+			if (loadSound)
+			{
+				FileChooser browseFile("Load Sound Preview", theSound->getParentDirectory().getFullPathName(), "*.wav;*.mp3;*.flac;*.ogg");
+				//
+				if (browseFile.browseForFileToOpen())
+				{
+					*theSound = browseFile.getResult().getFullPathName();
+					processor->collection->hasUnsavedChanges = true;
+				}
+			}
+		}
 		//
 		if (callback != nullptr && callback->process(processor)) return; // we exit quickly as this is about to go down //
 		editor->repaint();
@@ -273,6 +310,14 @@ public:
 					else
 						g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
 				}
+				else if (type == kPreviewSound)
+				{
+					File* theSound = (File*)object;
+					if (theSound->existsAsFile())
+						g.drawFittedText(theSound->getFileNameWithoutExtension(), (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+					else
+						g.drawFittedText("No File Selected", (double(getWidth()) * 0.26) + 8, 0, getWidth() - 16 - (double(getWidth()) * 0.26), getHeight(), Justification::centredRight, 1);
+				}
 				else if (type >= kSlider && type <= kSliderIntegerBipolar)
 				{
 					slider->setBounds(getWidth() - (double(getWidth()) * 0.42), 12, double(getWidth()) * 0.40, getHeight() - 16);
@@ -299,6 +344,7 @@ public:
 		kString,
 		kStringInt64,
 		kImage,
+		kPreviewSound,
 		kSkinFolder,
 		kLabel,
 		kLabelSmall,

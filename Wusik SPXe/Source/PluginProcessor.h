@@ -7,9 +7,23 @@
 //
 #pragma once
 #include "WSPX Definitions.h"
+//
 #if WSPXPLAYERPREVIEW
 	#include "WSPX Player/WSX Player.h"
-	#pragma pack(32)
+	//
+	class WSXPlayerUIWindow : public DocumentWindow
+	{
+	public:
+		WSXPlayerUIWindow() : DocumentWindow("Wusik SPX Preview", Colours::black, DocumentWindow::closeButton)
+		{ 
+			setUsingNativeTitleBar(true);
+		}
+		//
+		void closeButtonPressed() override
+		{
+			setVisible(false);
+		}
+	};
 #endif
 //
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -88,7 +102,7 @@ public:
 		#endif	
 	}
 	//
-	String readGlobalSettings(String key, String defaultVal)
+	static String readGlobalSettings(String key, String defaultVal)
 	{
 		String sKey(XRGKEY + key);
 		if (WindowsRegistry::keyExists(sKey) &&
@@ -100,12 +114,12 @@ public:
 		return defaultVal;
 	}
 	//
-	void saveGlobalSettings(String key, String value)
+	static void saveGlobalSettings(String key, String value)
 	{
 		WindowsRegistry::setValue(XRGKEY + key, value);
 	}
 	//
-	void deleteGlobalSettings(String key)
+	static void deleteGlobalSettings(String key)
 	{
 		saveGlobalSettings(key, "");
 		if (WindowsRegistry::keyExists(XRGKEY + key)) WindowsRegistry::deleteKey(XRGKEY + key);
@@ -136,6 +150,7 @@ public:
 	//
 	#if WSPXPLAYERPREVIEW
 		alignas(32) ScopedPointer<WSPX_Player_Preset> playerPreset; // We align the data so variables can be aligned to SSE/AVX requirements //
+		ScopedPointer<WSXPlayerUIWindow> playerUI;
 	#endif
 	//
 private:

@@ -4,7 +4,7 @@
 
 This Project is in ALPHA stage. The file format can be changed at any time rendering any save file unusable.
 
-NEW: preview is now partially working! Keep in mind that Wusik SPXe is the Editor, not the player. You can load .wspxe (project) files but not .wspx (export) files.
+NEW: preview is now partially working! Keep in mind that Wusik SPXe is the Editor, not the player. You can load .wspxe (project) files but not .wspx (exported) files.
 
 Here you will find the definition of the format plus a full free open-source editor. There's no player yet, but soon there will be one soon. But you can preview your .wspxe files inside the editor. The player will not be open-source. You will need a license to be able to distribute your sounds with the player. Or, you can create your own player. The use of the file format is free and not tied to the player in any way. The editor doesn't feature sample manipulation. So you need to use something like Ocean Audio to edit and loop your sounds. https://www.ocenaudio.com/
 
@@ -23,6 +23,7 @@ Check the Releases folder for the Application (.exe) and VST2/VST3 Plugins. Agai
 - 16, 24 and 32 bits support;
 - Collection, Preset and About PNG files;
 - Skin data for the Player;
+- Preview Sound per preset (flac format streamed from the .wspx file);
 - Every filename is stored as relative to the .WSPXe project file.
 
 -----------------------------------------------------------------------------------
