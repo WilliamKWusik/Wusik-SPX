@@ -120,15 +120,7 @@ void WSPXThread::run()
 				processor->playerPreset = new WSPX_Player_Preset(*processor->collection->lastSelectedPreset, _processor);
 				processor->playerPreset->prepareToPlay(processor->lastSamplerate, processor->lastSamplesPerBlock);
 				processor->playerPreset->isReady.set(1);
-				//
-				// Open The UI //
-				processor->playerUI = new WSXPlayerUIWindow();
-				WSXPlayerUI* playerUI = new WSXPlayerUI;
-				playerUI->setBounds(0, 0, playerUI->getWidth(), playerUI->getHeight());
-				processor->playerUI->setContentOwned(playerUI, true);
-				processor->playerUI->centreAroundComponent(processor->getActiveEditor(), playerUI->getWidth(), playerUI->getHeight());
-				processor->playerUI->setAlwaysOnTop(true);
-				processor->playerUI->setVisible(true);
+				openPlayerUI();
 			}
 			//
 		#else
@@ -138,4 +130,22 @@ void WSPXThread::run()
 	//
 	sleep(50);
 	processor->resumeAudio();
+}
+//
+// ------------------------------------------------------------------------------------------------------------------------- //
+void WSPXThread::openPlayerUI()
+{
+	WusikSpxAudioProcessor* processor = (WusikSpxAudioProcessor*)_processor;
+	//
+	if (processor->openUIWhenLoadingPreset)
+	{
+		processor->playerUI = new WSXPlayerUIWindow();
+		WSXPlayerUI* playerUI = new WSXPlayerUI(processor->collection, processor->playerPreset);
+		playerUI->setBounds(0, 0, playerUI->getWidth(), playerUI->getHeight());
+		processor->playerUI->setContentOwned(playerUI, true);
+		processor->playerUI->centreAroundComponent(processor->getActiveEditor(), playerUI->getWidth(), playerUI->getHeight());
+		processor->playerUI->setAlwaysOnTop(true);
+		processor->playerUI->setVisible(true);
+		processor->openUIWhenLoadingPreset = false;
+	}
 }

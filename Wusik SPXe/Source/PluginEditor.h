@@ -106,6 +106,7 @@ public:
 	WTransparentButton* saveButton;
 	WTransparentButton* collectionButton;
 	WTransparentButton* previewButton;
+	WTransparentButton* uiButton;
 	//
 	enum
 	{

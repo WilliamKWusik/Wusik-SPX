@@ -34,6 +34,7 @@ public:
 		ThreadWithProgressWindow(title, true, false, 0, String(), editor), _processor(__processor), type(_type) { }
 	//
 	void run() override;
+	void openPlayerUI();
 	void* _processor;
 	int type;
 	//
@@ -147,6 +148,7 @@ public:
 	float lastSamplerate = 44100.0f;
 	int lastSamplesPerBlock = 128;
 	bool allNotesOff = false;
+	bool openUIWhenLoadingPreset = false;
 	//
 	#if WSPXPLAYERPREVIEW
 		alignas(32) ScopedPointer<WSPX_Player_Preset> playerPreset; // We align the data so variables can be aligned to SSE/AVX requirements //

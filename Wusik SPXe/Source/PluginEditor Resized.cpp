@@ -24,6 +24,7 @@ void WusikSpxAudioProcessorEditor::resized()
 	boundsSet(1185, 12, 84, 50, saveButton, multRatio);
 	boundsSet(682, 12, 452, 51, collectionButton, multRatio);
 	boundsSet(1507, 11, 96, 50, previewButton, multRatio);
+	boundsSet(1455, 11, 52, 50, uiButton, multRatio);
 	//
 	if (redoTreeViewsOnResize)
 	{

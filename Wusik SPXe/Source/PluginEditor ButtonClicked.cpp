@@ -150,8 +150,20 @@ void WusikSpxAudioProcessorEditor::buttonClicked(Button* buttonThatWasClicked)
 			}
 		}
 	}
-	else
+	else if (buttonThatWasClicked == previewButton)
 	{
 		processor.loadPreset();
+	}
+	else if (buttonThatWasClicked == uiButton)
+	{
+		if (processor.playerPreset != nullptr && processor.processThread != nullptr)
+		{
+			processor.processThread->openPlayerUI();
+		}
+		else
+		{
+			processor.openUIWhenLoadingPreset = true;
+			processor.loadPreset(true);
+		}
 	}
 }

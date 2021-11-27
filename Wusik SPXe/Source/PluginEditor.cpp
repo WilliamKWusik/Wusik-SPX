@@ -43,6 +43,7 @@ WusikSpxAudioProcessorEditor::WusikSpxAudioProcessorEditor (WusikSpxAudioProcess
 	addAndMakeVisible(saveButton = new WTransparentButton(this));
 	addAndMakeVisible(collectionButton = new WTransparentButton(this));
 	addAndMakeVisible(previewButton = new WTransparentButton(this));
+	addAndMakeVisible(uiButton = new WTransparentButton(this));
 	//
 	addChildComponent(statusLabel = new WSPXStatusLabel);
 	//
